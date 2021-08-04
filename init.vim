@@ -35,7 +35,7 @@ set lazyredraw
 set backspace=indent,eol,start
 set splitbelow
 set splitright
-set helpheight=40
+set helpheight=999
 " Problems that can occur in vim session can be avoid using this configuration
 set sessionoptions-=options
 set encoding=utf-8
@@ -147,7 +147,7 @@ nnoremap Y yg_
 nnoremap <c-z> <nop>
 " Join lines in a better way - From a video of ThePrimeagen
 nnoremap J mzJ`z
-" Undo better - inserting breaking points - thanks to ThePrimeagen
+" Undo better - inserting breaking points, thanks to ThePrimeagen
 inoremap , ,<c-g>u
 inoremap . .<c-g>u
 inoremap ( (<c-g>u
@@ -177,12 +177,6 @@ inoremap '' ''<left>
 inoremap (( ()<left>
 inoremap {{ {}<left>
 inoremap [[ []<left>
-
-" " Half PageUp/PageDown
-" nnoremap K <c-u>
-" vnoremap K <c-u>
-" nnoremap J <c-d>
-" vnoremap J <c-d>
 
 " Move to first/last character in screen line
 nnoremap H g^
@@ -395,7 +389,7 @@ autocmd goosebumps FileType java setlocal commentstring=//\ %s
 autocmd goosebumps FileType vim setlocal commentstring=\"\ %s
 
 " Compilar Suckless config - utilizar escape sequence para pipeline nos comandos passados pelo VIM
-autocmd goosebumps BufWritePost config.h :!sudo make clean install
+" autocmd goosebumps BufWritePost config.h :!sudo make clean install
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
@@ -405,7 +399,7 @@ autocmd goosebumps InsertLeave * setlocal nocursorline
 autocmd goosebumps FileType html,css EmmetInstall
 
 " Setlocal :compiler to use with :make and quickfix commands
-autocmd goosebumps FileType python compiler python
+autocmd goosebumps FileType python compiler python3
 autocmd goosebumps FileType java compiler java
 autocmd goosebumps FileType css compiler csslint
 " autocmd goosebumps FileType javascript compiler
@@ -419,11 +413,11 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 autocmd goosebumps FileType man nnoremap <buffer> K <c-u>
 
 " Highlight yanked text - NeoVim 0.5.0 nightly
-autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank {higroup="IncSearch", timeout=300}
+autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
 
 " --- Lua Configurations ---
 " LSP configuration
 lua require('lspconfig').pyright.setup{}
 
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
-lua require('nvim-treesitter.configs').setup {highlight = {enable = true, additional_vim_regex_highlighting = true}}
+lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
