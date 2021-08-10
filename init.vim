@@ -178,7 +178,7 @@ inoremap (( ()<left>
 inoremap {{ {}<left>
 inoremap [[ []<left>
 
-" Move to first/last character in screen line
+" Move to first/last character in screen line - Evita casos em que existem espaços no final da linha
 nnoremap H g^
 vnoremap H g^
 nnoremap L g$
@@ -192,7 +192,7 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 
 " $MYVIMRC
 nnoremap <silent> <leader>r :edit $MYVIMRC<cr>
-nnoremap <silent> <leader>so :source $MYVIMRC<cr>
+nnoremap <silent> <leader>so :call <SID>update_vimrc()<cr>
 
 " :mksession
 nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
@@ -238,16 +238,19 @@ command! HexEditor %!xxd
 
 " --- Functions ---
 
+" Hack way to update Vimrc
+function! s:update_vimrc() abort
+	return ':source $MYVIMRC'
+endfunction
+
 " Hack way to get :redraws after CapsLockToggle
 function! s:capslock_redraw() abort
 	let cmd = "\<plug>CapsLockToggle\<c-r>="
 	let exec_redraw = "execute('redraws')"
 	if CapsLockStatusline() is ''
-		let cmd .= toupper(exec_redraw)
-	else
-		let cmd .= exec_redraw
+		let exec_redraw = toupper(exec_redraw)
 	endif
-	return cmd . "\<cr>"
+	return cmd . exec_redraw . "\<cr>"
 endfunction
 
 function! s:quit_list() abort
