@@ -2,6 +2,7 @@
 " Maintainer:   Tim Pope <https://tpo.pe/>
 " Version:      1.1
 " GetLatestVimScripts: 1725 1 :AutoInstall: capslock.vim
+" TODO: Como executar exitcallback ao sair do CommandMode?
 
 if exists("g:loaded_capslock") || v:version < 700 || &cp
   finish
@@ -77,6 +78,7 @@ augroup capslock
   autocmd!
   autocmd User Flags call Hoist('window', 'CapsLockStatusline')
 
+  " Não funciona para versões mais antigas do Vim
   autocmd CmdlineLeave : call s:exitcallback('c')
 
   autocmd InsertLeave * call s:exitcallback('i')
