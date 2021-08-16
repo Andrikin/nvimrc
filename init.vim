@@ -1,7 +1,7 @@
 " $MYVIMRC --- NeoVim ---
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: ripgrep, traces.vim, [surround, comment, capslock, eunuch] tpope, emmet-vim, vim-cool, vim-hexokinase, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground]
+" Dependences: ripgrep, traces.vim, [surround, comment, capslock, eunuch] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer
 " TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!
 
 " plugin -> verify $RUNTIMEPATH/ftplugin for files
@@ -106,7 +106,7 @@ let g:lightline = {
 			\ }
 
 " --- Hexokinase ---
-let g:Hexokinase_highlighters = ['backgroundfull']
+" let g:Hexokinase_highlighters = ['backgroundfull']
 
 " --- Emmet ---
 let g:user_emmet_install_global = 0
@@ -192,7 +192,7 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 
 " $MYVIMRC
 nnoremap <silent> <leader>r :edit $MYVIMRC<cr>
-nnoremap <silent> <leader>so :call <SID>update_vimrc()<cr>
+nnoremap <silent> <leader>so :call <SID>update_vimrc()
 
 " :mksession
 nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
@@ -240,7 +240,7 @@ command! HexEditor %!xxd
 
 " Hack way to update Vimrc
 function! s:update_vimrc() abort
-	return ':source $MYVIMRC'
+	return ':source $MYVIMRC\<cr>'
 endfunction
 
 " Hack way to get :redraws after CapsLockToggle
@@ -421,6 +421,9 @@ autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="Inc
 " --- Lua Configurations ---
 " LSP configuration
 lua require('lspconfig').pyright.setup{}
+
+" Colorizer
+lua require 'colorizer'.setup(nil, { css = true; })
 
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
 lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
