@@ -134,6 +134,7 @@ let g:python3_host_prog = '/usr/local/bin/python3'
 " so that you can undo CTRL-U after inserting a line break.
 " Revert with ":iunmap <C-U>". -> from defaults.vim
 inoremap <c-u> <c-g>u<c-u>
+inoremap <c-w> <c-g>u<c-w>
 nnoremap <backspace> X
 nnoremap <c-h> X
 nnoremap ' `
@@ -192,7 +193,7 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 
 " $MYVIMRC
 nnoremap <silent> <leader>r :edit $MYVIMRC<cr>
-nnoremap <silent> <leader>so :call <SID>update_vimrc()
+nnoremap <silent> <expr> <leader>so <SID>update_vimrc()
 
 " :mksession
 nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
@@ -240,7 +241,7 @@ command! HexEditor %!xxd
 
 " Hack way to update Vimrc
 function! s:update_vimrc() abort
-	return ':source $MYVIMRC\<cr>'
+	return ":source $MYVIMRC\<cr>"
 endfunction
 
 " Hack way to get :redraws after CapsLockToggle
