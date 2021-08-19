@@ -428,3 +428,23 @@ lua require 'colorizer'.setup(nil, { css = true; })
 
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
 lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
+
+" Telescope config
+lua require('telescope').setup{ defaults = { layout_config = { preview_width = 0, } } }
+" ESC to exit Telescope
+lua << EOF
+local actions = require('telescope.actions')
+require('telescope').setup{
+	defaults = {
+		mappings = {
+			i = {
+				["<NL>"] = actions.select_default + actions.center,
+				["<esc>"] = actions.close
+			},
+			n = {
+				["<NL>"] = actions.select_default + actions.center,
+			},
+		},
+	}
+}
+EOF
