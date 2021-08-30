@@ -113,7 +113,7 @@ let g:user_emmet_install_global = 0
 let g:user_emmet_leader_key = '<m-space>'
 
 " --- Traces ---
-" let g:traces_num_range_preview = 1
+let g:traces_num_range_preview = 1
 
 " --- UndoTree ---
 let g:undotree_WindowLayout = 2
@@ -302,7 +302,7 @@ endfunction
 function! s:toggle_terminal() abort
 	let stats = s:t_stats()
 	if stats[0]
-		return join([':'] + [stats[1]] + [" windo normal ZQ\<cr>"], '')
+		return join([':', stats[1], " windo normal ZQ\<cr>"], '')
 	endif
 	return ":10split +terminal\<cr>"
 endfunction
@@ -334,7 +334,7 @@ function! s:set_qf_win_height() abort
 endfunction
 
 function! s:g_bar_search(...) abort
-	return system(join([&grepprg] + [shellescape(expand(join(a:000, ' ')))] + [shellescape(expand("%"))], ' '))
+	return system(join([&grepprg, shellescape(expand(join(a:000, ' '))), shellescape(expand("%"))], ' '))
 endfunction
 
 " Run C, Java code
@@ -342,9 +342,9 @@ endfunction
 function! s:run_code() abort
 	let file = shellescape(expand("%:e"))
 	if file ==? "java"
-		execute join('!java ' . shellescape(expand("%:t:r")))
+		execute join(['!java ', shellescape(expand("%:t:r"))])
 	elseif file ==? "c"
-		execute join('!tcc -run ' . shellescape(expand("%:t")))
+		execute join(['!tcc -run ', shellescape(expand("%:t"))])
 	endif
 endfunction
 
@@ -415,6 +415,9 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 
 " Remove map 'K' from :Man plugin
 autocmd goosebumps FileType man nnoremap <buffer> K <c-u>
+
+" Fast quit in vim help files
+autocmd goosebumps FileType help nnoremap <buffer> q ZQ
 
 " Highlight yanked text - NeoVim 0.5.0 nightly
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
