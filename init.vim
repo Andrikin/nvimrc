@@ -35,7 +35,7 @@ set lazyredraw
 set backspace=indent,eol,start
 set splitbelow
 set splitright
-set helpheight=999
+set helpheight=15
 " Problems that can occur in vim session can be avoid using this configuration
 set sessionoptions-=options
 set encoding=utf-8
@@ -88,6 +88,7 @@ let g:lightline = {
 			\	'left': [
 			\		['mode', 'paste'],
 			\		['readonly', 'filename'],
+			\		['gutentags'],
 			\		],
 			\	},
 			\ 'component': {
@@ -98,6 +99,7 @@ let g:lightline = {
 			\	'mode': 'LightlineMode',
 			\	'readonly': 'LightlineReadonly',
 			\	'filename': 'LightlineFilename',
+			\	'gutentags': 'LightlineGutentag',
 			\	},
 			\ 'tab': {
 			\	'active': ['filename', 'modified'],
@@ -127,6 +129,15 @@ let g:loaded_netrwPlugin = 1
 
 " Set python3
 let g:python3_host_prog = '/usr/local/bin/python3'
+
+" --- Gutentags ---
+let g:gutentags_add_default_project_roots = 0
+let g:gutentags_project_root = ['package.json', '.git']
+let g:gutentags_cache_dir = expand('~/.cache/nvim/ctags/')
+let g:gutentags_generate_on_new = 1
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+let g:gutentags_generate_on_empty_buffer = 0
 
 " --- Key maps ---
 
@@ -192,8 +203,8 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 " Be aware that '\' is used as mapleader character, so conflits can occur in Insert Mode maps
 
 " $MYVIMRC
-nnoremap <silent> <leader>r :edit $MYVIMRC<cr>
-nnoremap <silent> <expr> <leader>so <SID>update_vimrc()
+nnoremap <silent> <leader>r :tabe $MYVIMRC<cr>
+" nnoremap <silent> <expr> <leader>so <SID>update_vimrc()
 
 " :mksession
 nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
@@ -219,6 +230,7 @@ nnoremap <silent> <expr> <leader>t <SID>toggle_terminal()
 
 " --- Telescope ---
 nnoremap <silent> <leader>b :Telescope buffers<cr>
+nnoremap <silent> <leader>- :Telescope find_files<cr>
 
 " --- Command's ---
 
@@ -241,7 +253,7 @@ command! HexEditor %!xxd
 
 " Hack way to update Vimrc
 function! s:update_vimrc() abort
-	return ":source $MYVIMRC\<cr>"
+	return ":source $MYVIMRC | call lightline#update()\<cr>"
 endfunction
 
 " Hack way to get :redraws after CapsLockToggle
@@ -256,9 +268,12 @@ endfunction
 
 function! s:quit_list() abort
 	let qf = s:qf_stats()
+	let tf = s:t_stats()
 	let cmd = ''
 	if qf[0]
 		let cmd = qf[1] ? ":lclose\<cr>" : ":cclose\<cr>"
+	elseif tf[0]
+		let cmd = join([':', tf[1], " windo normal ZQ\<cr>"], '')
 	endif
 	return cmd
 endfunction
@@ -363,6 +378,10 @@ function! LightlineFilename() abort
 	return filename . modified 
 endfunction
 
+function! LightlineGutentag() abort
+	return gutentags#statusline('[', ']')
+endfunction
+
 " --- Autocommands ---
 " for map's use <buffer>, for set's use setlocal
 
@@ -391,9 +410,6 @@ autocmd goosebumps FileType sh,bash setlocal commentstring=#\ %s
 autocmd goosebumps FileType c setlocal commentstring=/*\ %s\ */
 autocmd goosebumps FileType java setlocal commentstring=//\ %s
 autocmd goosebumps FileType vim setlocal commentstring=\"\ %s
-
-" Compilar Suckless config - utilizar escape sequence para pipeline nos comandos passados pelo VIM
-" autocmd goosebumps BufWritePost config.h :!sudo make clean install
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
@@ -432,17 +448,42 @@ lua require 'colorizer'.setup(nil, { css = true; })
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
 lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
 
-" Telescope config
-lua require('telescope').setup{ defaults = { layout_config = { preview_width = 0, } } }
-" ESC to exit Telescope
+" Telescope configuration
 lua << EOF
 local actions = require('telescope.actions')
 require('telescope').setup{
+	pickers = {
+		buffers = {
+			previewer = false,
+			mappings = {
+				i = {
+					["<c-d>"] = actions.delete_buffer,
+				},
+				n = {
+					["<c-d>"] = actions.delete_buffer,
+				},
+			},
+		},
+		find_files = {
+			previewer = false,
+		},
+		file_browser = {
+			previewer = false,
+		},
+	},
 	defaults = {
+		layout_config = { 
+			width = 0.5, 
+			height = 0.70,
+		},
+		path_display = { 
+			shorten = 2,
+		},
 		mappings = {
 			i = {
 				["<NL>"] = actions.select_default + actions.center,
-				["<esc>"] = actions.close
+				["<esc>"] = actions.close,
+				["<c-u>"] = {"<c-u>", type = "command"},
 			},
 			n = {
 				["<NL>"] = actions.select_default + actions.center,
