@@ -33,7 +33,7 @@ function! s:startthething(...) abort
 	else
 		return ''
 	endif
-	" When calling 'g@', return cmd (to populate command line) don't work. Has to use feedkeys()
+	" When calling 'g@', 'return cmd' (to populate command line) don't work. Have to use feedkeys()
 	call feedkeys(cmd)
 endfunction
 

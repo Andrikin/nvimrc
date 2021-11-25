@@ -1,14 +1,15 @@
 " $MYVIMRC --- NeoVim ---
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: ripgrep, traces.vim, [surround, comment, capslock, eunuch] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer
-" TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!
+" Dependences: ripgrep, traces.vim, [surround, comment, capslock, eunuch, fugitive] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer, nvim-lspconfig
+" TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!, learn lua!
 
 " plugin -> verify $RUNTIMEPATH/ftplugin for files
 " indent -> verify $RUNTIMEPATH/indent for files
 filetype indent plugin on
 syntax enable
-colorscheme molokai
+" colorscheme molokai
+colorscheme dracula
 
 " Search recursively
 set path+=**
@@ -54,7 +55,7 @@ set noswapfile
 " set linebreak
 " set wrapmargin=5
 let &g:textwidth=0
-let mapleader = '\'
+let mapleader = ' '
 
 " Statusline
 set laststatus=2 
@@ -77,10 +78,11 @@ else
 endif
 
 " --- lightline ---
+" Only possible with SauceCodePro Nerd Font
 let g:lightline = {
-			\ 'colorscheme': 'molokai',
-			\ 'separator': { 'left': '', 'right': '' },
-			\ 'subseparator': { 'left': '', 'right': '' },
+			\ 'colorscheme': 'darcula',
+			\ 'separator': { 'left': '', 'right': '' },
+			\ 'subseparator': { 'left': '', 'right': '' },
 			\ 'tabline': {
 			\	'left': [['tabs']],
 			\ },
@@ -88,7 +90,7 @@ let g:lightline = {
 			\	'left': [
 			\		['mode', 'paste'],
 			\		['readonly', 'filename'],
-			\		['gutentags'],
+			\		['gitbranch'],
 			\		],
 			\	},
 			\ 'component': {
@@ -99,7 +101,7 @@ let g:lightline = {
 			\	'mode': 'LightlineMode',
 			\	'readonly': 'LightlineReadonly',
 			\	'filename': 'LightlineFilename',
-			\	'gutentags': 'LightlineGutentag',
+			\	'gitbranch': 'LightlineStatusline',
 			\	},
 			\ 'tab': {
 			\	'active': ['filename', 'modified'],
@@ -127,17 +129,18 @@ let g:undotree_DiffpanelHeight = 5
 " Disable Netrw
 let g:loaded_netrwPlugin = 1
 
-" Set python3
+" Set python
+let g:python_host_prog = '/usr/bin/python2'
 let g:python3_host_prog = '/usr/local/bin/python3'
 
-" --- Gutentags ---
-let g:gutentags_add_default_project_roots = 0
-let g:gutentags_project_root = ['package.json', '.git']
-let g:gutentags_cache_dir = expand('~/.cache/nvim/ctags/')
-let g:gutentags_generate_on_new = 1
-let g:gutentags_generate_on_missing = 1
-let g:gutentags_generate_on_write = 1
-let g:gutentags_generate_on_empty_buffer = 0
+" " --- Gutentags ---
+" let g:gutentags_add_default_project_roots = 0
+" let g:gutentags_project_root = ['package.json', '.git']
+" let g:gutentags_cache_dir = expand('~/.cache/nvim/ctags/')
+" let g:gutentags_generate_on_new = 1
+" let g:gutentags_generate_on_missing = 1
+" let g:gutentags_generate_on_write = 1
+" let g:gutentags_generate_on_empty_buffer = 0
 
 " --- Key maps ---
 
@@ -150,8 +153,8 @@ nnoremap <backspace> X
 nnoremap <c-h> X
 nnoremap ' `
 " Fix & command. Redo :substitute command
-nnoremap & :&&<cr>
-xnoremap & :&&<cr>
+nnoremap & <cmd>&&<cr>
+xnoremap & <cmd>&&<cr>
 " Yank to end of sreen line
 " g$ cursor after last character, g_ cursor at last character
 nnoremap Y yg_
@@ -178,17 +181,10 @@ nnoremap <expr> j (v:count > 1 ? 'm`' . v:count : '') . 'j'
 " Moving lines up and down - The Primeagen knowledge word
 " inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria inviável trocar para essa funcionalidade
 " inoremap <c-k> <c-o>:m.-2<cr>
-nnoremap <leader>k :m.-2<cr>
-nnoremap <leader>j :m.+1<cr>
+nnoremap <leader>k <cmd>m.-2<cr>
+nnoremap <leader>j <cmd>m.+1<cr>
 vnoremap K :m'<-2<cr>gv
 vnoremap J :m'>+1<cr>gv
-
-" Move cursor inside pair
-inoremap "" ""<left>
-inoremap '' ''<left>
-inoremap (( ()<left>
-inoremap {{ {}<left>
-inoremap [[ []<left>
 
 " Move to first/last character in screen line - Evita casos em que existem espaços no final da linha
 nnoremap H g^
@@ -202,12 +198,11 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 " --- Mapleader Commands ---
 " Be aware that '\' is used as mapleader character, so conflits can occur in Insert Mode maps
 
-" $MYVIMRC
-nnoremap <silent> <leader>r :tabe $MYVIMRC<cr>
-" nnoremap <silent> <expr> <leader>so <SID>update_vimrc()
+" open $MYVIMRC
+nnoremap <silent> <leader>r <cmd>tabe $MYVIMRC<cr>
 
 " :mksession
-nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
+" nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
 
 " Copy and paste from clipboard (* -> selection register/+ -> primary register)
 nnoremap <leader>p "+P
@@ -216,26 +211,40 @@ nnoremap <leader>y "+y
 
 " --- Quickfix window ---
 " NeoVim excells about terminal jobs
-nnoremap <silent> <leader>m :make %:S<cr>
+nnoremap <silent> <leader>m <cmd>make %:S<cr>
 " Toggle quickfix window
 nnoremap <silent> <expr> <leader>c <SID>toggle_list('c')
 nnoremap <silent> <expr> <leader>l <SID>toggle_list('l')
 nnoremap <silent> <expr> <leader>q <SID>quit_list()
 
 " Undotree plugin
-nnoremap <silent> <leader>u :UndotreeToggle<cr>
+nnoremap <silent> <leader>u <cmd>UndotreeToggle<cr>
 
 " Terminal
 nnoremap <silent> <expr> <leader>t <SID>toggle_terminal()
 
+" Fugitive maps
+nnoremap <leader>g <cmd>Git<cr>
+
 " --- Telescope ---
-nnoremap <silent> <leader>b :Telescope buffers<cr>
-nnoremap <silent> <leader>- :Telescope find_files<cr>
+nnoremap <silent> <leader>b <cmd>Telescope buffers<cr>
+nnoremap <silent> <leader>o <cmd>Telescope find_files<cr>
+
+" --- Builtin LSP commands ---
+" Only available in git projects (git init)
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<cr>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<cr>
+nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<cr>
+nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<cr>
+nnoremap <silent> <ctrl-k> <cmd>lua vim.lsp.buf.signature_help()<cr>
+" Lida com erros LSP
+nnoremap <silent> ]d <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
+nnoremap <silent> [d <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
+nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
+" Renomeia variável pelo projeto inteiro
+nnoremap <leader>s <cmd>lua vim.lsp.buf.rename()<cr>
 
 " --- Command's ---
-
-" Like ':g/', but with results in local quickfix window
-command! -nargs=1 -bar Bar lgetexpr <SID>g_bar_search(<f-args>)
 
 " Dirvish modes
 command! -nargs=? -complete=dir Sirvish belowright split | silent Dirvish <args>
@@ -250,13 +259,8 @@ command! HexEditor %!xxd
 " --- Plug's ---
 
 " --- Functions ---
-
-" Hack way to update Vimrc
-function! s:update_vimrc() abort
-	return ":source $MYVIMRC | call lightline#update()\<cr>"
-endfunction
-
-" Hack way to get :redraws after CapsLockToggle
+"
+" HACK: Way to get :redraws after CapsLockToggle
 function! s:capslock_redraw() abort
 	let cmd = "\<plug>CapsLockToggle\<c-r>="
 	let exec_redraw = "execute('redraws')"
@@ -378,9 +382,18 @@ function! LightlineFilename() abort
 	return filename . modified 
 endfunction
 
-function! LightlineGutentag() abort
-	return gutentags#statusline('[', ']')
+function! LightlineStatusline() abort
+	let branch = FugitiveHead()
+	if branch != ''
+		return ' [' . FugitiveHead() . ']'
+	else
+		return ''
+	endif
 endfunction
+
+" function! LightlineGutentag() abort
+" 	return gutentags#statusline('[', ']')
+" endfunction
 
 " --- Autocommands ---
 " for map's use <buffer>, for set's use setlocal
@@ -390,15 +403,14 @@ augroup goosebumps
 augroup END
 
 " Atalhos para arquivos específicos
-autocmd goosebumps FileType python inoremap <buffer> ; :
-autocmd goosebumps FileType java,c nnoremap <buffer> <m-k> :call <SID>run_code()<cr>
-autocmd goosebumps FileType html,vim inoremap <buffer> << <><left>
+" autocmd goosebumps FileType java,c nnoremap <buffer> <m-k> <SID>run_code()<cr>
 
 " Quickfix maps
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> l <SID>move_in_list('l')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> h <SID>move_in_list('h')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> j <SID>move_in_list('j')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> k <SID>move_in_list('k')
+autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> q <SID>quit_list()
 
 autocmd goosebumps FileType * setlocal textwidth=0
 
@@ -414,6 +426,11 @@ autocmd goosebumps FileType vim setlocal commentstring=\"\ %s
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
+" TEST: Highligh the 80th column only on INSERT MODE
+" autocmd goosebumps InsertEnter * setlocal colorcolumn=80 
+" autocmd goosebumps InsertEnter * hi ColorColumn ctermbg=NONE guibg=NONE
+" autocmd goosebumps InsertLeave * setlocal colorcolumn& 
+" autocmd goosebumps InsertLeave * hi ColorColumn ctermbg=1 guibg=#232526
 
 " Enable Emmet plugin just for html, css files
 autocmd goosebumps FileType html,css EmmetInstall
@@ -422,7 +439,6 @@ autocmd goosebumps FileType html,css EmmetInstall
 autocmd goosebumps FileType python compiler python3
 autocmd goosebumps FileType java compiler java
 autocmd goosebumps FileType css compiler csslint
-" autocmd goosebumps FileType javascript compiler
 
 " Open quickfix window automaticaly
 autocmd goosebumps QuickFixCmdPost [^l]* ++nested cwindow
@@ -439,11 +455,56 @@ autocmd goosebumps FileType help nnoremap <buffer> q ZQ
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
 
 " --- Lua Configurations ---
-" LSP configuration
+" Python Lsp
 lua require('lspconfig').pyright.setup{}
 
+" VimScript Lsp
+lua require('lspconfig').vimls.setup{}
+
+" Javascript/Typescript Lsp
+lua require('lspconfig').denols.setup{}
+
+" Rust Lsp
+lua require('lspconfig').rust_analyzer.setup{}
+
+" Lua Lsp
+lua << EOF
+local sumneko_root_path = '/home/andre/documents/LSP Servers/sumneko/lua-language-server'
+local sumneko_binary = sumneko_root_path.."/bin/Linux/lua-language-server"
+
+local runtime_path = vim.split(package.path, ';')
+table.insert(runtime_path, "lua/?.lua")
+table.insert(runtime_path, "lua/?/init.lua")
+
+require('lspconfig').sumneko_lua.setup{
+	cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
+	settings = {
+		Lua = {
+			runtime = {
+				-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+				version = 'LuaJIT',
+				-- Setup your lua path
+				path = runtime_path,
+				},
+			diagnostics = {
+				-- Get the language server to recognize the `vim` global
+				globals = {'vim'},
+				},
+			workspace = {
+				-- Make the server aware of Neovim runtime files
+				library = vim.api.nvim_get_runtime_file("", true),
+				},
+			-- Do not send telemetry data containing a randomized but unique identifier
+			telemetry = {
+			enable = false,
+			},
+		},
+	},
+}
+EOF
+
 " Colorizer
-lua require 'colorizer'.setup(nil, { css = true; })
+lua require('colorizer').setup(nil, { css = true; })
 
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
 lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
@@ -452,6 +513,25 @@ lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additio
 lua << EOF
 local actions = require('telescope.actions')
 require('telescope').setup{
+	-- Playground configuration, extracted from github https://github.com/nvim-treesitter/playground
+	playground = {
+		enable = true,
+		disable = {},
+		updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+		persist_queries = false, -- Whether the query persists across vim sessions
+		keybindings = {
+			toggle_query_editor = 'o',
+			toggle_hl_groups = 'i',
+			toggle_injected_languages = 't',
+			toggle_anonymous_nodes = 'a',
+			toggle_language_display = 'I',
+			focus_language = 'f',
+			unfocus_language = 'F',
+			update = 'R',
+			goto_node = '<cr>',
+			show_help = '?',
+		},
+	},
 	pickers = {
 		buffers = {
 			previewer = false,
@@ -477,7 +557,7 @@ require('telescope').setup{
 			height = 0.70,
 		},
 		path_display = { 
-			shorten = 2,
+			tail = true,
 		},
 		mappings = {
 			i = {
