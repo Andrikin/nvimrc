@@ -56,7 +56,7 @@ function! s:cmd_pairing_char(c) abort
 		return a:c
 	endif
 	let pair = ''
-	if getcmdline() =~ '^g\/\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}s\/\|^.s\/\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}g\/'
+	if getcmdline() =~ '^g\/\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}s[\/:]\|^.s[\/:]\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}g\/'
 		let pair = a:c
 	else
 		let pair =  s:get_closing_char(a:c)
