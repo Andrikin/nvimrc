@@ -1,2 +1,6 @@
 *.bak
 undodir/
+# Excluir todos os arquivos, menos a pasta "andrikin".
+# A ideia é excluir todas as pastas e depois "negar" a exclusão da pasta alvo
+pack/
+!pack/andrikin
