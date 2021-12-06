@@ -1,7 +1,6 @@
-" automatic pairing for ({['""']})
+" Automatic pairing for ({['""']})
 " Autor: André Alexandre Aguiar
 " Version: 0.1
-" Dependences: traces.vim
 
 if exists("g:loaded_awesome_pairing")
   finish
