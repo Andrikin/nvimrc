@@ -155,9 +155,9 @@ nnoremap ' `
 " Fix & command. Redo :substitute command
 nnoremap & <cmd>&&<cr>
 xnoremap & <cmd>&&<cr>
-" Yank to end of sreen line
+" Yank to end of sreen line. Make default in Neovim 0.6.0
 " g$ cursor after last character, g_ cursor at last character
-nnoremap Y yg_
+" nnoremap Y yg_
 " Disable <c-z> (:stop)
 nnoremap <c-z> <nop>
 " Join lines in a better way - From a video of ThePrimeagen
