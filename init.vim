@@ -238,9 +238,9 @@ nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<cr>
 nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<cr>
 nnoremap <silent> <ctrl-k> <cmd>lua vim.lsp.buf.signature_help()<cr>
 " Lida com erros LSP
-nnoremap <silent> ]d <cmd>lua vim.lsp.diagnostic.goto_next()<cr>
-nnoremap <silent> [d <cmd>lua vim.lsp.diagnostic.goto_prev()<cr>
-nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<cr>
+nnoremap <silent> ]d <cmd>lua vim.diagnostic.goto_next()<cr>
+nnoremap <silent> [d <cmd>lua vim.diagnostic.goto_prev()<cr>
+nnoremap <leader>e <cmd>lua vim.diagnostic.open_float()<cr>
 " Renomeia variável pelo projeto inteiro
 nnoremap <leader>s <cmd>lua vim.lsp.buf.rename()<cr>
 
