@@ -75,7 +75,7 @@ function! s:ins_pairing_char(c) abort
 			" HACK: Não incluir c duplicado nos códigos Python, tanto em comentários
 			" como para doc string's
 			" TODO: Identificar situação em que o comentário é uma multistring
-			if &filetype == 'python' && bchar !~ 'f\|b\|r' && (line =~ "'" . '\{3}.*' . "'" . '\{,3}' || line =~ '"\{3}.*"\{,3}')
+			if &filetype == 'python' && (bchar !~ 'f\|b\|r' && (line =~ "'" . '\{3}.*' . "'" . '\{,3}' || line =~ '"\{3}.*"\{,3}'))
 				let pair = a:c
 			endif
 		endif

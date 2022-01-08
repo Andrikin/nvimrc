@@ -455,6 +455,22 @@ autocmd goosebumps FileType help nnoremap <buffer> q ZQ
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
 
 " --- Lua Configurations ---
+
+"  Lsp Configurarion
+lua << EOF
+vim.diagnostic.config({
+		virtual_text = {
+			format = function(diagnostic)
+				if diagnostic.severity == vim.diagnostic.severity.ERROR then
+					return 'Error'
+				end
+				return diagnostic.message
+			end
+		}
+	}
+)
+EOF
+
 " Python Lsp
 lua require('lspconfig').pyright.setup{}
 
