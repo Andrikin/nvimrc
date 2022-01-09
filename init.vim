@@ -449,7 +449,7 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 autocmd goosebumps FileType man nnoremap <buffer> K <c-u>
 
 " Fast quit in vim help files
-autocmd goosebumps FileType help nnoremap <buffer> q ZQ
+autocmd goosebumps FileType help nnoremap <buffer> q :helpclose<cr>
 
 " Highlight yanked text - NeoVim 0.5.0 nightly
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
