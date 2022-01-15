@@ -117,7 +117,7 @@ let g:user_emmet_install_global = 0
 let g:user_emmet_leader_key = '<m-space>'
 
 " --- Traces ---
-let g:traces_num_range_preview = 1
+let g:traces_num_range_preview = 0
 
 " --- UndoTree ---
 let g:undotree_WindowLayout = 2
