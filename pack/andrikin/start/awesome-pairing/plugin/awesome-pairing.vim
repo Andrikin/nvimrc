@@ -63,6 +63,7 @@ function! s:cmd_pairing_char(c) abort
 	return pair
 endfunction
 
+" TODO: Compreender as situações em que não se deve inserir o caracter complementado
 function! s:ins_pairing_char(c) abort
 	" Verify if we are in a comment line
 	let pair = ''

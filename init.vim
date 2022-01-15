@@ -68,7 +68,7 @@ set termguicolors
 " NeoVim
 set guicursor=
 set inccommand=
-let &g:fillchars='vert: '
+let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
 " Using ripgrep ([cf]open; [cf]do {cmd} | update)
 if executable('rg')
