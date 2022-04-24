@@ -5,6 +5,7 @@
 if exists("g:loaded_awesome_pairing")
   finish
 endif
+
 let g:loaded_awesome_pairing = 1
 
 let s:save_cpo = &cpo
@@ -30,15 +31,21 @@ function! s:is_comment_line(line) abort
 	if &l:commentstring == ''
 		return 0
 	endif
-	let comment = substitute(substitute(substitute(&l:commentstring, '/', '\/', 'g'), '\*', '\\*', 'g'), '%s', '.*', '')
-	let commented_line = join(['^\(\|\s\{1,}\)', comment, '$', '\|', '^\(\|\t\{1,}\)', comment, '$' ], '') 
+	let comment = substitute(
+				\ substitute(
+				\ substitute(&l:commentstring, '/', '\/', 'g'),
+				\ '\*', '\\*', 'g'),
+				\ '%s', '.*', '')
+	let commented_line = join(
+				\ ['^\(\|\s\{1,}\)', comment, '$', '\|', '^\(\|\t\{1,}\)', comment, '$' ],
+				\ '') 
 	return a:line =~ commented_line
 endfunction
 
 function! s:get_closing_char(c) abort
 	let pair = ''
 	let left = "\<left>"
-	if a:c =~ '[\[{<]'
+	if a:c =~ "[\[{<]"
 		let pair = join([a:c, nr2char(char2nr(a:c) + 2), left], '')
 	elseif a:c == '('
 		let pair = join(['()', left], '')
@@ -51,14 +58,15 @@ function! s:get_closing_char(c) abort
 endfunction
 
 function! s:cmd_pairing_char(c) abort
-	if s:forbided_cmd()
+	let line = getcmdline()
+	if s:forbided_cmd() || (a:c =~ "[`']" && empty(line)) || line =~ "^[`']"
 		return a:c
 	endif
 	let pair = ''
-	if getcmdline() =~ '^g\/\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}s[\/:]\|^.s[\/:]\|^.\=[<0-9]\{1,},.\=[>0-9]\{1,}g\/'
+	if line =~ '^g\/\|^[0-9]\{1,},[0-9]\{1,}s[\/:]\|^.s[\/:]\|^[0-9]\{1,},[0-9]\{1,}g\/'
 		let pair = a:c
 	else
-		let pair =  s:get_closing_char(a:c)
+		let pair = s:get_closing_char(a:c)
 	endif
 	return pair
 endfunction
@@ -76,7 +84,10 @@ function! s:ins_pairing_char(c) abort
 			" HACK: Não incluir c duplicado nos códigos Python, tanto em comentários
 			" como para doc string's
 			" TODO: Identificar situação em que o comentário é uma multistring
-			if &filetype == 'python' && (bchar !~ 'f\|b\|r' && (line =~ "'" . '\{3}.*' . "'" . '\{,3}' || line =~ '"\{3}.*"\{,3}'))
+			if &filetype == 'python' 
+						\ && (bchar !~ 'f\|b\|r' 
+						\ && (line =~ "'" . '\{3}.*' . "'" . '\{,3}' 
+						\ || line =~ '"\{3}.*"\{,3}'))
 				let pair = a:c
 			endif
 		endif

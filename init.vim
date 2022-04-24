@@ -58,7 +58,7 @@ let &g:textwidth=0
 let mapleader = ' '
 
 " Statusline
-set laststatus=2 
+set laststatus=3
 set showtabline=2 
 set noshowmode 
 
@@ -186,11 +186,11 @@ nnoremap <leader>j <cmd>m.+1<cr>
 vnoremap K :m'<-2<cr>gv
 vnoremap J :m'>+1<cr>gv
 
-" Move to first/last character in screen line - Evita casos em que existem espaços no final da linha
-nnoremap H g^
-vnoremap H g^
-nnoremap L g$
-vnoremap L g$
+" " Move to first/last character in screen line - Evita casos em que existem espaços no final da linha
+" nnoremap H g^
+" vnoremap H g^
+" nnoremap L g$
+" vnoremap L g$
 
 " Vim-capslock in command line
 cmap <silent> <expr> <c-l> <SID>capslock_redraw()
@@ -483,10 +483,13 @@ lua require('lspconfig').denols.setup{}
 " Rust Lsp
 lua require('lspconfig').rust_analyzer.setup{}
 
+" Bash Lsp
+lua require('lspconfig').bashls.setup{}
+
 " Lua Lsp
 lua << EOF
-local sumneko_root_path = '/home/andre/documents/LSP Servers/sumneko/lua-language-server'
-local sumneko_binary = sumneko_root_path.."/bin/Linux/lua-language-server"
+local sumneko_root_path = "/home/andre/documents/LSP Servers/sumneko/lua-language-server"
+local sumneko_binary = sumneko_root_path.."/bin/lua-language-server"
 
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, "lua/?.lua")
@@ -524,6 +527,15 @@ lua require('colorizer').setup(nil, { css = true; })
 
 " Configuração Treesitter para highligth, configuração retirada diretamente do site
 lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
+
+" Configuração Treesitter para indentação
+lua << EOF
+require('nvim-treesitter.configs').setup{
+	indent = {
+		enable = true
+	}
+}
+EOF
 
 " Telescope configuration
 lua << EOF
