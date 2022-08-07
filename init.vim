@@ -131,7 +131,7 @@ let g:loaded_netrwPlugin = 1
 
 " Set python
 let g:python_host_prog = '/usr/bin/python2'
-let g:python3_host_prog = '/usr/local/bin/python3'
+let g:python3_host_prog = '/usr/bin/python3.10'
 
 " " --- Gutentags ---
 " let g:gutentags_add_default_project_roots = 0
@@ -323,7 +323,7 @@ function! s:toggle_terminal() abort
 	if stats[0]
 		return join([':', stats[1], " windo normal ZQ\<cr>"], '')
 	endif
-	return ":10split +terminal\<cr>"
+	return ":15split +terminal\<cr>"
 endfunction
 
 function! s:t_stats() abort
@@ -410,7 +410,11 @@ autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> l <SID>move_in_
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> h <SID>move_in_list('h')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> j <SID>move_in_list('j')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> k <SID>move_in_list('k')
-autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> q <SID>quit_list()
+autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> gq <SID>quit_list()
+
+" Terminal maps
+autocmd goosebumps TermOpen * nnoremap <expr> <silent> <buffer> gq <SID>quit_list()
+autocmd goosebumps TermOpen * setlocal scrolloff=0
 
 autocmd goosebumps FileType * setlocal textwidth=0
 
@@ -449,7 +453,7 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 autocmd goosebumps FileType man nnoremap <buffer> K <c-u>
 
 " Fast quit in vim help files
-autocmd goosebumps FileType help nnoremap <buffer> q :helpclose<cr>
+autocmd goosebumps FileType help nnoremap <buffer> gq :helpclose<cr>
 
 " Highlight yanked text - NeoVim 0.5.0 nightly
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
