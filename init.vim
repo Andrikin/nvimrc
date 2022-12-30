@@ -1,7 +1,7 @@
 " $MYVIMRC --- NeoVim ---
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: ripgrep, traces.vim, [surround, comment, capslock, eunuch, fugitive] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer, nvim-lspconfig
+" Dependences: ripgrep, traces.vim, [dadbod, obsession, surround, comment, capslock, eunuch, fugitive] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer, nvim-lspconfig, harpoon (The Primeagen), jdtls-nvim, denols
 " TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!, learn lua!
 
 " plugin -> verify $RUNTIMEPATH/ftplugin for files
@@ -43,6 +43,7 @@ set encoding=utf-8
 set autoread
 set tabpagemax=50
 set wildmenu
+set completeopt=menu,menuone,noselect
 let &g:shell='/bin/bash'
 let &g:shellpipe='2>&1 | tee'
 set complete-=t
@@ -59,8 +60,11 @@ let mapleader = ' '
 
 " Statusline
 set laststatus=3
-set showtabline=2 
+set showtabline=1 
 set noshowmode 
+
+" Winbar
+let &g:winbar='%#LightlineLeft_active_0#%{LightlineFilename()}%#LightlineLeft_active_0_1#'
 
 " St tem um problema com o cursor. Ele não muda de acordo com as cores da fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html), é possível obter o cursor com a cor do texto (com truecolor)
 set termguicolors
@@ -228,7 +232,15 @@ nnoremap <leader>g <cmd>Git<cr>
 
 " --- Telescope ---
 nnoremap <silent> <leader>b <cmd>Telescope buffers<cr>
-nnoremap <silent> <leader>o <cmd>Telescope find_files<cr>
+" nnoremap <silent> <leader>o <cmd>Telescope find_files<cr>
+
+" The Primeagen Harpoon
+nnoremap <silent> <leader>a <cmd>lua require('harpoon.mark').add_file()<cr>
+nnoremap <silent> <leader>h <cmd>lua require('harpoon.ui').toggle_quick_menu()<cr>
+nnoremap <silent> <leader>1 <cmd>lua require('harpoon.ui').nav_file(1)<cr>
+nnoremap <silent> <leader>2 <cmd>lua require('harpoon.ui').nav_file(2)<cr>
+nnoremap <silent> <leader>3 <cmd>lua require('harpoon.ui').nav_file(3)<cr>
+nnoremap <silent> <leader>4 <cmd>lua require('harpoon.ui').nav_file(4)<cr>
 
 " --- Builtin LSP commands ---
 " Only available in git projects (git init)
@@ -453,10 +465,14 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 autocmd goosebumps FileType man nnoremap <buffer> K <c-u>
 
 " Fast quit in vim help files
-autocmd goosebumps FileType help nnoremap <buffer> gq :helpclose<cr>
+autocmd goosebumps FileType help nnoremap <buffer> <silent> gq :helpclose<cr>
 
 " Highlight yanked text - NeoVim 0.5.0 nightly
 autocmd goosebumps TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
+
+" Disable nvim-cmp in COMMAND MODE
+autocmd goosebumps CmdlineLeave * lua require('cmp').setup({enabled = true})
+autocmd goosebumps CmdlineEnter * lua require('cmp').setup({enabled = false})
 
 " --- Lua Configurations ---
 
@@ -475,6 +491,8 @@ vim.diagnostic.config({
 )
 EOF
 
+" Java Lsp configuration is in /nvim/ftplugin/java.lua
+
 " Python Lsp
 lua require('lspconfig').pyright.setup{}
 
@@ -492,7 +510,7 @@ lua require('lspconfig').bashls.setup{}
 
 " Lua Lsp
 lua << EOF
-local sumneko_root_path = "/home/andre/documents/LSP Servers/sumneko/lua-language-server"
+local sumneko_root_path = "/home/andre/documents/lsp-servers/sumneko/lua-language-server"
 local sumneko_binary = sumneko_root_path.."/bin/lua-language-server"
 
 local runtime_path = vim.split(package.path, ';')
@@ -604,3 +622,84 @@ require('telescope').setup{
 	}
 }
 EOF
+
+lua <<EOF
+  -- Set up nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      -- REQUIRED - you must specify a snippet engine
+      expand = function(args)
+        -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      end,
+    },
+    window = {
+      -- completion = cmp.config.window.bordered(),
+      -- documentation = cmp.config.window.bordered(),
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      -- { name = 'vsnip' }, -- For vsnip users.
+      -- { name = 'luasnip' }, -- For luasnip users.
+      -- { name = 'ultisnips' }, -- For ultisnips users.
+      -- { name = 'snippy' }, -- For snippy users.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+
+  -- Set up lspconfig.
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
+  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  -- require('lspconfig')['<YOUR_LSP_SERVER>'].setup {
+  require('lspconfig')['pyright'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['rust_analyzer'].setup {
+    capabilities = capabilities
+  }
+  require('lspconfig')['denols'].setup {
+    capabilities = capabilities
+  }
+EOF
+
+" My lua custom functions
+lua require('globals')
