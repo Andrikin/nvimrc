@@ -1,13 +1,94 @@
 " $MYVIMRC --- NeoVim ---
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: ripgrep, traces.vim, [dadbod, obsession, surround, comment, capslock, eunuch, fugitive] tpope, emmet-vim, vim-cool, vim-dirvish, undotree, vim-highlightedyank, vim-sxhkdrc, telescope.nvim [popup.nvim, plenary.nvim], nvim-treesitter [playground], nvim-colorizer, nvim-lspconfig, harpoon (The Primeagen), jdtls-nvim, denols
+
+" Dependences:
+" ripgrep,
+" traces.vim,
+" [dadbod, obsession, surround, comment, capslock, eunuch, fugitive] tpope,
+" emmet-vim,
+" vim-cool,
+" vim-dirvish,
+" undotree,
+" vim-highlightedyank,
+" vim-sxhkdrc,
+" telescope.nvim [popup.nvim, plenary.nvim],
+" nvim-treesitter [playground],
+" nvim-colorizer,
+" nvim-lspconfig,
+" harpoon (The Primeagen),
+" jdtls-nvim,
+" denols
+" vim-plug
+
 " TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!, learn lua!
+" ALERT: Custom plugins in /.local/share/nvim/plugin directory
+
+" Automaticaly install vim-plug
+let vim_plug_dir = stdpath('data') . '/site'
+if empty(glob(vim_plug_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.vim_plug_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" --- Vim Plug Configurations ---
+call plug#begin(stdpath('config') . '/plugged')
+
+" Tim Pope
+Plug 'https://github.com/tpope/vim-capslock.git'
+Plug 'https://github.com/tpope/vim-commentary.git'
+Plug 'https://github.com/tpope/vim-dadbod.git'
+Plug 'https://github.com/tpope/vim-eunuch.git'
+Plug 'https://github.com/tpope/vim-fugitive.git'
+Plug 'https://github.com/tpope/vim-obsession.git'
+Plug 'https://github.com/tpope/vim-surround.git'
+" Dracula theme
+Plug 'https://github.com/Mofiqul/dracula.nvim.git'
+" Vim Cool
+Plug 'https://github.com/romainl/vim-cool.git'
+" Dirvirsh
+Plug 'https://github.com/justinmk/vim-dirvish.git'
+" Emmet
+Plug 'https://github.com/mattn/emmet-vim.git'
+" Harpoon - The Primeagen
+Plug 'https://github.com/ThePrimeagen/harpoon.git'
+" Lightline
+Plug 'https://github.com/itchyny/lightline.vim.git'
+" Nvim-Colorizer
+Plug 'https://github.com/norcalli/nvim-colorizer.lua.git'
+" Nvim Lspconfig
+Plug 'https://github.com/neovim/nvim-lspconfig.git'
+" Traces.vim
+Plug 'https://github.com/markonm/traces.vim.git'
+" Nvim-ts-context-commentstring
+Plug 'https://github.com/JoosepAlviste/nvim-ts-context-commentstring.git'
+" Undotree
+Plug 'https://github.com/mbbill/undotree.git'
+" Nim-cmp
+Plug 'https://github.com/hrsh7th/nvim-cmp.git'
+	Plug 'https://github.com/hrsh7th/cmp-nvim-lsp.git'
+	Plug 'https://github.com/hrsh7th/cmp-buffer.git'
+	Plug 'https://github.com/hrsh7th/cmp-path.git'
+	Plug 'https://github.com/hrsh7th/cmp-cmdline.git'
+" Telescope
+Plug 'https://github.com/nvim-telescope/telescope.nvim.git'
+	Plug 'https://github.com/nvim-lua/plenary.nvim.git'
+" Treesitter
+Plug 'https://github.com/nvim-treesitter/nvim-treesitter.git'
+	Plug 'https://github.com/nvim-treesitter/playground.git'
+" Nvim jdtls
+Plug 'https://github.com/mfussenegger/nvim-jdtls.git'
+" Lua ls
+Plug 'https://github.com/LuaLS/lua-language-server.git'
+
+call plug#end()
+" --- Vim Plug Configurations ---
 
 " plugin -> verify $RUNTIMEPATH/ftplugin for files
 " indent -> verify $RUNTIMEPATH/indent for files
-filetype indent plugin on
-syntax enable
+" filetype indent plugin on " vim-plug toggle on
+" syntax enable " vim-plug toggle on
+
 " colorscheme molokai
 colorscheme dracula
 
@@ -66,7 +147,7 @@ set noshowmode
 " Winbar
 let &g:winbar='%#LightlineLeft_active_0#%{LightlineFilename()}%#LightlineLeft_active_0_1#'
 
-" St tem um problema com o cursor. Ele não muda de acordo com as cores da fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html), é possível obter o cursor com a cor do texto (com truecolor)
+" st (simple terminal - suckless) tem um problema com o cursor. Ele não muda de acordo com as cores da fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html), é possível obter o cursor com a cor do texto (truecolor)
 set termguicolors
 
 " NeoVim
@@ -118,7 +199,7 @@ let g:lightline = {
 
 " --- Emmet ---
 let g:user_emmet_install_global = 0
-let g:user_emmet_leader_key = '<m-space>'
+" let g:user_emmet_leader_key = '<m-space>'
 
 " --- Traces ---
 let g:traces_num_range_preview = 0
@@ -145,7 +226,6 @@ let g:python3_host_prog = '/usr/bin/python3.10'
 " let g:gutentags_generate_on_missing = 1
 " let g:gutentags_generate_on_write = 1
 " let g:gutentags_generate_on_empty_buffer = 0
-
 " --- Key maps ---
 
 " CTRL-U in insert mode deletes a lot. Use CTRL-G u to first break undo,
@@ -176,19 +256,26 @@ inoremap ! !<c-g>u
 inoremap ? ?<c-g>u
 
 " Using gk and gj (screen cursor up/down)
-nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
-nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
-" Adding jumps to jumplist - The Primeagen gold apple
-nnoremap <expr> k (v:count > 1 ? 'm`' . v:count : '') . 'k'
-nnoremap <expr> j (v:count > 1 ? 'm`' . v:count : '') . 'j'
+" nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+" nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+" Adding jumps to jumplist - The Primeagen gold apple with gk and gj (screen cursor up/down)
+nnoremap <expr> k v:count == 0 ? (v:count > 1 ? 'm`' . v:count : '') . 'gk' : (v:count > 1 ? 'm`' . v:count : '') . 'k'
+nnoremap <expr> j v:count == 0 ? (v:count > 1 ? 'm`' . v:count : '') . 'gj' : (v:count > 1 ? 'm`' . v:count : '') . 'j'
 
 " Moving lines up and down - The Primeagen knowledge word
 " inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria inviável trocar para essa funcionalidade
 " inoremap <c-k> <c-o>:m.-2<cr>
-nnoremap <leader>k <cmd>m.-2<cr>
-nnoremap <leader>j <cmd>m.+1<cr>
+" nnoremap <leader>k <cmd>m.-2<cr>
+" nnoremap <leader>j <cmd>m.+1<cr>
 vnoremap K :m'<-2<cr>gv
 vnoremap J :m'>+1<cr>gv
+
+" Copy and paste from clipboard (* -> selection register/+ -> primary register)
+nnoremap gP "+P
+nnoremap gp "+p
+vnoremap gy "+y
+nnoremap gY "+Y
+nnoremap gy "+y
 
 " " Move to first/last character in screen line - Evita casos em que existem espaços no final da linha
 " nnoremap H g^
@@ -203,15 +290,10 @@ cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 " Be aware that '\' is used as mapleader character, so conflits can occur in Insert Mode maps
 
 " open $MYVIMRC
-nnoremap <silent> <leader>r <cmd>tabe $MYVIMRC<cr>
+nnoremap <silent> <leader>r <cmd>e $MYVIMRC<cr>
 
 " :mksession
 " nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
-
-" Copy and paste from clipboard (* -> selection register/+ -> primary register)
-nnoremap <leader>p "+P
-vnoremap <leader>y "+y
-nnoremap <leader>y "+y
 
 " --- Quickfix window ---
 " NeoVim excells about terminal jobs
@@ -248,7 +330,7 @@ nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<cr>
 nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<cr>
 nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<cr>
 nnoremap <silent> gD <cmd>lua vim.lsp.buf.declaration()<cr>
-nnoremap <silent> <ctrl-k> <cmd>lua vim.lsp.buf.signature_help()<cr>
+nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<cr>
 " Lida com erros LSP
 nnoremap <silent> ]d <cmd>lua vim.diagnostic.goto_next()<cr>
 nnoremap <silent> [d <cmd>lua vim.diagnostic.goto_prev()<cr>
@@ -424,6 +506,9 @@ autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> j <SID>move_in_
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> k <SID>move_in_list('k')
 autocmd goosebumps FileType qf nnoremap <expr> <silent> <buffer> gq <SID>quit_list()
 
+" Command for compile LaTeX (need script)
+autocmd goosebumps FileType tex command! LatexCompile !clatex %
+
 " Terminal maps
 autocmd goosebumps TermOpen * nnoremap <expr> <silent> <buffer> gq <SID>quit_list()
 autocmd goosebumps TermOpen * setlocal scrolloff=0
@@ -438,6 +523,7 @@ autocmd goosebumps FileType sh,bash setlocal commentstring=#\ %s
 autocmd goosebumps FileType c setlocal commentstring=/*\ %s\ */
 autocmd goosebumps FileType java setlocal commentstring=//\ %s
 autocmd goosebumps FileType vim setlocal commentstring=\"\ %s
+autocmd goosebumps FileType json setlocal commentstring=/*\ %s\ */
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
@@ -475,6 +561,9 @@ autocmd goosebumps CmdlineLeave * lua require('cmp').setup({enabled = true})
 autocmd goosebumps CmdlineEnter * lua require('cmp').setup({enabled = false})
 
 " --- Lua Configurations ---
+"
+" Vim lsp cofiguration
+" lua require("vim.lsp.health").check()
 
 "  Lsp Configurarion
 lua << EOF
@@ -500,7 +589,7 @@ lua require('lspconfig').pyright.setup{}
 lua require('lspconfig').vimls.setup{}
 
 " Javascript/Typescript Lsp
-lua require('lspconfig').denols.setup{}
+" lua require('lspconfig').denols.setup{}
 
 " Rust Lsp
 lua require('lspconfig').rust_analyzer.setup{}
@@ -508,54 +597,53 @@ lua require('lspconfig').rust_analyzer.setup{}
 " Bash Lsp
 lua require('lspconfig').bashls.setup{}
 
-" Lua Lsp
+"Lua lsp
 lua << EOF
-local sumneko_root_path = "/home/andre/documents/lsp-servers/sumneko/lua-language-server"
-local sumneko_binary = sumneko_root_path.."/bin/lua-language-server"
-
-local runtime_path = vim.split(package.path, ';')
-table.insert(runtime_path, "lua/?.lua")
-table.insert(runtime_path, "lua/?/init.lua")
-
-require('lspconfig').sumneko_lua.setup{
-	cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"};
-	settings = {
-		Lua = {
-			runtime = {
-				-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-				version = 'LuaJIT',
-				-- Setup your lua path
-				path = runtime_path,
-				},
-			diagnostics = {
-				-- Get the language server to recognize the `vim` global
-				globals = {'vim'},
-				},
-			workspace = {
-				-- Make the server aware of Neovim runtime files
-				library = vim.api.nvim_get_runtime_file("", true),
-				},
-			-- Do not send telemetry data containing a randomized but unique identifier
-			telemetry = {
-			enable = false,
-			},
-		},
-	},
+require('lspconfig').lua_ls.setup {
+  settings = {
+    Lua = {
+      runtime = {
+        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        -- Get the language server to recognize the `vim` global
+        globals = {'vim'},
+      },
+      workspace = {
+        -- Make the server aware of Neovim runtime files
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      -- Do not send telemetry data containing a randomized but unique identifier
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
 }
 EOF
 
 " Colorizer
 lua require('colorizer').setup(nil, { css = true; })
 
-" Configuração Treesitter para highligth, configuração retirada diretamente do site
-lua require('nvim-treesitter.configs').setup{highlight = {enable = true, additional_vim_regex_highlighting = true}}
-
-" Configuração Treesitter para indentação
+" Treesitter configuration
 lua << EOF
 require('nvim-treesitter.configs').setup{
+	highlight = {
+		enable = true,
+		additional_vim_regex_highlighting = true,
+	},
 	indent = {
 		enable = true
-	}
+	},
+	ensure_installed = {
+		'astro', 'css', 'glimmer', 'graphql', 'html', 'javascript',
+		'lua', 'php', 'python', 'scss', 'svelte', 'tsx', 'twig',
+		'typescript', 'vim', 'vue',
+	},
+	context_commentstring = {
+		enable = true,
+	},
 }
 EOF
 
@@ -625,8 +713,7 @@ EOF
 
 lua <<EOF
   -- Set up nvim-cmp.
-  local cmp = require'cmp'
-
+  local cmp = require('cmp')
   cmp.setup({
     snippet = {
       -- REQUIRED - you must specify a snippet engine
@@ -658,7 +745,6 @@ lua <<EOF
       { name = 'buffer' },
     })
   })
-
   -- Set configuration for specific filetype.
   cmp.setup.filetype('gitcommit', {
     sources = cmp.config.sources({
@@ -667,7 +753,6 @@ lua <<EOF
       { name = 'buffer' },
     })
   })
-
   -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
   cmp.setup.cmdline({ '/', '?' }, {
     mapping = cmp.mapping.preset.cmdline(),
@@ -675,7 +760,6 @@ lua <<EOF
       { name = 'buffer' }
     }
   })
-
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
   cmp.setup.cmdline(':', {
     mapping = cmp.mapping.preset.cmdline(),
@@ -685,7 +769,6 @@ lua <<EOF
       { name = 'cmdline' }
     })
   })
-
   -- Set up lspconfig.
   local capabilities = require('cmp_nvim_lsp').default_capabilities()
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
@@ -703,3 +786,4 @@ EOF
 
 " My lua custom functions
 lua require('globals')
+

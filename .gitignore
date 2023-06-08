@@ -4,3 +4,7 @@ undodir/
 # A ideia é excluir todas as pastas e depois "negar" a exclusão da pasta alvo
 pack/
 !pack/andrikin
+Session.vim
+lua/Session.vim
+*.wip
+*.bkp

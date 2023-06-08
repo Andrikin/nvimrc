@@ -49,7 +49,7 @@ function! s:get_closing_char(c) abort
 		let pair = join([a:c, nr2char(char2nr(a:c) + 2), left], '')
 	elseif a:c == '('
 		let pair = join(['()', left], '')
-	elseif a:c =~ "['\"]"
+	elseif a:c =~ "['\"`]"
 		let pair = join([a:c, a:c, left], '')
 	else
 		let pair = a:c
@@ -112,12 +112,20 @@ function! s:pair(c) abort
 endfunction
 
 if !hasmapto('<plug>(AwesomePairing)', 'ci')
+
+	augroup awesomepairing
+		autocmd!
+	augroup END
+
+	autocmd awesomepairing FileType html noremap! <expr> < <SID>pair('<')
+	autocmd awesomepairing FileType javascript,html noremap! <expr> ` <SID>pair('`')
+
 	noremap! <expr> ( <SID>pair('(')
 	noremap! <expr> [ <SID>pair('[')
 	noremap! <expr> { <SID>pair('{')
 	noremap! <expr> " <SID>pair('"')
 	noremap! <expr> ' <SID>pair("'")
-	noremap! <expr> < <SID>pair('<')
+
 endif
 
 let &cpo = s:save_cpo
