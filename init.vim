@@ -22,20 +22,21 @@
 " vim-plug
 
 " TODO: Learn how to use vimdiff/diffing a file, learn :args and how to modify :args list, learn how to use :ls and :buffer, configure telescope!, learn lua!
-" ALERT: Custom plugins in /.local/share/nvim/plugin directory
+" ALERT: Custom plugins in /.local/share/nvim/site/plugin directory
 
 " Automaticaly install vim-plug
-let vim_plug_dir = stdpath('data') . '/site'
-if empty(glob(vim_plug_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.vim_plug_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+let VIM_PLUG_DIR = stdpath('data') . '/site'
+if empty(glob(VIM_PLUG_DIR . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.VIM_PLUG_DIR.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " --- Vim Plug Configurations ---
 call plug#begin(stdpath('config') . '/plugged')
-
 " Tim Pope
-Plug 'https://github.com/tpope/vim-capslock.git'
+" Plug 'https://github.com/tpope/vim-capslock.git'
+" vim-capslock version modified
+Plug 'https://github.com/Andrikin/vim-capslock'
 Plug 'https://github.com/tpope/vim-commentary.git'
 Plug 'https://github.com/tpope/vim-dadbod.git'
 Plug 'https://github.com/tpope/vim-eunuch.git'
@@ -80,7 +81,6 @@ Plug 'https://github.com/nvim-treesitter/nvim-treesitter.git'
 Plug 'https://github.com/mfussenegger/nvim-jdtls.git'
 " Lua ls
 Plug 'https://github.com/LuaLS/lua-language-server.git'
-
 call plug#end()
 " --- Vim Plug Configurations ---
 
@@ -588,6 +588,9 @@ lua require('lspconfig').pyright.setup{}
 " VimScript Lsp
 lua require('lspconfig').vimls.setup{}
 
+" HTML Lsp
+lua require('lspconfig').html.setup{}
+
 " Javascript/Typescript Lsp
 " lua require('lspconfig').denols.setup{}
 
@@ -597,7 +600,7 @@ lua require('lspconfig').rust_analyzer.setup{}
 " Bash Lsp
 lua require('lspconfig').bashls.setup{}
 
-"Lua lsp
+" Lua lsp
 lua << EOF
 require('lspconfig').lua_ls.setup {
   settings = {
@@ -734,6 +737,8 @@ lua <<EOF
       ['<C-Space>'] = cmp.mapping.complete(),
       ['<C-e>'] = cmp.mapping.abort(),
       ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+	  ['<C-n>'] = cmp.mapping.select_next_item(),
+	  ['<C-p>'] = cmp.mapping.select_prev_item(),
     }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },

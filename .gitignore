@@ -8,3 +8,4 @@ Session.vim
 lua/Session.vim
 *.wip
 *.bkp
+plugged/*
