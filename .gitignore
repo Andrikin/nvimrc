@@ -9,3 +9,4 @@ lua/Session.vim
 *.wip
 *.bkp
 plugged/*
+lazy-lock.json
