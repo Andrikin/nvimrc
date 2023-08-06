@@ -8,5 +8,6 @@ Session.vim
 lua/Session.vim
 *.wip
 *.bkp
-plugged/*
+plugged/
+plugged/**/*
 lazy-lock.json
