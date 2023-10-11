@@ -1,5 +1,6 @@
+local os = vim.uv.os_uname().sysname
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -24,7 +25,7 @@ local plugins = {
 	},
 	{
 		'https://github.com/tpope/vim-eunuch.git',
-		lazy = true,
+		lazy = os == 'Linux',
 	},
 	{
 		'https://github.com/tpope/vim-obsession.git',
