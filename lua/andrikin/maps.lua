@@ -143,6 +143,14 @@ vim.keymap.set(
 	end
 )
 
+vim.keymap.set(
+	'n',
+	'<leader>f',
+	function()
+		vim.cmd.Telescope('find_files')
+	end
+)
+
 -- The Primeagen Harpoon
 vim.keymap.set(
 	'n',
@@ -214,11 +222,11 @@ local lsp_maps = {
 		map = vim.lsp.buf.signature_help,
 	},
 	{
-		key = ']d',
+		key = ']e',
 		map = vim.diagnostic.goto_next,
 	},
 	{
-		key = '[d',
+		key = '[e',
 		map = vim.diagnostic.goto_prev,
 	}
 }

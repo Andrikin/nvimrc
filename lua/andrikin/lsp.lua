@@ -82,20 +82,20 @@ require('telescope').setup{
 	},
 	pickers = {
 		buffers = {
+			theme = 'dropdown',
 			previewer = false,
 			mappings = {
-				i = {
-					["<c-d>"] = telescope_actions.delete_buffer,
-				},
 				n = {
-					["<c-d>"] = telescope_actions.delete_buffer,
+					["dd"] = telescope_actions.delete_buffer,
 				},
 			},
 		},
 		find_files = {
+			theme = 'dropdown',
 			previewer = false,
 		},
 		file_browser = {
+			theme = 'dropdown',
 			previewer = false,
 		},
 	},
@@ -110,7 +110,7 @@ require('telescope').setup{
 		mappings = {
 			i = {
 				["<NL>"] = telescope_actions.select_default + telescope_actions.center,
-				["<esc>"] = telescope_actions.close,
+				-- ["<esc>"] = telescope_actions.close,
 				["<c-u>"] = {"<c-u>", type = "command"},
 			},
 			n = {
