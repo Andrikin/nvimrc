@@ -2,6 +2,7 @@
 local fn = vim.fn
 local api = vim.api
 
+-- TODO: Criar plugin?
 local FILLME = function(argumento, comando, posicao)
 	local MUSICAS = vim.env.HOME .. [[/music/]]
 	local opts = {
@@ -41,7 +42,7 @@ local FILLME = function(argumento, comando, posicao)
 			end
 		end
 	else
-		for _, cmd in ipairs(ls) do
+		for _, cmd in ipairs(ls) do -- completar diretório
 			cmd = fn.fnameescape(MUSICAS .. cmd)
 			if string.match(cmd, argumento) then
 				table.insert(diretorios, cmd)
@@ -51,9 +52,9 @@ local FILLME = function(argumento, comando, posicao)
 	return diretorios
 end
 
-
 api.nvim_create_user_command('HexEditor', '%!xxd', {})
 api.nvim_create_user_command('Cmus', 'silent !cmus-remote <args>', {
 	nargs = '+',
 	complete = FILLME
 })
+
