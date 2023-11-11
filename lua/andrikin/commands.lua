@@ -2,6 +2,7 @@
 local fn = vim.fn
 local api = vim.api
 local env = vim.env
+local cmd = vim.cmd
 
 local Cmus = {}
 Cmus.opts = {
@@ -207,7 +208,7 @@ Ouvidoria.nova_comunicacao = function(opts)
 			return
 		end
 	end
-	-- fechar buffer do modelo
+	cmd.bdelete(tipo)
 end
 Ouvidoria.complete = function(args, cmd, pos)
 	return vim.tbl_filter(
