@@ -114,9 +114,7 @@ Latex.clear = function(arquivo)
 		function(auxiliar)
 			return string.match(auxiliar, 'aux$') or string.match(auxiliar, 'out$') or string.match(auxiliar, 'log$')
 		end,
-		fn.glob(
-			Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.*', false, true
-		)
+		fn.glob(Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.*', false, true)
 	)
 	if #auxiliares == 0 then
 		return
@@ -134,7 +132,7 @@ Latex.compile = function(opts)
 		return
 	end
 	if vim.o.modified then -- salvar arquivo que está modificado.
-		vim.cmd.write()
+		cmd.write()
 	end
 	local arquivo = fn.expand('%:t')
 	local cmd = {}
@@ -187,11 +185,10 @@ end
 Ouvidoria.nova_comunicacao = function(opts)
 	local tipo = opts.fargs[1] or 'modelo-basico'
 	local arquivo = opts.fargs[2] or 'ci-modelo'
-	vim.cmd.edit(
-		Ouvidoria.CI_FOLDER .. '/' .. tipo .. Ouvidoria.TEX
-	)
+	local alternativo = fn.expand('%')
+	cmd.edit(Ouvidoria.CI_FOLDER .. '/' .. tipo .. Ouvidoria.TEX)
 	local ok, retorno = pcall(
-		vim.cmd.saveas,
+		cmd.saveas,
 		Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
 	)
 	while not ok do
@@ -200,7 +197,7 @@ Ouvidoria.nova_comunicacao = function(opts)
 				'Arquivo com este nome já existe. Digite outro nome para arquivo: '
 			)
 			ok, retorno = pcall(
-				vim.cmd.saveas,
+				cmd.saveas,
 				Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
 			)
 		else
@@ -208,6 +205,7 @@ Ouvidoria.nova_comunicacao = function(opts)
 			return
 		end
 	end
+	fn.setreg('#', alternativo) -- setando arquivo alternativo
 	cmd.bdelete(tipo)
 end
 Ouvidoria.complete = function(args, cmd, pos)
