@@ -211,7 +211,7 @@ end
 Ouvidoria.complete = function(args, cmd, pos)
 	return vim.tbl_filter(
 		function(ci)
-			return string.match(ci, args)
+			return string.match(ci, args:gsub('-', '.'))
 		end,
 		vim.tbl_map(
 			function(ci)
