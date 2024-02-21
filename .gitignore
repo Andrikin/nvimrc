@@ -11,3 +11,4 @@ lua/Session.vim
 plugged/
 plugged/**/*
 lazy-lock.json
+/lua/.luarc.json
