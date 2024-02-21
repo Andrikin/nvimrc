@@ -1,6 +1,6 @@
-local os = vim.uv.os_uname().sysname
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.uv.fs_stat(lazypath) then
+-- Inicializando caminho para git
+if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -12,12 +12,13 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local TEMA = 'dracula'
 local plugins = {
 	-- Fork Tim Pope vim-capslock
 	'https://github.com/Andrikin/vim-capslock',
 	-- Tim Pope's miracles
+    'https://github.com/tpope/vim-fugitive.git',
 	'https://github.com/tpope/vim-commentary.git',
-	'https://github.com/tpope/vim-fugitive.git',
 	'https://github.com/tpope/vim-surround.git',
 	{
 		'https://github.com/tpope/vim-dadbod.git',
@@ -25,7 +26,7 @@ local plugins = {
 	},
 	{
 		'https://github.com/tpope/vim-eunuch.git',
-		lazy = os == 'Linux',
+		lazy = true,
 	},
 	{
 		'https://github.com/tpope/vim-obsession.git',
@@ -34,9 +35,10 @@ local plugins = {
 	-- Dracula theme,
 	{
 		'https://github.com/Mofiqul/dracula.nvim.git',
+        priority = 1000,
 		config = function()
-			vim.cmd.colorscheme('dracula')
-		end,
+			vim.cmd.colorscheme(TEMA)
+		end
 	},
 	-- Vim Cool,
 	'https://github.com/romainl/vim-cool.git',
@@ -47,17 +49,18 @@ local plugins = {
 		'https://github.com/mattn/emmet-vim.git',
 		lazy = true,
 	},
-	-- Harpoon - The Primeagen,
-	'https://github.com/ThePrimeagen/harpoon.git',
-	-- Lightline,
-	-- 'https://github.com/itchyny/lightline.vim.git',
+	-- Harpoon2 - The Primeagen,
+	{
+		'https://github.com/ThePrimeagen/harpoon.git',
+		branch = "harpoon2",
+	},
 	-- Lualine,
 	{
 		'https://github.com/nvim-lualine/lualine.nvim',
 		config = function()
 			require('lualine').setup(
 				{
-					options = { theme = 'dracula' },
+					options = { theme = TEMA },
 					winbar = {
 						lualine_a = {},
 						lualine_b = {},
@@ -65,10 +68,19 @@ local plugins = {
 						lualine_x = {},
 						lualine_y = {},
 						lualine_z = {}
-					}
+					},
+                    tabline = {
+                        lualine_a = {
+                            {
+                                'tabs',
+                                mode = 1,
+                                path = 0,
+                            },
+                        },
+                    }
 				}
 			)
-		end,
+		end
 	},
 	-- Nvim-Colorizer,
 	{
@@ -76,29 +88,55 @@ local plugins = {
 		lazy = true,
 	},
 	-- Nvim Lspconfig,
-	'https://github.com/neovim/nvim-lspconfig.git',
+	{
+        'https://github.com/neovim/nvim-lspconfig.git',
+        dependencies = {
+            'https://github.com/folke/neodev.nvim.git', -- signature help, docs and completion for nvim lua API
+            -- { 'https://github.com/j-hui/fidget.nvim.git',
+            --     opts = {
+            --         progress = {
+            --             display = {
+            --                 skip_history = false,
+            --             }
+            --         }
+            --     }
+            -- },
+        }
+    },
+    -- Java LSP
+	{
+		'https://github.com/mfussenegger/nvim-jdtls.git',
+		lazy = true,
+	},
 	-- Traces.vim,
 	'https://github.com/markonm/traces.vim.git',
-	-- Nvim-ts-context-commentstring,
-	-- 'https://github.com/JoosepAlviste/nvim-ts-context-commentstring.git',
 	-- Undotree,
 	'https://github.com/mbbill/undotree.git',
 	-- Nim-cmp,
 	{
 		'https://github.com/hrsh7th/nvim-cmp.git',
-		event = 'InsertEnter',
 		dependencies = {
 			'https://github.com/hrsh7th/cmp-nvim-lsp.git',
 			'https://github.com/hrsh7th/cmp-buffer.git',
 			'https://github.com/hrsh7th/cmp-path.git',
-			'https://github.com/hrsh7th/cmp-cmdline.git',
+			'https://github.com/L3MON4D3/LuaSnip.git',
+            'https://github.com/saadparwaiz1/cmp_luasnip.git',
+            'https://github.com/rafamadriz/friendly-snippets.git',
 		},
 	},
 	-- Telescope,
 	{
 		'https://github.com/nvim-telescope/telescope.nvim.git',
+        lazy = true,
 		dependencies = {
 			'https://github.com/nvim-lua/plenary.nvim.git',
+            {
+                'nvim-telescope/telescope-fzf-native.nvim',
+                build = 'make',
+                cond = function()
+                    return vim.fn.executable('make') == 1
+                end,
+            },
 		},
 	},
 	-- Treesitter,
@@ -127,4 +165,13 @@ local opts = {
 }
 
 require("lazy").setup(plugins, opts)
+
+-- builtin plugins
+-- vim.cmd.packadd('cfilter') -- filtrar itens no quickfix/localfix list
+-- vim.cmd.packadd('justify')
+vim.cmd.packadd('matchit')
+-- vim.cmd.packadd('shellmenu')
+-- vim.cmd.packadd('swapmouse')
+-- vim.cmd.packadd('termdebug')
+-- vim.cmd.packadd('vimball')
 

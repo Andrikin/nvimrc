@@ -1,225 +1,255 @@
 -- Configuração de LSP servers
 
--- LSP SERVERS 
--- TODO: Sempre instalar os arquivos binários dos executáveis
-local lsp = require('lspconfig')
+local notify = require('andrikin.utils').notify
 
--- nvim-cmp
-local cmp = require('cmp')
-cmp.setup({
-	snippet = {
-		-- REQUIRED - you must specify a snippet engine
-		expand = function(args)
-			-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-			-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-			-- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-			-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-		end,
-	},
-	window = {
-		-- completion = cmp.config.window.bordered(),
-		-- documentation = cmp.config.window.bordered(),
-	},
-	mapping = cmp.mapping.preset.insert({
-		['<C-b>'] = cmp.mapping.scroll_docs(-4),
-		['<C-f>'] = cmp.mapping.scroll_docs(4),
-		['<C-Space>'] = cmp.mapping.complete(),
-		['<C-e>'] = cmp.mapping.abort(),
-		['<CR>'] = cmp.mapping.confirm({ select = false }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-		['<C-n>'] = cmp.mapping.select_next_item(),
-		['<C-p>'] = cmp.mapping.select_prev_item(),
-	}),
-	sources = cmp.config.sources({
-		{ name = 'nvim_lsp' },
-		-- { name = 'vsnip' }, -- For vsnip users.
-		-- { name = 'luasnip' }, -- For luasnip users.
-		-- { name = 'ultisnips' }, -- For ultisnips users.
-		-- { name = 'snippy' }, -- For snippy users.
-		}, {
-			{ name = 'buffer' },
-	})
-})
--- Set configuration for specific filetype.
-cmp.setup.filetype('gitcommit', {
-	sources = cmp.config.sources({
-		{ name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
-		}, {
-			{ name = 'buffer' },
-	})
-})
--- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline({ '/', '?' }, {
-	mapping = cmp.mapping.preset.cmdline(),
-	sources = {
-		{ name = 'buffer' }
-	}
-})
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
-	mapping = cmp.mapping.preset.cmdline(),
-	sources = cmp.config.sources({
-		{ name = 'path' }
-		}, {
-			{ name = 'cmdline' }
-	})
-})
--- Set up lspconfig.
-local cmp_capabilities = require('cmp_nvim_lsp').default_capabilities()
--- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
--- require('lspconfig')['<YOUR_LSP_SERVER>'].setup {
---   capabilities = capabilities
--- }
-
--- Python LSP
-lsp.pyright.setup({
-	capabilities = cmp_capabilities
-})
-
--- HTML LSP
-lsp.html.setup({})
-
--- Javascript LSP
-lsp.denols.setup({
-	capabilities = cmp_capabilities
-})
-
--- Lua LSP
-lsp.lua_ls.setup({
-	on_init = function(client)
-		local path = client.workspace_folders[1].name
-		if not vim.loop.fs_stat(path..'/.luarc.json') and not vim.loop.fs_stat(path..'/.luarc.jsonc') then
-			client.config.settings = vim.tbl_deep_extend('force', client.config.settings, {
-				Lua = {
-					runtime = {
-						-- Tell the language server which version of Lua you're using
-						-- (most likely LuaJIT in the case of Neovim)
-						version = 'LuaJIT'
-					},
-					-- Make the server aware of Neovim runtime files
-					workspace = {
-						checkThirdParty = false,
-						library = {
-							vim.env.VIMRUNTIME
-							-- "${3rd}/luv/library"
-							-- "${3rd}/busted/library",
-						}
-						-- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-						-- library = vim.api.nvim_get_runtime_file("", true)
-					}
-				}
-			})
-			client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
-		end
-		return true
-	end
-})
-
--- lsp.vimls.setup({})
-
--- lsp.rust_analyzer.setup({})
-
+-- colorizer.lua
 require('colorizer').setup(nil, { css = true })
 
--- require('nvim-treesitter.install').compilers = {'clang', 'gcc'}
-require('nvim-treesitter.configs').setup{
-	highlight = {
-		enable = true,
-		additional_vim_regex_highlighting = true,
-	},
-	indent = {
-		enable = true
-	},
-	ensure_installed = { -- linguagens para web development
-		'css', 'html', 'javascript', 'vue',
-		'diff',
-		'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore',
-		'jsdoc', 'json', 'json5',
-		'lua', 'luadoc', 'luap', 'luau',
-		'markdown', 'markdown_inline',
-		'regex',
-		'xml',
-		'python',
-		'vim', 'java',
-		'latex',
-	},
-	context_commentstring = {
-		enable = true,
-	},
-}
+-- Neodev
+require('neodev').setup()
 
-local telescope_actions = require('telescope.actions')
-require('telescope').setup{
-	-- Playground configuration, extracted from github https://github.com/nvim-treesitter/playground
-	playground = {
-		enable = true,
-		disable = {},
-		updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
-		persist_queries = false, -- Whether the query persists across vim sessions
-		keybindings = {
-			toggle_query_editor = 'o',
-			toggle_hl_groups = 'i',
-			toggle_injected_languages = 't',
-			toggle_anonymous_nodes = 'a',
-			toggle_language_display = 'I',
-			focus_language = 'f',
-			unfocus_language = 'F',
-			update = 'R',
-			goto_node = '<cr>',
-			show_help = '?',
-		},
-	},
-	pickers = {
-		buffers = {
-			theme = 'dropdown',
-			previewer = false,
-			mappings = {
-				n = {
-					["dd"] = telescope_actions.delete_buffer,
-				},
-			},
-		},
-		find_files = {
-			theme = 'dropdown',
-			previewer = false,
-		},
-		file_browser = {
-			theme = 'dropdown',
-			previewer = false,
-		},
-	},
-	defaults = {
-		layout_config = { 
-			width = 0.5, 
-			height = 0.70,
-		},
-		path_display = { 
-			tail = true,
-		},
-		mappings = {
-			i = {
-				["<NL>"] = telescope_actions.select_default + telescope_actions.center,
-				-- ["<esc>"] = telescope_actions.close,
-				["<c-u>"] = {"<c-u>", type = "command"},
-			},
-			n = {
-				["<NL>"] = telescope_actions.select_default + telescope_actions.center,
-			},
-		},
-	}
-}
-
--- Mensagem de erro mais curta
-vim.diagnostic.config(
-	{
-		virtual_text = false,
-		-- virtual_text = {
-		-- 	format = function(diagnostic)
-		-- 		if diagnostic.severity == vim.diagnostic.severity.ERROR then
-		-- 			return 'Seu burro!'
-		-- 		end
-		-- 		return diagnostic.message
-		-- 	end
-		-- }
-	}
+vim.defer_fn( -- kickstart.nvim
+    function()
+        require('nvim-treesitter.install').compilers = {'gcc', 'cc', 'clang'}
+        require('nvim-treesitter.configs').setup({
+            modules = {}, -- padrao
+            ignore_install = {}, -- padrao
+            auto_install = false, -- padrao
+            sync_install = false, -- padrao
+            ensure_installed = { -- parsers para highlight - treesitter
+                'css', 'html', 'javascript', 'vue',
+                'diff',
+                'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore',
+                'jsdoc', 'json', 'json5', 'java',
+                'lua', 'luadoc', 'luap', 'luau',
+                'markdown', 'markdown_inline',
+                'regex',
+                -- 'xml',
+                'python',
+                'vim', 'vimdoc',
+                'latex',
+                'comment',
+            },
+            highlight = {
+                enable = true,
+                additional_vim_regex_highlighting = true,
+            },
+            indent = { enable = true },
+        })
+    end,
+    0
 )
+
+local telescope_tema = 'dropdown'
+local telescope_actions = require('telescope.actions')
+require('telescope').setup({
+    -- Playground configuration, extracted from github https://github.com/nvim-treesitter/playground
+    playground = {
+        enable = true,
+        disable = {},
+        updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+        persist_queries = false, -- Whether the query persists across vim sessions
+        keybindings = {
+            toggle_query_editor = 'o',
+            toggle_hl_groups = 'i',
+            toggle_injected_languages = 't',
+            toggle_anonymous_nodes = 'a',
+            toggle_language_display = 'I',
+            focus_language = 'f',
+            unfocus_language = 'F',
+            update = 'R',
+            goto_node = '<cr>',
+            show_help = '?',
+        },
+    },
+    pickers = {
+        buffers = {
+            previewer = false,
+            theme = telescope_tema,
+            mappings = {
+                n = {
+                    ['dd'] = telescope_actions.delete_buffer,
+                },
+            },
+        },
+        find_files = {
+            previewer = false,
+            theme = telescope_tema,
+        },
+        file_browser = {
+            previewer = false,
+            theme = telescope_tema,
+        },
+    },
+    defaults = {
+        layout_config = {
+            width = 0.5,
+            height = 0.70,
+        },
+        path_display = {
+            tail = true,
+        },
+        mappings = {
+            i = {
+                ['<NL>'] = telescope_actions.select_default + telescope_actions.center,
+                ['gq'] = telescope_actions.close, -- ruim para as buscas que precisarem de "gq"
+                ['<c-u>'] = {'<c-u>', type = 'command'},
+                ['<esc>'] = {'<esc>', type = 'command'},
+            },
+            n = {
+                ['<NL>'] = telescope_actions.select_default + telescope_actions.center,
+                ['gq'] = telescope_actions.close,
+            },
+        },
+    }
+})
+local ok, _ = pcall(require('telescope').load_extension, 'fzf')
+if not ok then
+    notify('Telescope: não foi possível carregar a extenção fzf.')
+else
+    notify('Telescope: extenção fzf carregada com sucesso')
+end
+
+local cmp = require('cmp')
+local luasnip = require('luasnip')
+require('luasnip.loaders.from_vscode').lazy_load() -- carregar snippets (templates)
+luasnip.config.setup({})
+cmp.setup({
+    snippet = {
+        -- REQUIRED - you must specify a snippet engine
+        expand = function(args)
+            -- vim.fn['vsnip#anonymous'](args.body) -- For `vsnip` users.
+            luasnip.lsp_expand(args.body) -- For `luasnip` users.
+            -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+            -- vim.fn['UltiSnips#Anon'](args.body) -- For `ultisnips` users.
+        end,
+    },
+    formatting = {
+        expandable_indicator = true,
+        fields = { 'abbr', 'kind', 'menu' },
+        format = function(entry, vim_item)
+            -- Source
+            vim_item.menu = ({
+                buffer = "[BUFFER]",
+                nvim_lsp = "[LSP]",
+                luasnip = "[LUASNIP]",
+                nvim_lua = "[LUA]",
+                latex_symbols = "[LaTeX]",
+                path = "[PATH]"
+            })[entry.source.name]
+            return vim_item
+        end
+    },
+    experimental = {
+        ghost_text = true,
+    },
+    completion = {
+        completeopt = vim.o.completeopt,
+        autocomplete = false,
+    },
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        {
+            name = 'buffer',
+            option = {
+                get_bufnrs = function()
+                    local buf = vim.api.nvim_get_current_buf() -- ganho de performace
+                    local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+                    if byte_size > 1024 * 1024 then -- 1 Megabyte max
+                        return {}
+                    end
+                    local bufs = {} -- somente buffers visíveis
+                    for _, win in ipairs(vim.api.nvim_list_wins()) do
+                        bufs[vim.api.nvim_win_get_buf(win)] = true
+                    end
+                    return vim.tbl_keys(bufs)
+                end
+            }
+        },
+        { name = 'luasnip' }, -- For luasnip users.
+        }, {
+            { name = 'path' },
+    })
+})
+
+-- Set up lspconfig.
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+-- LSP CONFIGURATION
+local lsp = require('lspconfig')
+local servers = {
+    'emmet_ls', -- emmet LSP
+    'pyright', -- python LSP
+    'denols', -- javascript LSP
+    'texlab', -- LaTeX LSP
+    'jdtls', -- java LSP
+    'vimls', -- vim LSP
+    'html', -- html LSP
+    'jsonls', -- json LSP
+    'cssls', -- css LSP
+    -- 'rust_analyzer', -- rust LSP
+    'lua_ls',
+    -- {
+    --     lsp = 'lua_ls',
+    --     config = {
+    --         on_init = function(client)
+    --             local path = client.workspace_folders[1].name
+    --             if not vim.loop.fs_stat(path .. '/.luarc.json') and not vim.loop.fs_stat(path .. '/.luarc.jsonc') then
+    --                 client.config.settings = vim.tbl_deep_extend('force', client.config.settings, {
+    --                     Lua = {
+    --                         completion = { -- folke/neodev configuration
+    --                             callSnippet = "Replace"
+    --                         },
+    --                         runtime = { -- comentado para funcionamento do neodev
+    --                             -- Tell the language server which version of Lua you're using
+    --                             -- (most likely LuaJIT in the case of Neovim)
+    --                             version = 'LuaJIT'
+    --                         },
+    --                         -- Make the server aware of Neovim runtime files
+    --                         workspace = {
+    --                             checkThirdParty = false,
+    --                             library = {
+    --                                 vim.env.VIMRUNTIME
+    --                                 -- '${3rd}/luv/library'
+    --                                 -- '${3rd}/busted/library',
+    --                             }
+    --                             -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+    --                             -- library = vim.api.nvim_get_runtime_file('', true)
+    --                         },
+    --                         diagnostics = {
+    --                             -- Get the language server to recognize the `vim` global
+    --                             globals = {'vim'},
+    --                         },
+    --                     }
+    --                 })
+    --                 client.notify('workspace/didChangeConfiguration', { settings = client.config.settings })
+    --             end
+    --             return true
+    --         end
+    --     },
+    -- },
+    -- { -- javascript LSP
+    --     lsp = 'eslint',
+    --     config = {
+    --         on_attach = function(_, bufnr)
+    --             vim.api.nvim_create_autocmd('BufWritePre', {
+    --                 buffer = bufnr,
+    --                 command = 'EslintFixAll',
+    --             })
+    --         end,
+    --     }
+    -- },
+}
+for _, server in ipairs(servers) do
+    if server.config then
+        lsp[server.lsp].setup({
+            capabilities = capabilities,
+            unpack(server.config)
+        })
+    else
+        lsp[server].setup({
+            capabilities = capabilities
+        })
+    end
+end
 
