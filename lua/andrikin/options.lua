@@ -1,5 +1,21 @@
 vim.g.mapleader = ' '
 
+vim.opt.mouse = ''
+
+vim.env.WAYLAND_DISPLAY = 'wayland-1' -- Configuração para wl-clipboard
+vim.g.clipboard  = {
+	name = 'AndrikinClipboard',
+	copy = { -- wl-copy
+		['+'] = 'wl-copy',
+		['*'] = 'wl-copy',
+	},
+	paste = { -- wl-paste
+		['+'] = 'wl-paste',
+		['*'] = 'wl-paste',
+	},
+	cache_enabled = true,
+}
+
 -- Search recursively
 vim.opt.path:append('**')
 
@@ -32,7 +48,7 @@ vim.opt.encoding='utf-8'
 vim.opt.autoread=true
 vim.opt.tabpagemax=50
 vim.opt.wildmenu=true
-vim.opt.completeopt='menu,menuone,noselect'
+vim.opt.completeopt='menu,menuone,noinsert,noselect'
 if vim.fn.has('win32') then
 	vim.g.shell=vim.env.COMSPEC
 else
@@ -94,4 +110,7 @@ vim.g.undotree_DiffpanelHeight=5
 -- --- Netrw ---
 -- Disable Netrw
 vim.g.loaded_netrwPlugin=1
+
+-- Dirvish
+vim.g.dirvish_mode='%sort /.*\\/\\|.*[^\\/]/' -- diretórios primeiro, depois arquivos
 

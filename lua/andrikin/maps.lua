@@ -113,6 +113,9 @@ vim.keymap.set(
 local toggle_list = function(modo, comando, on_error)
     local aberto = false
     local windows = vim.fn.getwininfo()
+	if not windows then
+		error('Não há informação para as janelas do nvim.')
+	end
     for _, win in ipairs(windows) do
         aberto = win[modo] == 1
         if aberto then

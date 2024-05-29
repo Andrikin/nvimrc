@@ -170,7 +170,7 @@ autocmd(
                 vim.keymap.set("i", "<cr>", function() -- insert word and skip from INSERT MODE
                     cmp.confirm({select = false})
                     local esc = vim.api.nvim_replace_termcodes("<esc>", true, false, true)
-                    vim.api.nvim_feedkeys(esc, 'n', false)
+                    vim.api.nvim_feedkeys(esc, 't', false)
                 end)
                 vim.keymap.set("i", "<c-e>", function()
                     cmp.abort()
@@ -186,16 +186,10 @@ autocmd(
     {
         group = Andrikin,
         pattern = 'AndrikinQuickFixHidden',
-        callback = function(ev)
-            local qf_winid = vim.fn.bufwinid(ev.buf)
-            local windows = vim.fn.gettabinfo(vim.fn.tabpagenr())[1].windows
-            windows = vim.tbl_filter(function(winid)
-                return winid ~= qf_winid
-            end, windows)
+        callback = function() -- getwinvar, setwinvar
+            local windows = vim.fn.getwininfo() or {}
             for _, window in ipairs(windows) do
-                local bufnr = vim.fn.getwininfo(window)[1].bufnr
-                vim.fn.setbufvar(bufnr, '&cursorline', false)
-                vim.fn.setbufvar(bufnr, '&cursorlineopt', 'number,line')
+				vim.wo[window.winid].cursorline = false
             end
         end
     }
@@ -206,7 +200,7 @@ autocmd(
         group = Andrikin,
         pattern = '*',
         callback = function()
-            if vim.o.buftype == 'quickfix' then
+            if vim.o.filetype == 'qf' then
                 vim.api.nvim_exec_autocmds('User', {
                     group = Andrikin,
                     pattern = 'AndrikinQuickFixHidden',
@@ -233,7 +227,7 @@ autocmd(
                             print('fim da lista.')
                         end
                     end
-                    cursorline.on()
+					cursorline.on()
                     vim.fn.win_gotoid(qf.winid) -- retornar para quickfix/loclist
                 end,
                 enter = function(self)

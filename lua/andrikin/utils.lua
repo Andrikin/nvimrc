@@ -1,8 +1,5 @@
 ---@class Utils
 ---@field Diretorio Diretorio
----@field SauceCodePro SauceCodePro
----@field Registrador Registrador
----@field Curl Curl
 ---@field OPT Diretorio
 ---@field win7 string | nil
 local Utils = {}
