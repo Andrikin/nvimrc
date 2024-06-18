@@ -63,7 +63,7 @@ autocmd(
 	'FileType',
 	{
 		group = Andrikin,
-		pattern = {'qf', 'checkhealth', 'help'},
+		pattern = {'qf', 'checkhealth', 'help', 'harpoon'},
 		callback = function(args)
 			vim.keymap.set(
 				'n',
