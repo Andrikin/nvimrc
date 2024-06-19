@@ -209,14 +209,14 @@ vim.keymap.set("n", "ghn", function() harpoon2:list():next() end)
 
 -- vim.diagnostic
 local diagnostic = function(next, severity)
-	local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
 	severity = severity and vim.diagnostic.severity[severity] or nil
 	return function()
-		go({ severity = severity })
+		local direction = next and 1 or -1
+		vim.diagnostic.jump({ severity = severity,  count = direction})
 	end
 end
-vim.keymap.set("n", "]d", diagnostic(true), { desc = 'Próximo Diagnóstico' })
-vim.keymap.set("n", "[d", diagnostic(false), { desc = 'Diagnóstico Anterior' })
+-- vim.keymap.set("n", "]d", diagnostic(true), { desc = 'Próximo Diagnóstico' })
+-- vim.keymap.set("n", "[d", diagnostic(false), { desc = 'Diagnóstico Anterior' })
 vim.keymap.set("n", "]e", diagnostic(true, "ERROR"), { desc = 'Próximo Erro' })
 vim.keymap.set("n", "[e", diagnostic(false, "ERROR"), { desc = 'Erro Anterior' })
 vim.keymap.set("n", "]w", diagnostic(true, "WARN"), { desc = 'Próximo Alerta' })
