@@ -98,7 +98,7 @@ Cmus.complete = function(argumento, comando, posicao)
 end
 
 local Latex = {}
-Latex.AUX_FOLDER = env.HOME .. '/git/itajai/modelos/aux' -- only for MiKTex
+Latex.AUX_FOLDER = env.HOME .. '/git/ouvidoria-latex-modelos/' -- only for MiKTex
 Latex.OUTPUT_FOLDER = env.HOME .. '/downloads'
 Latex.PDF_READER = 'zathura'
 Latex.ft = function()
@@ -124,7 +124,7 @@ Latex.clear = function(arquivo)
 	end
 end
 Latex.inicializar = function()
-	env.TEXINPUTS='.:/home/andre/git/itajai/modelos/LaTeX/ouvidoria-latex-modelos/:'
+	env.TEXINPUTS='.:/home/andre/git/ouvidoria-latex-modelos/:'
 end
 Latex.compile = function(opts)
 	if Latex.ft() then
@@ -172,7 +172,7 @@ Latex.inicializar()
 
 local Ouvidoria = {}
 Ouvidoria.TEX = '.tex'
-Ouvidoria.CI_FOLDER = env.HOME .. '/git/itajai/modelos/LaTeX/ouvidoria-latex-modelos'
+Ouvidoria.CI_FOLDER = env.HOME .. '/git/ouvidoria-latex-modelos'
 Ouvidoria.OUTPUT_FOLDER = env.HOME .. '/downloads'
 Ouvidoria.listagem = function()
 	return vim.tbl_map(
