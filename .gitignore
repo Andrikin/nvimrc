@@ -12,3 +12,8 @@ plugged/
 plugged/**/*
 lazy-lock.json
 /lua/.luarc.json
+plugged/nvim-colorizer.lua
+plugged/nvim-jdtls
+plugged/nvim-ts-context-commentstring
+plugged/vim-capslock
+
