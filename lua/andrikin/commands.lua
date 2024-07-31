@@ -1,13 +1,12 @@
 -- CUSTOM COMMANDS
 
+local musicas =  vim.fs.normalize(vim.env.HOME .. '/music/')
+
 local Cmus = {}
 Cmus.escolher_diretorio_musicas = function()
-	local musicas =  vim.env.HOME .. '/music/'
-	local diretorios = vim.fn.systemlist({'ls', musicas})
-	return diretorios
+	return vim.fn.systemlist({'ls', musicas})
 end
 Cmus.diretorios_musicas_tratadas = function()-- diretórios tratados para vim.cmd
-	local musicas =  vim.env.HOME .. '/music/'
 	local diretorios = vim.fn.systemlist({'ls', musicas})
 	diretorios = vim.tbl_map(
 		function(diretorio)
@@ -69,20 +68,32 @@ Cmus.acoes = {
 		Cmus.comando('-Q')
 	end,
 	-- CONTINUE
-	queue = function()-- '-q',
-		Cmus.comando('-q')
+	queue = function(dir)-- '-q',
+		Cmus.comando('-q', dir)
 	end,
 	raw = function()-- '-C', -- insert command
 		local comando = vim.fn.input('Digite comando Cmus: ')
 		Cmus.comando('-C', comando)
 	end,
 }
+Cmus.acoes.keys = function()
+    local keys = {}
+    for k, _ in pairs(Cmus.acoes) do
+        if k == 'keys' then
+            goto continue
+        end
+        table.insert(keys, k)
+        ::continue::
+    end
+    return keys
+end
 Cmus.executar = function(args)
 	local exec = Cmus.acoes[args.fargs[1]]
 	if not exec then
 		error('Cmus: executar: não foi encontrado comando válido')
 	end
-	exec()
+    table.remove(args.fargs, 1)
+    exec(unpack(args.fargs))
 end
 Cmus.complete2 = function(args)
 	local acoes = {}
