@@ -1,19 +1,14 @@
 -- CUSTOM COMMANDS
 
+local Diretorio = require('andrikin.utils').Diretorio
 local musicas =  vim.fs.normalize(vim.env.HOME .. '/music/')
 
 local Cmus = {}
-Cmus.escolher_diretorio_musicas = function()
+Cmus.lista_diretorios_musica = function()
 	return vim.fn.systemlist({'ls', musicas})
 end
-Cmus.diretorios_musicas_tratadas = function()-- diretórios tratados para vim.cmd
-	local diretorios = vim.fn.systemlist({'ls', musicas})
-	diretorios = vim.tbl_map(
-		function(diretorio)
-			return vim.fn.fnameescape(musicas .. diretorio)
-		end, diretorios
-	)
-	return diretorios
+Cmus.diretorio_musica = function(diretorio)
+    return vim.fn.fnameescape(musicas .. diretorio)
 end
 Cmus.comando = function(...)-- {'silent', '!cmus-remote'}-- vim.cmd
 	local cmd = {'silent', '!cmus-remote'}
@@ -67,9 +62,8 @@ Cmus.acoes = {
 	info = function()-- '-Q', -- player status information
 		Cmus.comando('-Q')
 	end,
-	-- CONTINUE
 	queue = function(dir)-- '-q',
-		Cmus.comando('-q', dir)
+		Cmus.comando('-q', Cmus.diretorio_musica(dir))
 	end,
 	raw = function()-- '-C', -- insert command
 		local comando = vim.fn.input('Digite comando Cmus: ')
@@ -95,106 +89,18 @@ Cmus.executar = function(args)
     table.remove(args.fargs, 1)
     exec(unpack(args.fargs))
 end
-Cmus.complete2 = function(args)
-	local acoes = {}
-	for k, _ in pairs(Cmus.acoes) do
-		table.insert(acoes, k)
-	end
-	return vim.tbl_filter(function(acao)
-		return acao:match(args)
-	end, acoes
-	)
-end
-Cmus.commands = {
-	'--play', '-p',
-	'--pause', '-u',
-	'--stop', '-s',
-	'--next', '-n',
-	'--prev', '-r',
-	'--repeat', '-R',
-	'--clear', '-c', -- Clear playlist, library (-l) or play queue (-q).
-	'--shuffle', '-S',
-	'--volume', '-v',
-	'--seek', '-k',
-	'--playlist', '-P',
-	'--file', '-f',
-	'-Q', -- player status information
-	'--queue', '-q',
-	'--raw', '-C', -- insert command
-}
-Cmus.fun = function(opts)
-	local acoes = { -- Ações que podem ser executadas
-		play = '-p',
-		pause = '-u',
-		prev = '-r',
-		next = '-n',
-		stop = '-s',
-		queue = '-q',
-		redo = '-R',
-		volume = '-v',
-		seek = '-k',
-		info = '-Q',
-		command = '-C',
-	}
-	local comando = opts.fargs[1]
-	local valido = false
-	for arg, _ in pairs(acoes) do
-		if comando == arg then
-			valido = true
-			opts.fargs[1] = acoes[comando]
-			break
-		end
-	end
-	if not valido then
-		print(comando .. ': não é uma ação válida.')
-		return
-	end
-	local prompt = {
-		'cmus-remote',
-	}
-	for _, arg in ipairs(opts.fargs) do
-		table.insert(prompt, arg)
-	end
-	local saida = vim.system(prompt, {text=true}):wait()
-	if comando == 'info' then
-		--WIP: Formatar para mostrar somente a música que está tocando
-		print(saida.stdout)
-	end
-end
-Cmus.complete = function(argumento, comando, posicao)
-	local _ = posicao
-	local MUSICAS = vim.env.HOME .. [[/music/]]
-	if not string.match(comando, '-') then -- nenhum comando inserido, retonar todos os comandos
-		return Cmus.commands
-	end
-	if string.match(argumento, '^-') then -- completar o comando atual
-		local prompt = {}
-		for _, cmd in ipairs(Cmus.commands) do
-			if string.match(cmd, argumento) then
-				table.insert(prompt, cmd)
-			end
-		end
-		return prompt
-	end
-	local diretorios = {}
-	local ls = vim.fn.systemlist({'ls', MUSICAS})
-	if not string.match(comando, MUSICAS) then -- quando nenhum diretório foi escolhido
-		if string.match(comando, '([-]?[-][qQ])') then -- checando se '--queue', '-q' ou '-Q' no comando
-			table.insert(diretorios, MUSICAS)
-			for _, diretorio in ipairs(ls) do -- adicionar '~/' no início de todas as opções 
-				diretorio = vim.fn.fnameescape(MUSICAS .. diretorio)
-				table.insert(diretorios, diretorio)
-			end
-		end
-	else
-		for _, cmd in ipairs(ls) do -- completar diretório
-			cmd = vim.fn.fnameescape(MUSICAS .. cmd)
-			if string.match(cmd, argumento) then
-				table.insert(diretorios, cmd)
-			end
-		end
-	end
-	return diretorios
+Cmus.tab = function(arg, cmd, pos)-- completion function
+    local narg = #(vim.split(cmd, ' '))
+    if narg == 3 then
+        return vim.tbl_filter(function(diretorio)
+            return diretorio:match(arg)
+        end, Cmus.lista_diretorios_musica()
+        )
+    end
+    return vim.tbl_filter(function(acao)
+        return acao:match(arg)
+    end, Cmus.acoes.keys()
+    )
 end
 
 local Latex = {}
@@ -328,11 +234,12 @@ vim.api.nvim_create_user_command(
 	{}
 )
 
--- api.nvim_create_user_command('Cmus', CMUS.fun, {
-vim.api.nvim_create_user_command(
-	'Cmus', 'silent !cmus-remote <args>', {
+api.nvim_create_user_command(
+    'Cmus',
+    Cmus.executar,
+    {
 		nargs = '+',
-		complete = Cmus.complete,
+		complete = Cmus.tab,
 	}
 )
 
