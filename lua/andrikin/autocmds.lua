@@ -75,7 +75,7 @@ autocmd(
 						vim.fn.win_gotoid(id) -- ir para a primeira window da tab
 					end
 				end,
-				{ silent = true, }
+				{ silent = true, buffer = args.buf }
 			)
 		end,
 	}
@@ -254,7 +254,7 @@ autocmd(
                     self.mover(cmd)
                 end,
             }
-            local opts = { buffer = true }
+            local opts = { buffer = ev.buf }
             vim.keymap.set('n', 'k', function() mover:k() end, opts)
             vim.keymap.set('n', 'j', function() mover:j() end, opts)
             vim.keymap.set('n', '<cr>', function() mover:enter() end, opts)

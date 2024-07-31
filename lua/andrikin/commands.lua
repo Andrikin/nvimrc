@@ -1,11 +1,100 @@
 -- CUSTOM COMMANDS
-local fn = vim.fn
-local api = vim.api
-local env = vim.env
-local cmd = vim.cmd
 
 local Cmus = {}
-Cmus.opts = {
+Cmus.escolher_diretorio_musicas = function()
+	local musicas =  vim.env.HOME .. '/music/'
+	local diretorios = vim.fn.systemlist({'ls', musicas})
+	return diretorios
+end
+Cmus.diretorios_musicas_tratadas = function()-- diretórios tratados para vim.cmd
+	local musicas =  vim.env.HOME .. '/music/'
+	local diretorios = vim.fn.systemlist({'ls', musicas})
+	diretorios = vim.tbl_map(
+		function(diretorio)
+			return vim.fn.fnameescape(musicas .. diretorio)
+		end, diretorios
+	)
+	return diretorios
+end
+Cmus.comando = function(...)-- {'silent', '!cmus-remote'}-- vim.cmd
+	local cmd = {'silent', '!cmus-remote'}
+	for _, v in ipairs(arg) do
+		table.insert(cmd, v)
+	end
+	local exec = table.concat(cmd, ' ')
+	vim.cmd(exec)
+end
+Cmus.acoes = {
+	play = function()-- '-p',
+		Cmus.comando('-p')
+	end,
+	pause = function()-- '-u',
+		Cmus.comando('-u')
+	end,
+	stop = function()-- '-s',
+		Cmus.comando('-s')
+	end,
+	next = function()-- '-n',
+		Cmus.comando('-n')
+	end,
+	prev = function()-- '-r',
+		Cmus.comando('-r')
+	end,
+	redo = function()-- '-R',
+		Cmus.comando('-R')
+	end,
+	clear = function()-- '-c', -- Clear playlist, library (-l) or play queue (-q).
+		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary ou [q]ueue? ', 'q')
+		if not comando:match('^-') then
+			comando = '-' .. comando
+		end
+		Cmus.comando('-c', comando)
+	end,
+	shuffle = function()-- '-S',
+		Cmus.comando('-S')
+	end,
+	volume = function()-- '-v',
+		Cmus.comando('-v')
+	end,
+	seek = function()-- '-k',
+		Cmus.comando('-k')
+	end,
+	playlist = function()-- '-P',
+		Cmus.comando('-P')
+	end,
+	file = function()-- '-f',
+		Cmus.comando('-f')
+	end,
+	info = function()-- '-Q', -- player status information
+		Cmus.comando('-Q')
+	end,
+	-- CONTINUE
+	queue = function()-- '-q',
+		Cmus.comando('-q')
+	end,
+	raw = function()-- '-C', -- insert command
+		local comando = vim.fn.input('Digite comando Cmus: ')
+		Cmus.comando('-C', comando)
+	end,
+}
+Cmus.executar = function(args)
+	local exec = Cmus.acoes[args.fargs[1]]
+	if not exec then
+		error('Cmus: executar: não foi encontrado comando válido')
+	end
+	exec()
+end
+Cmus.complete2 = function(args)
+	local acoes = {}
+	for k, _ in pairs(Cmus.acoes) do
+		table.insert(acoes, k)
+	end
+	return vim.tbl_filter(function(acao)
+		return acao:match(args)
+	end, acoes
+	)
+end
+Cmus.commands = {
 	'--play', '-p',
 	'--pause', '-u',
 	'--stop', '-s',
@@ -63,13 +152,13 @@ Cmus.fun = function(opts)
 end
 Cmus.complete = function(argumento, comando, posicao)
 	local _ = posicao
-	local MUSICAS = env.HOME .. [[/music/]]
+	local MUSICAS = vim.env.HOME .. [[/music/]]
 	if not string.match(comando, '-') then -- nenhum comando inserido, retonar todos os comandos
-		return Cmus.opts
+		return Cmus.commands
 	end
 	if string.match(argumento, '^-') then -- completar o comando atual
 		local prompt = {}
-		for _, cmd in ipairs(Cmus.opts) do
+		for _, cmd in ipairs(Cmus.commands) do
 			if string.match(cmd, argumento) then
 				table.insert(prompt, cmd)
 			end
@@ -77,18 +166,18 @@ Cmus.complete = function(argumento, comando, posicao)
 		return prompt
 	end
 	local diretorios = {}
-	local ls = fn.systemlist({'ls', MUSICAS})
+	local ls = vim.fn.systemlist({'ls', MUSICAS})
 	if not string.match(comando, MUSICAS) then -- quando nenhum diretório foi escolhido
 		if string.match(comando, '([-]?[-][qQ])') then -- checando se '--queue', '-q' ou '-Q' no comando
 			table.insert(diretorios, MUSICAS)
 			for _, diretorio in ipairs(ls) do -- adicionar '~/' no início de todas as opções 
-				diretorio = fn.fnameescape(MUSICAS .. diretorio)
+				diretorio = vim.fn.fnameescape(MUSICAS .. diretorio)
 				table.insert(diretorios, diretorio)
 			end
 		end
 	else
 		for _, cmd in ipairs(ls) do -- completar diretório
-			cmd = fn.fnameescape(MUSICAS .. cmd)
+			cmd = vim.fn.fnameescape(MUSICAS .. cmd)
 			if string.match(cmd, argumento) then
 				table.insert(diretorios, cmd)
 			end
@@ -98,15 +187,15 @@ Cmus.complete = function(argumento, comando, posicao)
 end
 
 local Latex = {}
-Latex.AUX_FOLDER = env.HOME .. '/git/ouvidoria-latex-modelos/' -- only for MiKTex
-Latex.OUTPUT_FOLDER = env.HOME .. '/downloads'
+Latex.AUX_FOLDER = vim.env.HOME .. '/git/ouvidoria-latex-modelos/' -- only for MiKTex
+Latex.OUTPUT_FOLDER = vim.env.HOME .. '/downloads'
 Latex.PDF_READER = 'zathura'
 Latex.ft = function()
 	return vim.o.ft ~= 'tex'
 end
 Latex.clear = function(arquivo)
 	-- deletar arquivos auxiliares da compilação, no linux
-	if not fn.has('linux') then
+	if not vim.fn.has('linux') then
 		vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
 		return
 	end
@@ -114,17 +203,17 @@ Latex.clear = function(arquivo)
 		function(auxiliar)
 			return string.match(auxiliar, 'aux$') or string.match(auxiliar, 'out$') or string.match(auxiliar, 'log$')
 		end,
-		fn.glob(Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.*', false, true)
+		vim.fn.glob(Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.*', false, true)
 	)
 	if #auxiliares == 0 then
 		return
 	end
 	for _, auxiliar in ipairs(auxiliares) do
-		fn.delete(auxiliar)
+		vim.fn.delete(auxiliar)
 	end
 end
 Latex.inicializar = function()
-	env.TEXINPUTS='.:/home/andre/git/ouvidoria-latex-modelos/:'
+	vim.env.TEXINPUTS='.:/home/andre/git/ouvidoria-latex-modelos/:'
 end
 Latex.compile = function(opts)
 	if Latex.ft() then
@@ -132,11 +221,11 @@ Latex.compile = function(opts)
 		return
 	end
 	if vim.o.modified then -- salvar arquivo que está modificado.
-		cmd.write()
+		vim.cmd.write()
 	end
-	local arquivo = fn.expand('%:t')
+	local arquivo = vim.fn.expand('%:t')
 	local cmd = {}
-	if fn.has('linux') then
+	if vim.fn.has('linux') then
 		cmd = {
 			'pdflatex',
 			'-file-line-error',
@@ -155,12 +244,12 @@ Latex.compile = function(opts)
 		}
 	end
 	vim.notify('1º compilação!')
-	fn.system(cmd)
+	vim.fn.system(cmd)
 	vim.notify('2º compilação!')
-	fn.system(cmd)
+	vim.fn.system(cmd)
 	vim.notify('Pdf compilado!')
 	arquivo = string.match(arquivo, '(.*)%..*$') -- remover extenção do arquivo
-	fn.jobstart(
+	vim.fn.jobstart(
 		{
 			Latex.PDF_READER,
 			Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.pdf'
@@ -172,32 +261,32 @@ Latex.inicializar()
 
 local Ouvidoria = {}
 Ouvidoria.TEX = '.tex'
-Ouvidoria.CI_FOLDER = env.HOME .. '/git/ouvidoria-latex-modelos'
-Ouvidoria.OUTPUT_FOLDER = env.HOME .. '/downloads'
+Ouvidoria.CI_FOLDER = vim.env.HOME .. '/git/ouvidoria-latex-modelos'
+Ouvidoria.OUTPUT_FOLDER = vim.env.HOME .. '/downloads'
 Ouvidoria.listagem = function()
 	return vim.tbl_map(
 		function(diretorio)
 			return string.match(diretorio, "[a-zA-Z-]*.tex$")
 		end,
-		fn.glob(Ouvidoria.CI_FOLDER .. '/*.tex', false, true)
+		vim.fn.glob(Ouvidoria.CI_FOLDER .. '/*.tex', false, true)
 	)
 end
 Ouvidoria.nova_comunicacao = function(opts)
 	local tipo = opts.fargs[1] or 'modelo-basico'
 	local arquivo = opts.fargs[2] or 'ci-modelo'
-	local alternativo = fn.expand('%')
-	cmd.edit(Ouvidoria.CI_FOLDER .. '/' .. tipo .. Ouvidoria.TEX)
+	local alternativo = vim.fn.expand('%')
+	vim.cmd.edit(Ouvidoria.CI_FOLDER .. '/' .. tipo .. Ouvidoria.TEX)
 	local ok, retorno = pcall(
-		cmd.saveas,
+		vim.cmd.saveas,
 		Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
 	)
 	while not ok do
 		if string.match(retorno, 'E13:') then
-			arquivo = fn.input(
+			arquivo = vim.fn.input(
 				'Arquivo com este nome já existe. Digite outro nome para arquivo: '
 			)
 			ok, retorno = pcall(
-				cmd.saveas,
+				vim.cmd.saveas,
 				Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
 			)
 		else
@@ -205,8 +294,8 @@ Ouvidoria.nova_comunicacao = function(opts)
 			return
 		end
 	end
-	fn.setreg('#', alternativo) -- setando arquivo alternativo
-	cmd.bdelete(tipo)
+	vim.fn.setreg('#', alternativo) -- setando arquivo alternativo
+	vim.cmd.bdelete(tipo)
 end
 Ouvidoria.complete = function(args, cmd, pos)
 	return vim.tbl_filter(
@@ -222,29 +311,27 @@ Ouvidoria.complete = function(args, cmd, pos)
 	)
 end
 
-api.nvim_create_user_command(
+vim.api.nvim_create_user_command(
 	'HexEditor',
 	'%!xxd',
 	{}
 )
 
 -- api.nvim_create_user_command('Cmus', CMUS.fun, {
-api.nvim_create_user_command(
-	'Cmus',
-	'silent !cmus-remote <args>',
-	{
+vim.api.nvim_create_user_command(
+	'Cmus', 'silent !cmus-remote <args>', {
 		nargs = '+',
 		complete = Cmus.complete,
 	}
 )
 
-api.nvim_create_user_command(
+vim.api.nvim_create_user_command(
 	'Pdflatex',
 	Latex.compile,
 	{}
 )
 
-api.nvim_create_user_command(
+vim.api.nvim_create_user_command(
 	'Ouvidoria',
 	Ouvidoria.nova_comunicacao,
 	{

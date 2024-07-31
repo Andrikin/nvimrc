@@ -28,7 +28,7 @@ local plugins = {
 	'https://github.com/Andrikin/vim-capslock',
 	-- Tim Pope's miracles
     'https://github.com/tpope/vim-fugitive.git',
-	'https://github.com/tpope/vim-commentary.git',
+	-- 'https://github.com/tpope/vim-commentary.git', -- com 0.10, commentary é nativo
 	'https://github.com/tpope/vim-surround.git',
 	'https://github.com/tpope/vim-eunuch.git',
 	{
