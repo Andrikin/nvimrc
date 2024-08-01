@@ -8,66 +8,71 @@ Cmus.lista_diretorios_musica = function()
 	return vim.fn.systemlist({'ls', musicas})
 end
 Cmus.diretorio_musica = function(diretorio)
-    return vim.fn.fnameescape(musicas .. diretorio)
+    return vim.fn.fnameescape(musicas .. '/' .. diretorio)
 end
-Cmus.comando = function(...)-- {'silent', '!cmus-remote'}-- vim.cmd
+Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
+	local arg = {...}
 	local cmd = {'silent', '!cmus-remote'}
 	for _, v in ipairs(arg) do
 		table.insert(cmd, v)
+	end
+	if arg[1]:match('-[QC]') then -- mostrar resultados de '-Q', '-C'
+		table.remove(cmd, 1)
 	end
 	local exec = table.concat(cmd, ' ')
 	vim.cmd(exec)
 end
 Cmus.acoes = {
-	play = function()-- '-p',
+	play = function() -- '-p',
 		Cmus.comando('-p')
 	end,
-	pause = function()-- '-u',
+	pause = function() -- '-u',
 		Cmus.comando('-u')
 	end,
-	stop = function()-- '-s',
+	stop = function() -- '-s',
 		Cmus.comando('-s')
 	end,
-	next = function()-- '-n',
+	next = function() -- '-n',
 		Cmus.comando('-n')
 	end,
-	prev = function()-- '-r',
+	prev = function() -- '-r',
 		Cmus.comando('-r')
 	end,
-	redo = function()-- '-R',
+	redo = function() -- '-R',
 		Cmus.comando('-R')
 	end,
-	clear = function()-- '-c', -- Clear playlist, library (-l) or play queue (-q).
+	clear = function() -- '-c',  -- Clear playlist, library (-l) or play queue (-q).
 		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary ou [q]ueue? ', 'q')
 		if not comando:match('^-') then
 			comando = '-' .. comando
 		end
 		Cmus.comando('-c', comando)
 	end,
-	shuffle = function()-- '-S',
+	shuffle = function() -- '-S',
 		Cmus.comando('-S')
 	end,
-	volume = function()-- '-v',
+	volume = function() -- '-v',
 		Cmus.comando('-v')
 	end,
-	seek = function()-- '-k',
+	seek = function() -- '-k',
 		Cmus.comando('-k')
 	end,
-	playlist = function()-- '-P',
+	playlist = function() -- '-P',
 		Cmus.comando('-P')
 	end,
-	file = function()-- '-f',
+	file = function() -- '-f',
 		Cmus.comando('-f')
 	end,
-	info = function()-- '-Q', -- player status information
+	info = function() -- '-Q',  -- player status information
 		Cmus.comando('-Q')
 	end,
-	queue = function(dir)-- '-q',
+	queue = function(dir) -- '-q',
 		Cmus.comando('-q', Cmus.diretorio_musica(dir))
+		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
 	end,
-	raw = function()-- '-C', -- insert command
+	raw = function() -- '-C',  -- insert command
 		local comando = vim.fn.input('Digite comando Cmus: ')
-		Cmus.comando('-C', comando)
+		Cmus.comando('-C', '"' .. comando .. '"')
 	end,
 }
 Cmus.acoes.keys = function()
@@ -86,12 +91,16 @@ Cmus.executar = function(args)
 	if not exec then
 		error('Cmus: executar: não foi encontrado comando válido')
 	end
-    table.remove(args.fargs, 1)
-    exec(unpack(args.fargs))
+	local opts = ''
+	if #args.fargs > 1 then
+		table.remove(args.fargs, 1)
+		opts = table.concat(args.fargs, ' ')
+	end
+    exec(opts)
 end
-Cmus.tab = function(arg, cmd, pos)-- completion function
+Cmus.tab = function(arg, cmd, pos) -- completion function
     local narg = #(vim.split(cmd, ' '))
-    if narg == 3 then
+    if narg > 2 then
         return vim.tbl_filter(function(diretorio)
             return diretorio:match(arg)
         end, Cmus.lista_diretorios_musica()
@@ -234,7 +243,7 @@ vim.api.nvim_create_user_command(
 	{}
 )
 
-api.nvim_create_user_command(
+vim.api.nvim_create_user_command(
     'Cmus',
     Cmus.executar,
     {
