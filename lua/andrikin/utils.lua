@@ -1,11 +1,11 @@
 ---@class Utils
 ---@field Diretorio Diretorio
----@field OPT Diretorio
 ---@field win7 string | nil
 local Utils = {}
 
 ---@class Diretorio
 ---@field diretorio string Caminho completo do diretório
+---@field add function
 local Diretorio = {}
 
 Diretorio.__index = Diretorio
@@ -13,85 +13,111 @@ Diretorio.__index = Diretorio
 ---@param caminho string | table
 ---@return Diretorio
 Diretorio.new = function(caminho)
-	vim.validate({caminho = {caminho, {'table', 'string'}}})
-	if type(caminho) == 'table' then
-		for _, valor in ipairs(caminho) do
-			if type(valor) ~= 'string' then
-				error('Diretorio: new: Elemento de lista diferente de "string"!')
-			end
-		end
-	end
-	local diretorio = setmetatable({
-        diretorio = '',
+    caminho = caminho or ''
+    vim.validate({caminho = {caminho, {'table', 'string'}}})
+    if type(caminho) == 'table' then
+        for _, valor in ipairs(caminho) do
+            if type(valor) ~= 'string' then
+                error('Diretorio: new: Elemento de lista diferente de "string"!')
+            end
+        end
+        caminho = table.concat(caminho, '/'):gsub('//+', '/')
+    end
+    local diretorio = setmetatable({
+        diretorio = Diretorio._sanitize(caminho),
     }, Diretorio)
-	if type(caminho) == 'table' then
-		local concatenar = caminho[1]
-		for i=2, #caminho do
-			concatenar = concatenar .. diretorio._suffix(caminho[i])
-		end
-		caminho = concatenar
-	end
-	diretorio.diretorio = diretorio._sanitize(caminho)
-	return diretorio
+    return diretorio
 end
 
 ---@private
 ---@param str string
 ---@return string
 Diretorio._sanitize = function(str)
-    local sanitarizado = ''
-	vim.validate({ str = {str, 'string'} })
-	sanitarizado = string.gsub(str, '/', '\\')
-    return sanitarizado
+    vim.validate({ str = {str, 'string'} })
+    return vim.fs.normalize(str)
+end
+
+---@private
+---@return Diretorio
+--- Realiza busca nas duas direções pelo 
+Diretorio.buscar = function(dir, start)
+    vim.validate({ dir = {dir,{'table', 'string'}} })
+    vim.validate({ start = {start, 'string'} })
+    if type(dir) == 'table' then
+        dir = vim.fs.normalize(table.concat(dir, '/'))
+    else
+        dir = vim.fs.normalize(dir)
+    end
+    if dir:match('^' .. vim.env.HOMEDRIVE) then
+        error('Diretorio: buscar: argumento deve ser um trecho de diretório, não deve conter "C:/" no seu início.')
+    end
+    start = Diretorio._sanitize(start) or Diretorio._sanitize(vim.env.HOMEPATH)
+    local diretorio = ''
+    local diretorios = vim.fs.dir(start, {depth = math.huge})
+    for d, t in diretorios do
+        if not t == 'directory' then
+            goto continue
+        end
+        if d:match('.*' .. dir:gsub('-', '.')) then
+            diretorio = d
+            break
+        end
+        ::continue::
+    end
+    if diretorio == '' then
+        error('Diretorio: buscar: não foi encontrado o caminho do diretório informado.')
+    end
+    diretorio = vim.fs.normalize(start .. '/' .. diretorio):gsub('//+', '/')
+    return Diretorio.new(diretorio)-- valores de vim.fs.dir já são normalizados
 end
 
 ---@private
 ---@param str string
 ---@return string
 Diretorio._suffix = function(str)
-	vim.validate({ str = {str, 'string'} })
-	return (str:match('^[/\\]') or str == '') and str or '\\' .. str
+    vim.validate({ str = {str, 'string'} })
+    return (str:match('^[/\\]') or str == '') and str or vim.fs.normalize('/' .. str)
 end
 
 ---@param caminho string | table
 Diretorio.add = function(self, caminho)
-	if type(caminho) == 'table' then
-		local concatenar = ''
-		for _, c in ipairs(caminho) do
-			concatenar = concatenar .. Diretorio._suffix(c)
-		end
-		caminho = concatenar
-	end
-	self.diretorio = self.diretorio .. Diretorio._suffix(caminho)
+    if type(caminho) == 'table' then
+        local concatenar = ''
+        for _, c in ipairs(caminho) do
+            concatenar = concatenar .. Diretorio._suffix(c)
+        end
+        caminho = concatenar
+    end
+    self.diretorio = self.diretorio .. Diretorio._suffix(caminho)
 end
 
 ---@param other Diretorio | string
 ---@return Diretorio
 Diretorio.__div = function(self, other)
     local nome = self.diretorio
-	if getmetatable(other) == Diretorio then
+    if getmetatable(other) == Diretorio then
         other = other.diretorio
     elseif type(other) ~= 'string' then
-		error('Diretorio: __div: Elementos precisam ser do tipo "string".')
-	end
-	return Diretorio.new(Diretorio._sanitize(nome .. Diretorio._suffix(other)))
+        error('Diretorio: __div: Elementos precisam ser do tipo "string".')
+    end
+    return Diretorio.new(Diretorio._sanitize(nome .. Diretorio._suffix(other)))
 end
 
 ---@param str string
 ---@return string
 Diretorio.__concat = function(self, str)
-	if getmetatable(self) ~= Diretorio then
-		error('Diretorio: __concat: Objeto não é do tipo Diretorio.')
-	end
-	if type(str) ~= 'string' then
-		error('Diretorio: __concat: Argumento precisa ser do tipo "string".')
-	end
-	return Diretorio._sanitize(self.diretorio .. Diretorio._suffix(str))
+    if getmetatable(self) ~= Diretorio then
+        error('Diretorio: __concat: Objeto não é do tipo Diretorio.')
+    end
+    if type(str) ~= 'string' then
+        error('Diretorio: __concat: Argumento precisa ser do tipo "string".')
+    end
+    return Diretorio._sanitize(self.diretorio .. Diretorio._suffix(str))
 end
 
 ---@return string
 Diretorio.__tostring = function(self)
-	return self.diretorio
+    return self.diretorio
 end
 
 Utils.Diretorio = Diretorio
