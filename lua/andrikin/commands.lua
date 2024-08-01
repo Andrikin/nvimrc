@@ -54,6 +54,7 @@ Cmus.acoes = {
 		Cmus.comando('-R')
 	end,
 	clear = function()
+        -- --TODO: utilizar vim.ui.input (completion)
         -- -c, --clear
         -- Clear playlist, library (-l), play queue (-q) or playlist (-p).
 		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist? ', 'q')
@@ -115,6 +116,7 @@ Cmus.acoes = {
 	end,
 	raw = function()
         -- TODO: criar completefunc para input deste comando.
+        -- Utilizar vim.ui.input (completion)
         -- Seção COMANDOS, no manual do cmus
         -- -C, --raw
         -- Treat arguments (instead of stdin) as raw commands.
@@ -182,6 +184,7 @@ Cmus.tab = function(arg, cmd, pos) -- completion function
 end
 
 local Latex = {}
+Latex.__index = Latex
 Latex.AUX_FOLDER = vim.env.HOME .. '/git/ouvidoria-latex-modelos/' -- only for MiKTex
 Latex.OUTPUT_FOLDER = vim.env.HOME .. '/downloads'
 Latex.PDF_READER = 'zathura'
