@@ -23,54 +23,123 @@ Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
 	vim.cmd(exec)
 end
 Cmus.acoes = {
-	play = function() -- '-p',
+	play = function()
+        -- -p, --play
+        -- Start playing.
 		Cmus.comando('-p')
 	end,
-	pause = function() -- '-u',
+	pause = function()
+        -- -u, --pause
+        -- Toggle pause.
 		Cmus.comando('-u')
 	end,
-	stop = function() -- '-s',
+	stop = function()
+        -- -s, --stop
+        -- Stop playing.
 		Cmus.comando('-s')
 	end,
-	next = function() -- '-n',
+	next = function()
+        -- -n, --next
+        -- Skip forward in playlist.
 		Cmus.comando('-n')
 	end,
-	prev = function() -- '-r',
+	prev = function()
+        -- -r, --prev
+        -- Skip backward in playlist.
 		Cmus.comando('-r')
 	end,
-	redo = function() -- '-R',
+	redo = function()
+        -- -R, --repeat
+        -- Toggle repeat.
 		Cmus.comando('-R')
 	end,
-	clear = function() -- '-c',  -- Clear playlist, library (-l) or play queue (-q).
-		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary ou [q]ueue? ', 'q')
+	clear = function()
+        -- -c, --clear
+        -- Clear playlist, library (-l), play queue (-q) or playlist (-p).
+		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist? ', 'q')
 		if not comando:match('^-') then
 			comando = '-' .. comando
 		end
 		Cmus.comando('-c', comando)
 	end,
-	shuffle = function() -- '-S',
+	shuffle = function()
+        -- -S, --shuffle
+        -- Toggle shuffle.
 		Cmus.comando('-S')
 	end,
-	volume = function() -- '-v',
+	volume = function()
+        -- -v, --volume VOL
+        -- Change volume. See vol command in cmus(1).
+        -- cmus-remote -v <volume>
+        -- cmus-remote -v +<volume>
+        -- cmus-remote -v -<volume>
 		Cmus.comando('-v')
 	end,
-	seek = function() -- '-k',
+	seek = function()
+        -- -k, --seek SEEK
+        -- Seek. See seek command in cmus(1).
+        -- cmus-remote -k <tempo> (relativo a posição atual da faixa, não ao tempo total da faixa)
+        -- cmus-remote -k +<tempo>
+        -- cmus-remote -k -<tempo>
+		-- Cmus.comando('--seek')
 		Cmus.comando('-k')
 	end,
-	playlist = function() -- '-P',
+	playlist = function()
+        -- -P, --playlist
+        -- Modify playlist (default).
+        -- cmus-remote --playlist -l (exibe playlists disponíveis no cmus)
+        -- cmus-remote --playlist -a <caminho/playlist(.m3u,.pls)>
+        -- cmus-remote --playlista <caminho/playlist(.m3u,.pls)>
 		Cmus.comando('-P')
 	end,
-	file = function() -- '-f',
+	file = function()
+        -- -f, --file FILE
+        -- Play from file.
+        -- Adiciona faixa ao final da lista de reprodução atual
+        -- cmus-remote --file <caminho/para/arquivo>
 		Cmus.comando('-f')
 	end,
-	info = function() -- '-Q',  -- player status information
+	info = function()
+        -- -Q
+        -- Get player status information. Same as -C status. Note that status is a special command only available to cmus-remote.
+        -- TODO: como obter output de vim.cmd?
+        -- Utilizar vim.api.nvim_exec2, [vim.split]ando o resultado por '\n'
+        -- e removendo o primeiro elemento da table, junto com strings vazias
 		Cmus.comando('-Q')
 	end,
-	queue = function(dir) -- '-q',
+	queue = function(dir)
+        -- -q, --queue
+        -- Modify play queue instead of playlist.
 		Cmus.comando('-q', Cmus.diretorio_musica(dir))
 		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
 	end,
-	raw = function() -- '-C',  -- insert command
+	raw = function()
+        -- TODO: criar completefunc para input deste comando.
+        -- Seção COMANDOS, no manual do cmus
+        -- -C, --raw
+        -- Treat arguments (instead of stdin) as raw commands.
+        -- cmus-remote -C play
+        -- cmus-remote -C pause
+        -- cmus-remote -C stop
+        -- cmus-remote -C next
+        -- cmus-remote -C prev
+        -- cmus-remote -C seek <tempo>
+        -- cmus-remote -C volume <número>
+        -- cmus-remote -C add <caminho/para/arquivo>
+        -- cmus-remote -C remove <índice>
+        -- cmus-remote -C clear
+        -- cmus-remote -C save <nome-da-playlist>
+        -- cmus-remote -C load <nome-da-playlist>
+        -- cmus-remote -C status
+        -- cmus-remote -C current
+        -- cmus-remote -C search <termo>
+        -- cmus-remote -C queue
+        -- cmus-remote -C playmode <modo>
+        -- cmus-remote -C show
+        -- cmus-remote -C toggle
+        -- cmus-remote -C playpause
+        -- cmus-remote -C repeat
+        -- cmus-remote -C shuffle
 		local comando = vim.fn.input('Digite comando Cmus: ')
 		Cmus.comando('-C', '"' .. comando .. '"')
 	end,
