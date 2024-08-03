@@ -207,20 +207,3 @@ vim.keymap.set("n", "ghr", function() harpoon2:list():select(4) end)
 vim.keymap.set("n", "ghp", function() harpoon2:list():prev() end)
 vim.keymap.set("n", "ghn", function() harpoon2:list():next() end)
 
--- vim.diagnostic
-local diagnostic = function(next, severity)
-	severity = severity and vim.diagnostic.severity[severity] or nil
-	return function()
-		local direction = next and 1 or -1
-		vim.diagnostic.jump({ severity = severity,  count = direction})
-	end
-end
--- vim.keymap.set("n", "]d", diagnostic(true), { desc = 'Próximo Diagnóstico' })
--- vim.keymap.set("n", "[d", diagnostic(false), { desc = 'Diagnóstico Anterior' })
-vim.keymap.set("n", "]e", diagnostic(true, "ERROR"), { desc = 'Próximo Erro' })
-vim.keymap.set("n", "[e", diagnostic(false, "ERROR"), { desc = 'Erro Anterior' })
-vim.keymap.set("n", "]w", diagnostic(true, "WARN"), { desc = 'Próximo Alerta' })
-vim.keymap.set("n", "[w", diagnostic(false, "WARN"), { desc = 'Alerta Anterior' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Abrir erro no cursor'})
-vim.keymap.set('n', '<leader>d', vim.diagnostic.setloclist, { desc = 'Abrir lista de diagnósticos' })
-
