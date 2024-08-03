@@ -58,9 +58,15 @@ end
 vim.opt.complete:remove('t')
 vim.opt.title = true
 vim.opt.hidden = true
-vim.opt.mouse = 'nvi'
-vim.g.undodir = vim.fn.stdpath('data') .. [[\undotree]]
-vim.opt.undofile = true
+vim.opt.mouse = ''
+if vim.fn.has('persistent_undo') then
+	local path = vim.fn.stdpath('data') .. '\\undotree'
+	if vim.fn.isdirectory(path) == 0 then
+		vim.fn.mkdir(path, 'p', 0700)
+	end
+	vim.opt.undodir = path
+	vim.opt.undofile = true
+end
 vim.opt.swapfile = false
 vim.g.textwidth = 0
 
@@ -74,7 +80,7 @@ vim.opt.termguicolors = true
 
 -- NeoVim configurations
 vim.opt.guicursor = 'i-n-v-c:block'
-vim.opt.guifont = [[SauceCodePro NFM]]
+vim.opt.guifont =  'SauceCodePro NFM:h11'
 vim.opt.inccommand = ''
 vim.opt.fillchars = {
 	vert = '|',
@@ -102,10 +108,11 @@ vim.g.user_emmet_install_global = 0
 vim.g.traces_num_range_preview = 0
 
 -- --- UndoTree ---
-vim.g.undotree_WindowLayout = 2
+vim.g.undotree_WindowLayout = 1
 vim.g.undotree_ShortIndicators = 1
 vim.g.undotree_SetFocusWhenToggle = 1
-vim.g.undotree_DiffpanelHeight = 5
+vim.g.undotree_DiffpanelHeight = 10
+-- vim.g.undotree_DiffAutoOpen = 1
 
 -- --- Netrw ---
 -- Disable Netrw
@@ -117,4 +124,7 @@ vim.g.dirvish_mode = '%sort /.*\\/\\|.*[^\\/]/' -- diretórios primeiro, depois 
 -- TODO: Paleativo. CursorLine, para o tema tokyonight neste computador, não está configurado.
 -- Forçando configuração
 vim.api.nvim_set_hl(0, 'CursorLine', {link = 'Visual'})
+
+-- Removendo providers: Perl
+vim.g.loaded_perl_provider = 0
 
