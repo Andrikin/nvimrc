@@ -139,10 +139,7 @@ autocmd(
 			vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
 			vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
 			vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-			vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
 			vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-			vim.keymap.set('n', '<c-k>', vim.lsp.buf.signature_help, opts)
-			vim.keymap.set('n', 'gs', vim.lsp.buf.rename, opts)
             -- nvim-cmp (force autocompletion)
             if package.loaded['cmp'] then
                 local cmp = require('cmp')
@@ -173,7 +170,7 @@ autocmd(
                 vim.keymap.set("i", "<cr>", function() -- insert word and skip from INSERT MODE
                     cmp.confirm({select = false})
                     local esc = vim.api.nvim_replace_termcodes("<esc>", true, false, true)
-                    vim.api.nvim_feedkeys(esc, 't', false)
+                    vim.api.nvim_feedkeys(esc, 'n', false)
                 end)
                 vim.keymap.set("i", "<c-e>", function()
                     cmp.abort()
@@ -189,10 +186,14 @@ autocmd(
     {
         group = Andrikin,
         pattern = 'AndrikinQuickFixHidden',
-        callback = function() -- getwinvar, setwinvar
-            local windows = vim.fn.getwininfo() or {}
-            for _, window in ipairs(windows) do
-				vim.wo[window.winid].cursorline = false
+        callback = function(ev)
+            local qf_winid = vim.fn.bufwinid(ev.buf)
+            local windows = vim.fn.gettabinfo(vim.fn.tabpagenr())[1].windows
+            windows = vim.tbl_filter(function(winid)
+                return winid ~= qf_winid
+            end, windows)
+            for _, id in ipairs(windows) do
+                vim.wo[id].cursorline = false
             end
         end
     }
@@ -203,7 +204,7 @@ autocmd(
         group = Andrikin,
         pattern = '*',
         callback = function()
-            if vim.o.filetype == 'qf' then
+            if vim.o.buftype == 'quickfix' then
                 vim.api.nvim_exec_autocmds('User', {
                     group = Andrikin,
                     pattern = 'AndrikinQuickFixHidden',
