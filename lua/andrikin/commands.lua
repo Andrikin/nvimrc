@@ -1,14 +1,11 @@
 -- CUSTOM COMMANDS
 
 local Diretorio = require('andrikin.utils').Diretorio
-local musicas =  vim.fs.normalize(vim.env.HOME .. '/music/')
+local Musicas =  Diretorio.new(vim.env.HOME) / '/music/'
 
 local Cmus = {}
-Cmus.lista_diretorios_musica = function()
-	return vim.fn.systemlist({'ls', musicas})
-end
-Cmus.diretorio_musica = function(diretorio)
-    return vim.fn.fnameescape(musicas .. '/' .. diretorio)
+Cmus.diretorios_musica = function()
+	return vim.fn.systemlist({'ls', Musicas.diretorio})
 end
 Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
 	local arg = {...}
@@ -82,7 +79,6 @@ Cmus.acoes = {
         -- cmus-remote -k <tempo> (relativo a posição atual da faixa, não ao tempo total da faixa)
         -- cmus-remote -k +<tempo>
         -- cmus-remote -k -<tempo>
-		-- Cmus.comando('--seek')
 		Cmus.comando('-k')
 	end,
 	playlist = function()
@@ -111,7 +107,9 @@ Cmus.acoes = {
 	queue = function(dir)
         -- -q, --queue
         -- Modify play queue instead of playlist.
-		Cmus.comando('-q', Cmus.diretorio_musica(dir))
+		dir = vim.fn.fnameescape((Musicas / dir).diretorio)
+		Cmus.comando('-c', '-q')
+		Cmus.comando('-q', dir)
 		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
 	end,
 	raw = function()
@@ -169,12 +167,12 @@ Cmus.executar = function(args)
 	end
     exec(opts)
 end
-Cmus.tab = function(arg, cmd, pos) -- completion function
+Cmus.tab = function(arg, cmd) -- completion function
     local narg = #(vim.split(cmd, ' '))
     if narg > 2 then
         return vim.tbl_filter(function(diretorio)
             return diretorio:match(arg)
-        end, Cmus.lista_diretorios_musica()
+        end, Cmus.diretorios_musica()
         )
     end
     return vim.tbl_filter(function(acao)
@@ -185,129 +183,175 @@ end
 
 local Latex = {}
 Latex.__index = Latex
-Latex.AUX_FOLDER = vim.env.HOME .. '/git/ouvidoria-latex-modelos/' -- only for MiKTex
-Latex.OUTPUT_FOLDER = vim.env.HOME .. '/downloads'
-Latex.PDF_READER = 'zathura'
-Latex.ft = function()
-	return vim.o.ft ~= 'tex'
+Latex.new = function()
+	local latex = setmetatable({
+		reader = 'zathura',
+		diretorios = {
+			modelos = Diretorio.new(vim.env.HOME) / 'git' / 'ouvidoria-latex-modelos',
+			destino = Diretorio.new(vim.env.HOME) / 'downloads',
+		}
+	}, Latex)
+	latex:init()
+	return latex
 end
-Latex.clear = function(arquivo)
+Latex.ft_tex = function()
+	return vim.o.ft == 'tex'
+end
+Latex.clear_files = function()
 	-- deletar arquivos auxiliares da compilação, no linux
 	if not vim.fn.has('linux') then
 		vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
-		return
+		do return end
 	end
-	local auxiliares = vim.tbl_filter(
-		function(auxiliar)
-			return string.match(auxiliar, 'aux$') or string.match(auxiliar, 'out$') or string.match(auxiliar, 'log$')
-		end,
-		vim.fn.glob(Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.*', false, true)
-	)
+	local auxiliares = vim.fn.glob((Latex.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
 	if #auxiliares == 0 then
-		return
+		do return end
 	end
 	for _, auxiliar in ipairs(auxiliares) do
-		vim.fn.delete(auxiliar)
+		vim.fn.delete(vim.fn.fnameescape(auxiliar))
 	end
 end
-Latex.inicializar = function()
-	vim.env.TEXINPUTS='.:/home/andre/git/ouvidoria-latex-modelos/:'
+Latex.init = function(self)
+	vim.env.TEXINPUTS = '.:' .. self.diretorios.modelos.diretorio .. ':'
 end
-Latex.compile = function(opts)
-	if Latex.ft() then
+Latex.compile = function()
+	local arquivo = vim.fn.expand('%')
+	if not Latex.ft_tex() or not arquivo:match('%.tex$') then
 		vim.notify('Comando executável somente para arquivos .tex!')
-		return
+		do return end
+	end
+	if not arquivo:match(Latex.diretorios.destino.diretorio) then
+		vim.notify('Não foi possível compilar arquivo .tex! Necessário que arquivo esteja no diretório "$HOME/downloads."')
+		do return end
 	end
 	if vim.o.modified then -- salvar arquivo que está modificado.
 		vim.cmd.write()
+		vim.cmd.redraw({bang = true})
 	end
-	local arquivo = vim.fn.expand('%:t')
 	local cmd = {}
-	if vim.fn.has('linux') then
-		cmd = {
-			'pdflatex',
-			'-file-line-error',
-			'-interaction=nonstopmode',
-			'-output-directory=' .. Latex.OUTPUT_FOLDER,
-			arquivo
-		}
-	else -- para sistemas que não são linux, verificar a opção '-aux-directory'
-		cmd = {
-			'pdflatex',
-			'-file-line-error',
-			'-interaction=nonstopmode',
-			'-aux-directory=' .. Latex.AUX_FOLDER,
-			'-output-directory=' .. Latex.OUTPUT_FOLDER,
-			arquivo
-		}
+	cmd = {
+		'pdflatex',
+		'-file-line-error',
+		'-interaction=nonstopmode',
+		'-output-directory=' .. Latex.diretorios.destino.diretorio,
+		arquivo
+	}
+	vim.notify('Compilando arquivo!')
+	vim.fn.systemlist(cmd)
+	---@type string | table | nil
+	local out = vim.fn.systemlist(cmd) -- necessário segunda compilação
+	if vim.v.shell_error > 0 then
+		if type(out) == 'table' then
+			out = table.concat(out, ' ')
+		end
+		vim.notify('Não foi possível compilar arquivo.\n' .. out)
+		Latex.clear_files()
+		do return end
+	else
+		Latex.clear_files()
 	end
-	vim.notify('1º compilação!')
-	vim.fn.system(cmd)
-	vim.notify('2º compilação!')
-	vim.fn.system(cmd)
 	vim.notify('Pdf compilado!')
-	arquivo = string.match(arquivo, '(.*)%..*$') -- remover extenção do arquivo
-	vim.fn.jobstart(
-		{
-			Latex.PDF_READER,
-			Latex.OUTPUT_FOLDER .. '/' .. arquivo .. '.pdf'
-		}
-	)
-	Latex.clear(arquivo)
+	Latex.open(arquivo)
 end
-Latex.inicializar()
+Latex.open = function(arquivo)
+    arquivo = arquivo:gsub('tex$', 'pdf')
+	local existe = vim.fn.filereadable(arquivo) ~= 0
+	if not existe then
+		error('Ouvidoria: pdf.abrir: não foi possível encontrar arquivo "pdf"')
+	end
+    vim.notify(string.format('Abrindo arquivo %s', vim.fn.fnamemodify(arquivo, ':t')))
+    vim.fn.jobstart({
+		Latex.reader,
+        arquivo
+    })
+end
 
 local Ouvidoria = {}
-Ouvidoria.TEX = '.tex'
-Ouvidoria.CI_FOLDER = vim.env.HOME .. '/git/ouvidoria-latex-modelos'
-Ouvidoria.OUTPUT_FOLDER = vim.env.HOME .. '/downloads'
-Ouvidoria.listagem = function()
-	return vim.tbl_map(
-		function(diretorio)
-			return string.match(diretorio, "[a-zA-Z-]*.tex$")
-		end,
-		vim.fn.glob(Ouvidoria.CI_FOLDER .. '/*.tex', false, true)
-	)
+Ouvidoria.__index = Ouvidoria
+Ouvidoria.new = function()
+	local ouvidoria = setmetatable({
+		tex = '.tex',
+		latex = Latex.new(),
+	}, Ouvidoria)
+	return ouvidoria
 end
-Ouvidoria.nova_comunicacao = function(opts)
-	local tipo = opts.fargs[1] or 'modelo-basico'
-	local arquivo = opts.fargs[2] or 'ci-modelo'
-	local alternativo = vim.fn.expand('%')
-	vim.cmd.edit(Ouvidoria.CI_FOLDER .. '/' .. tipo .. Ouvidoria.TEX)
-	local ok, retorno = pcall(
-		vim.cmd.saveas,
-		Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
-	)
-	while not ok do
-		if string.match(retorno, 'E13:') then
-			arquivo = vim.fn.input(
-				'Arquivo com este nome já existe. Digite outro nome para arquivo: '
+Ouvidoria.ci = {
+	nova = function(opts)
+		local tipo = opts.fargs[1] or 'modelo-basico'
+		local modelo = table.concat(
+			vim.tbl_filter(
+				function(ci)
+					return ci:match(tipo:gsub('-', '.'))
+				end,
+				Ouvidoria.ci.modelos()
 			)
-			ok, retorno = pcall(
-				vim.cmd.saveas,
-				Ouvidoria.OUTPUT_FOLDER .. '/' .. arquivo .. Ouvidoria.TEX
-			)
-		else
-			vim.notify('Erro encontrado! Abortando comando.')
-			return
+		)
+		if not modelo then
+			vim.notify('Não foi encontrado o arquivo modelo para criar nova comunicação.')
+			do return end
 		end
-	end
-	vim.fn.setreg('#', alternativo) -- setando arquivo alternativo
-	vim.cmd.bdelete(tipo)
-end
-Ouvidoria.complete = function(args, cmd, pos)
+		local num_ci = vim.fn.input('Digite o número da C.I.: ')
+		local setor = vim.fn.input('Digite o setor destinatário: ')
+		local ocorrencia = ''
+		if not modelo:match('modelo.basico') then
+			ocorrencia = vim.fn.input('Digite o número da ocorrência: ')
+		end
+		if num_ci == '' or ocorrencia == '' or setor == '' then -- obrigatório informar os dados
+			error('Não foram informados os dados ou algum deles [C.I., ocorrência, setor].')
+		end
+		local titulo = ocorrencia .. '-' .. setor
+		if tipo:match('sipe.lai') then
+			titulo = 'LAI-' .. titulo .. Ouvidoria.tex
+		elseif tipo:match('carga.gabinete') then
+			titulo = 'GAB-PREF-LAI-' .. titulo .. Ouvidoria.tex
+		else
+			titulo = 'OUV-' .. titulo .. Ouvidoria.tex
+		end
+		titulo = string.format('C.I. N° %s.%s - ', num_ci, os.date('%Y')) .. titulo
+		local ci = (Ouvidoria.latex.diretorios.destino / titulo).diretorio
+		vim.fn.writefile(vim.fn.readfile(modelo), ci) -- Sobreescreve arquivo, se existir
+		vim.cmd.edit(ci)
+		vim.cmd.redraw({bang = true})
+		local range = {1, vim.fn.line('$')}
+		-- preencher dados de C.I., ocorrência e setor no arquivo tex
+		if modelo:match('modelo.basico') then
+			vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
+		elseif modelo:match('alerta.gabinete') or modelo:match('carga.gabinete') then
+			vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
+			vim.cmd.substitute({string.format("/Secretaria{}/Secretaria{%s}/I", setor), range = range})
+			vim.cmd.substitute({string.format("/Cabecalho{}/Cabecalho{%s}/I", num_ci), range = range})
+		else
+			vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
+			vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
+		end
+	end,
+	modelos = function()
+		return vim.fs.find(
+			function(name, path)
+				return name:match('.*%.tex$') and path:match('[/\\]ouvidoria.latex.modelos')
+			end,
+			{
+				path = tostring(Ouvidoria.ci.diretorios.modelos),
+				limit = math.huge,
+				type = 'file'
+			}
+		)
+	end,
+}
+Ouvidoria.tab = function(args)
 	return vim.tbl_filter(
 		function(ci)
-			return string.match(ci, args:gsub('-', '.'))
+			return ci:match(args:gsub('-', '.'))
 		end,
 		vim.tbl_map(
-			function(ci)
-				return string.match(ci, '(.*).tex$')
+			function(modelo)
+				return vim.fn.fnamemodify(modelo, ':t'):match('(.*).tex$')
 			end,
-			Ouvidoria.listagem()
+            Ouvidoria.ci.modelos()
 		)
 	)
 end
+local ouvidoria = Ouvidoria.new()
 
 vim.api.nvim_create_user_command(
 	'HexEditor',
@@ -326,16 +370,16 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
 	'Pdflatex',
-	Latex.compile,
+	ouvidoria.latex.compile,
 	{}
 )
 
 vim.api.nvim_create_user_command(
 	'Ouvidoria',
-	Ouvidoria.nova_comunicacao,
+	ouvidoria.ci.nova,
 	{
 		nargs = "+",
-		complete = Ouvidoria.complete,
+		complete = ouvidoria.tab,
 	}
 )
 
