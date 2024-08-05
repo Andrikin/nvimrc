@@ -60,9 +60,9 @@ vim.opt.title = true
 vim.opt.hidden = true
 vim.opt.mouse = ''
 if vim.fn.has('persistent_undo') then
-	local path = vim.fn.stdpath('data') .. '\\undotree'
+	local path = vim.fn.stdpath('data') .. '/undotree'
 	if vim.fn.isdirectory(path) == 0 then
-		vim.fn.mkdir(path, 'p', 0700)
+		vim.fn.mkdir(path, 'p', 0755)
 	end
 	vim.opt.undodir = path
 	vim.opt.undofile = true
@@ -76,7 +76,7 @@ vim.opt.showtabline = 1
 vim.opt.showmode = false
 
 -- st (simple terminal - suckless) tem um problema com o cursor. Ele não muda de acordo com as cores da fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html), é possível obter o cursor com a cor do texto (truecolor)
-vim.opt.termguicolors = true
+-- vim.opt.termguicolors = true -- default neovim 0.10
 
 -- NeoVim configurations
 vim.opt.guicursor = 'i-n-v-c:block'
@@ -95,9 +95,9 @@ vim.g.python3_host_prog = '/usr/bin/python3.10'
 
 -- Using ripgrep ([cf]open; [cf]do {cmd} | update)
 if vim.fn.executable('rg') then
-	vim.g.grepprg = [[rg --vimgrep --smart-case --follow]]
+	vim.g.grepprg = 'rg --vimgrep --smart-case --follow'
 else
-	vim.g.grepprg = [[grep -R]]
+	vim.g.grepprg = 'grep -R'
 end
 
 -- --- Emmet ---
