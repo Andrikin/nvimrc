@@ -54,11 +54,17 @@ Cmus.acoes = {
         -- --TODO: utilizar vim.ui.input (completion)
         -- -c, --clear
         -- Clear playlist, library (-l), play queue (-q) or playlist (-p).
-		local comando = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist? ', 'q')
-		if not comando:match('^-') then
-			comando = '-' .. comando
+		local opt = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist? ', 'q')
+		if opt == 'l' then
+			local confirmar = vim.fn.input('Deseja realmente limpar a library? Você precisará reindexar todas as múscicas... [s/n]: ')
+			if confirmar:match('[nN]') or confirmar:match('[nN][AaÃã][oO]') then
+				do return end
+			end
 		end
-		Cmus.comando('-c', comando)
+		if not opt:match('^-') then
+			opt = '-' .. opt
+		end
+		Cmus.opt('-c', opt)
 	end,
 	shuffle = function()
         -- -S, --shuffle
@@ -112,9 +118,8 @@ Cmus.acoes = {
 		Cmus.comando('-q', dir)
 		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
 	end,
-	raw = function()
+	raw = function(cmd)
         -- TODO: criar completefunc para input deste comando.
-        -- Utilizar vim.ui.input (completion)
         -- Seção COMANDOS, no manual do cmus
         -- -C, --raw
         -- Treat arguments (instead of stdin) as raw commands.
@@ -140,8 +145,7 @@ Cmus.acoes = {
         -- cmus-remote -C playpause
         -- cmus-remote -C repeat
         -- cmus-remote -C shuffle
-		local comando = vim.fn.input('Digite comando Cmus: ')
-		Cmus.comando('-C', '"' .. comando .. '"')
+		Cmus.comando('-C', ('"%s"'):format(cmd))
 	end,
 }
 Cmus.acoes.keys = function()
@@ -158,7 +162,8 @@ end
 Cmus.executar = function(args)
 	local exec = Cmus.acoes[args.fargs[1]]
 	if not exec then
-		error('Cmus: executar: não foi encontrado comando válido')
+		vim.notify('Cmus: executar: não foi encontrado comando válido. Nada a fazer...')
+		do return end
 	end
 	local opts = ''
 	if #args.fargs > 1 then
@@ -167,18 +172,56 @@ Cmus.executar = function(args)
 	end
     exec(opts)
 end
-Cmus.tab = function(arg, cmd) -- completion function
-    local narg = #(vim.split(cmd, ' '))
-    if narg > 2 then
-        return vim.tbl_filter(function(diretorio)
-            return diretorio:match(arg)
-        end, Cmus.diretorios_musica()
-        )
+Cmus.tab = function(arg, cmd) -- TODO: super completion function
+	local args = vim.split(cmd, ' ')
+	local filtrar = function(tabela)
+		return vim.tbl_filter(function(elemento)
+			return elemento:match(arg)
+		end, tabela)
+	end
+	-- WIP: CONTINUAR
+	local completar = function(cmd)
+		return ({
+			play = function()end,
+			pause = function()end,
+			stop = function()end,
+			next = function()end,
+			prev = function()end,
+			redo = function()end,
+			clear = function()end,
+			shuffle = function()end,
+			volume = function()end,
+			seek = function()end,
+			playlist = function()end,
+			file = function()end,
+			info = function()end,
+			queue = function()end,
+			raw = function()end,
+		})[cmd]
+	end
+	if #args == 2 then
+		return filtrar(Cmus.acoes.keys())
+	elseif #args > 2 then
+		local comando = args[2]
+		if comando == 'queue' then
+			return filtrar(Cmus.diretorios_musica())
+		elseif comando == 'raw' then
+			-- WIP: CONTINUAR
+			return filtrar({
+				'play', 'pause',
+				'stop', 'next',
+				'prev', 'seek',
+				'volume', 'add',
+				'remove', 'clear',
+				'save', 'load',
+				'status', 'current',
+				'search', 'queue',
+				'playmode', 'show',
+				'toggle', 'playpause',
+				'repeat', 'shuffle', 
+			})
+		end
     end
-    return vim.tbl_filter(function(acao)
-        return acao:match(arg)
-    end, Cmus.acoes.keys()
-    )
 end
 
 local Latex = {}
