@@ -5,120 +5,132 @@ local Musicas =  Diretorio.new(vim.env.HOME) / '/music/'
 
 local Cmus = {}
 Cmus.diretorios_musica = function()
-	return vim.fn.systemlist({'ls', Musicas.diretorio})
+    return vim.fn.systemlist({'ls', Musicas.diretorio})
 end
 Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
-	local arg = {...}
-	local cmd = {'silent', '!cmus-remote'}
-	for _, v in ipairs(arg) do
-		table.insert(cmd, v)
-	end
-	if arg[1]:match('-[QC]') then -- mostrar resultados de '-Q', '-C'
-		table.remove(cmd, 1)
-	end
-	local exec = table.concat(cmd, ' ')
-	vim.cmd(exec)
+    local arg = {...}
+    local cmd = {'silent', '!cmus-remote'}
+    for _, v in ipairs(arg) do
+        table.insert(cmd, v)
+    end
+    if arg[1]:match('-[QC]') then -- mostrar resultados de '-Q', '-C'
+        table.remove(cmd, 1)
+    end
+    local exec = table.concat(cmd, ' ')
+    vim.cmd(exec)
 end
 Cmus.acoes = {
-	play = function()
+    play = function()
         -- -p, --play
         -- Start playing.
-		Cmus.comando('-p')
-	end,
-	pause = function()
+        Cmus.comando('-p')
+    end,
+    pause = function()
         -- -u, --pause
         -- Toggle pause.
-		Cmus.comando('-u')
-	end,
-	stop = function()
+        Cmus.comando('-u')
+    end,
+    stop = function()
         -- -s, --stop
         -- Stop playing.
-		Cmus.comando('-s')
-	end,
-	next = function()
+        Cmus.comando('-s')
+    end,
+    next = function()
         -- -n, --next
         -- Skip forward in playlist.
-		Cmus.comando('-n')
-	end,
-	prev = function()
+        Cmus.comando('-n')
+    end,
+    prev = function()
         -- -r, --prev
         -- Skip backward in playlist.
-		Cmus.comando('-r')
-	end,
-	redo = function()
+        Cmus.comando('-r')
+    end,
+    redo = function()
         -- -R, --repeat
         -- Toggle repeat.
-		Cmus.comando('-R')
-	end,
-	clear = function()
+        Cmus.comando('-R')
+    end,
+    clear = function()
         -- --TODO: utilizar vim.ui.input (completion)
         -- -c, --clear
         -- Clear playlist, library (-l), play queue (-q) or playlist (-p).
-		local opt = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist: ', 'q')
-		if opt == 'l' then
-			local confirmar = vim.fn.input('Deseja realmente limpar a library? Você precisará reindexar todas as múscicas... [s/n]: ')
-			if confirmar:match('[nN]') or confirmar:match('[nN][AaÃã][oO]') then
-				do return end
-			end
-		end
-		if not opt:match('^-') then
-			opt = '-' .. opt
-		end
-		Cmus.opt('-c', opt)
-	end,
-	shuffle = function()
+        local opt = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist: ', 'q')
+        if opt == 'l' then
+            local confirmar = vim.fn.input('Deseja realmente limpar a library? Você precisará reindexar todas as múscicas... [s/n]: ')
+            if confirmar:match('[nN]') or confirmar:match('[nN][AaÃã][oO]') then
+                do return end
+            end
+        end
+        if not opt:match('^-') then
+            opt = '-' .. opt
+        end
+        Cmus.opt('-c', opt)
+    end,
+    shuffle = function()
         -- -S, --shuffle
         -- Toggle shuffle.
-		Cmus.comando('-S')
-	end,
-	volume = function()
+        Cmus.comando('-S')
+    end,
+    volume = function(volume)
         -- -v, --volume VOL
         -- Change volume. See vol command in cmus(1).
-        -- cmus-remote -v <volume>
-        -- cmus-remote -v +<volume>
-        -- cmus-remote -v -<volume>
-		Cmus.comando('-v')
-	end,
-	seek = function()
+        -- cmus-remote -v <volume>%
+        -- cmus-remote -v +<volume>%
+        -- cmus-remote -v -<volume>%
+        if not volume:match('%%$') then
+            volume = volume .. '%'
+        end
+        Cmus.comando('-v', volume)
+    end,
+    seek = function(tempo)
         -- -k, --seek SEEK
         -- Seek. See seek command in cmus(1).
         -- cmus-remote -k <tempo> (relativo a posição atual da faixa, não ao tempo total da faixa)
         -- cmus-remote -k +<tempo>
         -- cmus-remote -k -<tempo>
-		Cmus.comando('-k')
-	end,
-	playlist = function()
+        Cmus.comando('-k', tempo)
+    end,
+    playlist = function(playlist)
         -- -P, --playlist
         -- Modify playlist (default).
         -- cmus-remote --playlist -l (exibe playlists disponíveis no cmus)
         -- cmus-remote --playlist -a <caminho/playlist(.m3u,.pls)>
-        -- cmus-remote --playlista <caminho/playlist(.m3u,.pls)>
-		Cmus.comando('-P')
-	end,
-	file = function()
+        -- cmus-remote --playlist -a <caminho/playlist(.m3u,.pls)>
+        local ext = playlist:match('%.(%w+)$')
+        local extencoes = { -- adicionar mais extenções de arquivos válidos como playlist
+            m3u = true,
+            pls = true,
+        }
+        if not extencoes[ext] then
+            vim.notify('Não foi encontrado uma playlist para tocar.')
+            do return end
+        end
+        Cmus.comando('-P', playlist)
+    end,
+    file = function(arquivo)
         -- -f, --file FILE
         -- Play from file.
         -- Adiciona faixa ao final da lista de reprodução atual
         -- cmus-remote --file <caminho/para/arquivo>
-		Cmus.comando('-f')
-	end,
-	info = function()
+        Cmus.comando('-f', arquivo)
+    end,
+    info = function()
         -- -Q
         -- Get player status information. Same as -C status. Note that status is a special command only available to cmus-remote.
         -- TODO: como obter output de vim.cmd?
         -- Utilizar vim.api.nvim_exec2, [vim.split]ando o resultado por '\n'
         -- e removendo o primeiro elemento da table, junto com strings vazias
-		Cmus.comando('-Q')
-	end,
-	queue = function(dir)
+        Cmus.comando('-Q')
+    end,
+    queue = function(dir)
         -- -q, --queue
         -- Modify play queue instead of playlist.
-		dir = vim.fn.fnameescape((Musicas / dir).diretorio)
-		Cmus.comando('-c', '-q')
-		Cmus.comando('-q', dir)
-		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
-	end,
-	raw = function(cmd)
+        dir = vim.fn.fnameescape((Musicas / dir).diretorio)
+        Cmus.comando('-c', '-q')
+        Cmus.comando('-q', dir)
+        Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
+    end,
+    raw = function(cmd)
         -- Seção COMANDOS, no manual do cmus
         -- -C, --raw
         -- Treat arguments (instead of stdin) as raw commands.
@@ -144,8 +156,8 @@ Cmus.acoes = {
         -- cmus-remote -C playpause
         -- cmus-remote -C repeat
         -- cmus-remote -C shuffle
-		Cmus.comando('-C', ('"%s"'):format(cmd))
-	end,
+        Cmus.comando('-C', ('"%s"'):format(cmd))
+    end,
 }
 Cmus.acoes.keys = function()
     local keys = {}
@@ -159,144 +171,154 @@ Cmus.acoes.keys = function()
     return keys
 end
 Cmus.executar = function(args)
-	local exec = Cmus.acoes[args.fargs[1]]
-	if not exec then
-		vim.notify('Cmus: executar: não foi encontrado comando válido. Nada a fazer...')
-		do return end
-	end
-	local opts = ''
-	if #args.fargs > 1 then
-		table.remove(args.fargs, 1)
-		opts = table.concat(args.fargs, ' ')
-	end
+    local exec = Cmus.acoes[args.fargs[1]]
+    if not exec then
+        vim.notify('Cmus: executar: não foi encontrado comando válido. Nada a fazer...')
+        do return end
+    end
+    local opts = ''
+    if #args.fargs > 1 then
+        table.remove(args.fargs, 1)
+        opts = table.concat(args.fargs, ' ')
+    end
     exec(opts)
 end
-Cmus.tab = function(arg, cmd) -- TODO: super completion function
-	local args = vim.split(cmd, ' ')
-	local filtrar = function(tabela)
-		return vim.tbl_filter(function(elemento)
-			return elemento:match(arg)
-		end, tabela)
-	end
-	-- WIP: CONTINUAR utilizar cmd para verificar mais opções de comando
-	local completar = function(acao)
-		local cmp = ({
-			play = function() end,
-			pause = function() end,
-			stop = function() end,
-			next = function() end,
-			prev = function() end,
-			redo = function() end,
-			clear = function() end,
-			shuffle = function() end,
-			volume = function() end,
-			seek = function() end,
-			playlist = function() end,
-			file = function() end,
-			info = function() end,
-			queue = function() return filtrar(Cmus.diretorios_musica()) end,
-			raw = function() return filtrar({
-				'play', 'pause', 'stop', 'next',
-				'prev', 'seek', 'volume', 'add',
-				'remove', 'clear', 'save', 'load',
-				'status', 'current', 'search', 'queue',
-				'playmode', 'show', 'toggle', 'playpause',
-				'repeat', 'shuffle',
-			}) end,
-		})[acao]
-		if not cmp then
-			error(('Tentativa de completar um comando não existente: %s'):format(acao))
-		end
-		return cmp()
-	end
-	if #args == 2 then
-		return filtrar(Cmus.acoes.keys())
+Cmus.tab = function(arg, cmd)
+    local args = vim.split(cmd, ' ')
+    local filtrar = function(tabela)
+        return vim.tbl_filter(function(elemento)
+            return elemento:match(arg)
+        end, tabela)
     end
-	local acao = args[2]
-	return completar(acao)
+    -- WIP: CONTINUAR utilizar cmd para verificar mais opções de comando
+    local completar = function()
+        local cmp = ({
+            play = function() end, -- são comandos diretos. Nada para retornar
+            pause = function() end, -- são comandos diretos. Nada para retornar
+            stop = function() end, -- são comandos diretos. Nada para retornar
+            next = function() end, -- são comandos diretos. Nada para retornar
+            prev = function() end, -- são comandos diretos. Nada para retornar
+            redo = function() end, -- são comandos diretos. Nada para retornar
+            clear = function() end, -- são comandos diretos. Nada para retornar
+            shuffle = function() end, -- são comandos diretos. Nada para retornar
+            volume = function() end, -- são utilizados números. Nada para retornar
+            seek = function() end, -- são utilizados números. Nada para retornar
+            playlist = function() 
+            -- TODO: retornar arquivos que podem ser utilizados
+            end,
+            file = function() 
+            -- TODO: retornar caminho completado
+                local cd = args[3] and Diretorio.new(args[3])
+                if not cd then
+                    return {}
+                end
+                return vim.fn.glob() -- CONTINUE
+            end,
+            info = function() end, -- nada para retornar
+            queue = function() return filtrar(Cmus.diretorios_musica()) end,
+            raw = function() -- TODO: retornar mais opções conforme comando
+                return filtrar({
+                    'play', 'pause', 'stop', 'next',
+                    'prev', 'seek', 'volume', 'add',
+                    'remove', 'clear', 'save', 'load',
+                    'status', 'current', 'search', 'queue',
+                    'playmode', 'show', 'toggle', 'playpause',
+                    'repeat', 'shuffle',
+                }) 
+            end,
+        })[args[2]]
+        if not cmp then
+            error(('Tentativa de completar um comando não existente: %s'):format(acao))
+        end
+        return cmp()
+    end
+    if #args == 2 then
+        return filtrar(Cmus.acoes.keys())
+    end
+    return completar()
 end
 
 local Latex = {}
 Latex.__index = Latex
 Latex.new = function()
-	local latex = setmetatable({
-		reader = 'zathura',
-		diretorios = {
-			modelos = Diretorio.new(vim.env.HOME) / 'git' / 'ouvidoria-latex-modelos',
-			destino = Diretorio.new(vim.env.HOME) / 'downloads',
-		}
-	}, Latex)
-	latex:init()
-	return latex
+    local latex = setmetatable({
+        reader = 'zathura',
+        diretorios = {
+            modelos = Diretorio.new(vim.env.HOME) / 'git' / 'ouvidoria-latex-modelos',
+            destino = Diretorio.new(vim.env.HOME) / 'downloads',
+        }
+    }, Latex)
+    latex:init()
+    return latex
 end
 Latex.ft_tex = function()
-	return vim.o.ft == 'tex'
+    return vim.o.ft == 'tex'
 end
 Latex.clear_files = function()
-	-- deletar arquivos auxiliares da compilação, no linux
-	if not vim.fn.has('linux') then
-		vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
-		do return end
-	end
-	local auxiliares = vim.fn.glob((Latex.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
-	if #auxiliares == 0 then
-		do return end
-	end
-	for _, auxiliar in ipairs(auxiliares) do
-		vim.fn.delete(vim.fn.fnameescape(auxiliar))
-	end
+    -- deletar arquivos auxiliares da compilação, no linux
+    if not vim.fn.has('linux') then
+        vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
+        do return end
+    end
+    local auxiliares = vim.fn.glob((Latex.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
+    if #auxiliares == 0 then
+        do return end
+    end
+    for _, auxiliar in ipairs(auxiliares) do
+        vim.fn.delete(vim.fn.fnameescape(auxiliar))
+    end
 end
 Latex.init = function(self)
-	vim.env.TEXINPUTS = '.:' .. self.diretorios.modelos.diretorio .. ':'
+    vim.env.TEXINPUTS = '.:' .. self.diretorios.modelos.diretorio .. ':'
 end
 Latex.compile = function()
-	local arquivo = vim.fn.expand('%')
-	if not Latex.ft_tex() or not arquivo:match('%.tex$') then
-		vim.notify('Comando executável somente para arquivos .tex!')
-		do return end
-	end
-	if not arquivo:match(Latex.diretorios.destino.diretorio) then
-		vim.notify('Não foi possível compilar arquivo .tex! Necessário que arquivo esteja no diretório "$HOME/downloads."')
-		do return end
-	end
-	if vim.o.modified then -- salvar arquivo que está modificado.
-		vim.cmd.write()
-		vim.cmd.redraw({bang = true})
-	end
-	local cmd = {}
-	cmd = {
-		'pdflatex',
-		'-file-line-error',
-		'-interaction=nonstopmode',
-		'-output-directory=' .. Latex.diretorios.destino.diretorio,
-		arquivo
-	}
-	vim.notify('Compilando arquivo!')
-	vim.fn.systemlist(cmd)
-	---@type string | table | nil
-	local out = vim.fn.systemlist(cmd) -- necessário segunda compilação
-	if vim.v.shell_error > 0 then
-		if type(out) == 'table' then
-			out = table.concat(out, ' ')
-		end
-		vim.notify('Não foi possível compilar arquivo.\n' .. out)
-		Latex.clear_files()
-		do return end
-	else
-		Latex.clear_files()
-	end
-	vim.notify('Pdf compilado!')
-	Latex.open(arquivo)
+    local arquivo = vim.fn.expand('%')
+    if not Latex.ft_tex() or not arquivo:match('%.tex$') then
+        vim.notify('Comando executável somente para arquivos .tex!')
+        do return end
+    end
+    if not arquivo:match(Latex.diretorios.destino.diretorio) then
+        vim.notify('Não foi possível compilar arquivo .tex! Necessário que arquivo esteja no diretório "$HOME/downloads."')
+        do return end
+    end
+    if vim.o.modified then -- salvar arquivo que está modificado.
+        vim.cmd.write()
+        vim.cmd.redraw({bang = true})
+    end
+    local cmd = {}
+    cmd = {
+        'pdflatex',
+        '-file-line-error',
+        '-interaction=nonstopmode',
+        '-output-directory=' .. Latex.diretorios.destino.diretorio,
+        arquivo
+    }
+    vim.notify('Compilando arquivo!')
+    vim.fn.systemlist(cmd)
+    ---@type string | table | nil
+    local out = vim.fn.systemlist(cmd) -- necessário segunda compilação
+    if vim.v.shell_error > 0 then
+        if type(out) == 'table' then
+            out = table.concat(out, ' ')
+        end
+        vim.notify('Não foi possível compilar arquivo.\n' .. out)
+        Latex.clear_files()
+        do return end
+    else
+        Latex.clear_files()
+    end
+    vim.notify('Pdf compilado!')
+    Latex.open(arquivo)
 end
 Latex.open = function(arquivo)
     arquivo = arquivo:gsub('tex$', 'pdf')
-	local existe = vim.fn.filereadable(arquivo) ~= 0
-	if not existe then
-		error('Ouvidoria: pdf.abrir: não foi possível encontrar arquivo "pdf"')
-	end
+    local existe = vim.fn.filereadable(arquivo) ~= 0
+    if not existe then
+        error('Ouvidoria: pdf.abrir: não foi possível encontrar arquivo "pdf"')
+    end
     vim.notify(string.format('Abrindo arquivo %s', vim.fn.fnamemodify(arquivo, ':t')))
     vim.fn.jobstart({
-		Latex.reader,
+        Latex.reader,
         arquivo
     })
 end
@@ -304,117 +326,117 @@ end
 local Ouvidoria = {}
 Ouvidoria.__index = Ouvidoria
 Ouvidoria.new = function()
-	local ouvidoria = setmetatable({
-		tex = '.tex',
-		latex = Latex.new(),
-	}, Ouvidoria)
-	return ouvidoria
+    local ouvidoria = setmetatable({
+        tex = '.tex',
+        latex = Latex.new(),
+    }, Ouvidoria)
+    return ouvidoria
 end
 Ouvidoria.ci = {
-	nova = function(opts)
-		local tipo = opts.fargs[1] or 'modelo-basico'
-		local modelo = table.concat(
-			vim.tbl_filter(
-				function(ci)
-					return ci:match(tipo:gsub('-', '.'))
-				end,
-				Ouvidoria.ci.modelos()
-			)
-		)
-		if not modelo then
-			vim.notify('Não foi encontrado o arquivo modelo para criar nova comunicação.')
-			do return end
-		end
-		local num_ci = vim.fn.input('Digite o número da C.I.: ')
-		local setor = vim.fn.input('Digite o setor destinatário: ')
-		local ocorrencia = ''
-		if not modelo:match('modelo.basico') then
-			ocorrencia = vim.fn.input('Digite o número da ocorrência: ')
-		end
-		if num_ci == '' or ocorrencia == '' or setor == '' then -- obrigatório informar os dados
-			error('Não foram informados os dados ou algum deles [C.I., ocorrência, setor].')
-		end
-		local titulo = ocorrencia .. '-' .. setor
-		if tipo:match('sipe.lai') then
-			titulo = 'LAI-' .. titulo .. Ouvidoria.tex
-		elseif tipo:match('carga.gabinete') then
-			titulo = 'GAB-PREF-LAI-' .. titulo .. Ouvidoria.tex
-		else
-			titulo = 'OUV-' .. titulo .. Ouvidoria.tex
-		end
-		titulo = string.format('C.I. N° %s.%s - ', num_ci, os.date('%Y')) .. titulo
-		local ci = (Ouvidoria.latex.diretorios.destino / titulo).diretorio
-		vim.fn.writefile(vim.fn.readfile(modelo), ci) -- Sobreescreve arquivo, se existir
-		vim.cmd.edit(ci)
-		vim.cmd.redraw({bang = true})
-		local range = {1, vim.fn.line('$')}
-		-- preencher dados de C.I., ocorrência e setor no arquivo tex
-		if modelo:match('modelo.basico') then
-			vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
-		elseif modelo:match('alerta.gabinete') or modelo:match('carga.gabinete') then
-			vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
-			vim.cmd.substitute({string.format("/Secretaria{}/Secretaria{%s}/I", setor), range = range})
-			vim.cmd.substitute({string.format("/Cabecalho{}/Cabecalho{%s}/I", num_ci), range = range})
-		else
-			vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
-			vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
-		end
-	end,
-	modelos = function()
-		return vim.fs.find(
-			function(name, path)
-				return name:match('.*%.tex$') and path:match('[/\\]ouvidoria.latex.modelos')
-			end,
-			{
-				path = tostring(Ouvidoria.ci.diretorios.modelos),
-				limit = math.huge,
-				type = 'file'
-			}
-		)
-	end,
+    nova = function(opts)
+        local tipo = opts.fargs[1] or 'modelo-basico'
+        local modelo = table.concat(
+            vim.tbl_filter(
+                function(ci)
+                    return ci:match(tipo:gsub('-', '.'))
+                end,
+                Ouvidoria.ci.modelos()
+            )
+        )
+        if not modelo then
+            vim.notify('Não foi encontrado o arquivo modelo para criar nova comunicação.')
+            do return end
+        end
+        local num_ci = vim.fn.input('Digite o número da C.I.: ')
+        local setor = vim.fn.input('Digite o setor destinatário: ')
+        local ocorrencia = ''
+        if not modelo:match('modelo.basico') then
+            ocorrencia = vim.fn.input('Digite o número da ocorrência: ')
+        end
+        if num_ci == '' or ocorrencia == '' or setor == '' then -- obrigatório informar os dados
+            error('Não foram informados os dados ou algum deles [C.I., ocorrência, setor].')
+        end
+        local titulo = ocorrencia .. '-' .. setor
+        if tipo:match('sipe.lai') then
+            titulo = 'LAI-' .. titulo .. Ouvidoria.tex
+        elseif tipo:match('carga.gabinete') then
+            titulo = 'GAB-PREF-LAI-' .. titulo .. Ouvidoria.tex
+        else
+            titulo = 'OUV-' .. titulo .. Ouvidoria.tex
+        end
+        titulo = string.format('C.I. N° %s.%s - ', num_ci, os.date('%Y')) .. titulo
+        local ci = (Ouvidoria.latex.diretorios.destino / titulo).diretorio
+        vim.fn.writefile(vim.fn.readfile(modelo), ci) -- Sobreescreve arquivo, se existir
+        vim.cmd.edit(ci)
+        vim.cmd.redraw({bang = true})
+        local range = {1, vim.fn.line('$')}
+        -- preencher dados de C.I., ocorrência e setor no arquivo tex
+        if modelo:match('modelo.basico') then
+            vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
+        elseif modelo:match('alerta.gabinete') or modelo:match('carga.gabinete') then
+            vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
+            vim.cmd.substitute({string.format("/Secretaria{}/Secretaria{%s}/I", setor), range = range})
+            vim.cmd.substitute({string.format("/Cabecalho{}/Cabecalho{%s}/I", num_ci), range = range})
+        else
+            vim.cmd.substitute({string.format("/Ocorrencia{}/Ocorrencia{%s}/I", ocorrencia), range = range})
+            vim.cmd.substitute({string.format("/Cabecalho{}{[A-Z-]\\{-}}/Cabecalho{%s}{%s}/I", num_ci, setor), range = range})
+        end
+    end,
+    modelos = function()
+        return vim.fs.find(
+            function(name, path)
+                return name:match('.*%.tex$') and path:match('[/\\]ouvidoria.latex.modelos')
+            end,
+            {
+                path = tostring(Ouvidoria.ci.diretorios.modelos),
+                limit = math.huge,
+                type = 'file'
+            }
+        )
+    end,
 }
 Ouvidoria.tab = function(args)
-	return vim.tbl_filter(
-		function(ci)
-			return ci:match(args:gsub('-', '.'))
-		end,
-		vim.tbl_map(
-			function(modelo)
-				return vim.fn.fnamemodify(modelo, ':t'):match('(.*).tex$')
-			end,
+    return vim.tbl_filter(
+        function(ci)
+            return ci:match(args:gsub('-', '.'))
+        end,
+        vim.tbl_map(
+            function(modelo)
+                return vim.fn.fnamemodify(modelo, ':t'):match('(.*).tex$')
+            end,
             Ouvidoria.ci.modelos()
-		)
-	)
+        )
+    )
 end
 local ouvidoria = Ouvidoria.new()
 
 vim.api.nvim_create_user_command(
-	'HexEditor',
-	'%!xxd',
-	{}
+    'HexEditor',
+    '%!xxd',
+    {}
 )
 
 vim.api.nvim_create_user_command(
     'Cmus',
     Cmus.executar,
     {
-		nargs = '+',
-		complete = Cmus.tab,
-	}
+        nargs = '+',
+        complete = Cmus.tab,
+    }
 )
 
 vim.api.nvim_create_user_command(
-	'Pdflatex',
-	ouvidoria.latex.compile,
-	{}
+    'Pdflatex',
+    ouvidoria.latex.compile,
+    {}
 )
 
 vim.api.nvim_create_user_command(
-	'Ouvidoria',
-	ouvidoria.ci.nova,
-	{
-		nargs = "+",
-		complete = ouvidoria.tab,
-	}
+    'Ouvidoria',
+    ouvidoria.ci.nova,
+    {
+        nargs = "+",
+        complete = ouvidoria.tab,
+    }
 )
 
