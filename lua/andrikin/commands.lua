@@ -54,7 +54,7 @@ Cmus.acoes = {
         -- --TODO: utilizar vim.ui.input (completion)
         -- -c, --clear
         -- Clear playlist, library (-l), play queue (-q) or playlist (-p).
-		local opt = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist? ', 'q')
+		local opt = vim.fn.input('Limpar qual playlist: [l]ibrary/[q]ueue/[p]laylist: ', 'q')
 		if opt == 'l' then
 			local confirmar = vim.fn.input('Deseja realmente limpar a library? Você precisará reindexar todas as múscicas... [s/n]: ')
 			if confirmar:match('[nN]') or confirmar:match('[nN][AaÃã][oO]') then
@@ -119,7 +119,6 @@ Cmus.acoes = {
 		Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
 	end,
 	raw = function(cmd)
-        -- TODO: criar completefunc para input deste comando.
         -- Seção COMANDOS, no manual do cmus
         -- -C, --raw
         -- Treat arguments (instead of stdin) as raw commands.
@@ -179,49 +178,42 @@ Cmus.tab = function(arg, cmd) -- TODO: super completion function
 			return elemento:match(arg)
 		end, tabela)
 	end
-	-- WIP: CONTINUAR
-	local completar = function(cmd)
-		return ({
-			play = function()end,
-			pause = function()end,
-			stop = function()end,
-			next = function()end,
-			prev = function()end,
-			redo = function()end,
-			clear = function()end,
-			shuffle = function()end,
-			volume = function()end,
-			seek = function()end,
-			playlist = function()end,
-			file = function()end,
-			info = function()end,
-			queue = function()end,
-			raw = function()end,
-		})[cmd]
+	-- WIP: CONTINUAR utilizar cmd para verificar mais opções de comando
+	local completar = function(acao)
+		local cmp = ({
+			play = function() end,
+			pause = function() end,
+			stop = function() end,
+			next = function() end,
+			prev = function() end,
+			redo = function() end,
+			clear = function() end,
+			shuffle = function() end,
+			volume = function() end,
+			seek = function() end,
+			playlist = function() end,
+			file = function() end,
+			info = function() end,
+			queue = function() return filtrar(Cmus.diretorios_musica()) end,
+			raw = function() return filtrar({
+				'play', 'pause', 'stop', 'next',
+				'prev', 'seek', 'volume', 'add',
+				'remove', 'clear', 'save', 'load',
+				'status', 'current', 'search', 'queue',
+				'playmode', 'show', 'toggle', 'playpause',
+				'repeat', 'shuffle',
+			}) end,
+		})[acao]
+		if not cmp then
+			error(('Tentativa de completar um comando não existente: %s'):format(acao))
+		end
+		return cmp()
 	end
 	if #args == 2 then
 		return filtrar(Cmus.acoes.keys())
-	elseif #args > 2 then
-		local comando = args[2]
-		if comando == 'queue' then
-			return filtrar(Cmus.diretorios_musica())
-		elseif comando == 'raw' then
-			-- WIP: CONTINUAR
-			return filtrar({
-				'play', 'pause',
-				'stop', 'next',
-				'prev', 'seek',
-				'volume', 'add',
-				'remove', 'clear',
-				'save', 'load',
-				'status', 'current',
-				'search', 'queue',
-				'playmode', 'show',
-				'toggle', 'playpause',
-				'repeat', 'shuffle', 
-			})
-		end
     end
+	local acao = args[2]
+	return completar(acao)
 end
 
 local Latex = {}
