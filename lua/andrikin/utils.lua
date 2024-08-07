@@ -37,7 +37,7 @@ Diretorio._sanitize = function(str)
     return vim.fs.normalize(str)
 end
 
----@return valido boolean
+---@return boolean
 ---@param dir Diretorio | string
 Diretorio.validate = function(dir)
     local isdirectory = function(d)
@@ -129,7 +129,7 @@ Diretorio.__concat = function(self, str)
     if type(str) ~= 'string' then
         error('Diretorio: __concat: Argumento precisa ser do tipo "string".')
     end
-    return Diretorio._sanitize(self.diretorio .. Diretorio._suffix(str))
+    return Diretorio._sanitize(self.diretorio .. str)
 end
 
 ---@return string
