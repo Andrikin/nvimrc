@@ -5,9 +5,23 @@ local Ouvidoria = require('andrikin.utils').Ouvidoria
 local Musicas =  Diretorio.new(vim.env.HOME) / '/music/'
 
 local Cmus = {}
+
+Cmus.__index = Cmus
+
+Cmus.new = function()
+	local cmus = setmetatable({}, Cmus)
+	cmus:init()
+	return cmus
+end
+
+Cmus.init = function(self)
+	-- verificar se cmus-remote está funcionando
+end
+
 Cmus.diretorios_musica = function()
     return vim.fn.systemlist({'ls', Musicas.diretorio})
 end
+
 Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
     local arg = {...}
     local cmd = {'silent', '!cmus-remote'}
@@ -20,58 +34,96 @@ Cmus.comando = function(...) -- {'silent', '!cmus-remote'} -- vim.cmd
     local exec = table.concat(cmd, ' ')
     vim.cmd(exec)
 end
-Cmus.notificar = function()
-	-- WIP: notificar o resultado de ações enviadas para o cmus-remote
+
+Cmus.notificar = function(opt)
 	local info = vim.fn.systemlist({'cmus-remote', '-Q'})
-	-- local opcoes = {
-	-- 	music = function() end,
-	-- 	volume = function() end,
-	-- 	repeat = function() end,
-	-- }
-	if info then
-		local musica = info[2]:match('file (.*)$')
-		if musica then
-			vim.notify(vim.fn.fnamemodify(musica, ':t'))
-		end
+	if not info then
+		vim.notify('Comando "cmus-remote -Q" não retornou informação.')
+		do return end
+	end
+	local opcoes = {
+		music = function()
+			local musica = info[2]:match('file (.*)$')
+			if musica then
+				vim.notify(vim.fn.fnamemodify(musica, ':t'))
+			end
+		end,
+		volume = function()
+			local vol_left = info[16]:match('(%d+)$')
+			local vol_right = info[17]:match('(%d+)$')
+			vim.notify(('Volume esquerdo: %s\nVolume direito: %s'):format(vol_left, vol_right))
+		end,
+		redo = function()
+			local r = info[12]:match('(%a+)$')
+			local rc = info[13]:match('(%a+)$')
+			vim.notify(('Repeat: %s\nRepeat current: %s'):format(r, rc))
+		end,
+		shuffle = function()
+			local enabled = info[14]:match('(%a+)$')
+			vim.notify(('Shuffle: %s'):format(enabled))
+		end,
+		continue = function()
+			local enabled = info[6]:match('(%a+)$')
+			vim.notify(('Continue: %s'):format(enabled))
+		end,
+		seek = function()
+			local tempo = function(t)
+				local formatado = '00:00'
+				local minutos = math.floor(t/60)
+				local segundos = math.floor(t%60)
+				formatado = ('%s:%s'):format(minutos, segundos)
+				return formatado
+			end
+			local duracao = info[3]:match('(%d+)$')
+			local atual = info[4]:match('(%d+)$')
+			vim.notify(('Duração: %s\nPosição: %s'):format(tempo(duracao), tempo(atual)))
+		end,
+		status = function()
+			local s = info[1]:match('(%a+)$')
+			vim.notify(s)
+		end,
+	}
+	if opcoes[opt] then
+		opcoes[opt]()
 	end
 end
+
 Cmus.acoes = {
-	-- WIP: notificar usuário com música da vez
     play = function()
         -- -p, --play
         -- Start playing.
         Cmus.comando('-p')
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     pause = function()
         -- -u, --pause
         -- Toggle pause.
         Cmus.comando('-u')
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     stop = function()
         -- -s, --stop
         -- Stop playing.
         Cmus.comando('-s')
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     next = function()
         -- -n, --next
         -- Skip forward in playlist.
         Cmus.comando('-n')
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     prev = function()
         -- -r, --prev
         -- Skip backward in playlist.
         Cmus.comando('-r')
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     redo = function()
         -- -R, --repeat
         -- Toggle repeat.
         Cmus.comando('-R')
-		Cmus.notificar()
+		Cmus.notificar('redo')
     end,
     clear = function()
         -- -c, --clear
@@ -93,7 +145,7 @@ Cmus.acoes = {
         -- -S, --shuffle
         -- Toggle shuffle.
         Cmus.comando('-S')
-		Cmus.notificar()
+		Cmus.notificar('shuffle')
     end,
     volume = function(volume)
         -- -v, --volume VOL
@@ -101,10 +153,16 @@ Cmus.acoes = {
         -- cmus-remote -v <volume>%
         -- cmus-remote -v +<volume>%
         -- cmus-remote -v -<volume>%
-        if not volume:match('%%$') then
-            volume = volume .. '%'
-        end
+		if not volume or volume == '' or not volume:match('^[+-]%d+[%%]$') then
+			goto mostrar_volume
+			do return end
+		end
+        -- if not volume:match('%%$') then
+        --     volume = volume .. '%'
+        -- end
         Cmus.comando('-v', volume)
+		::mostrar_volume::
+		Cmus.notificar('volume')
     end,
     seek = function(tempo)
         -- -k, --seek SEEK
@@ -112,7 +170,10 @@ Cmus.acoes = {
         -- cmus-remote -k <tempo> (relativo a posição atual da faixa, não ao tempo total da faixa)
         -- cmus-remote -k +<tempo>
         -- cmus-remote -k -<tempo>
-        Cmus.comando('-k', tempo)
+		if tempo and tempo:match('^[+-]%d+$')then
+			Cmus.comando('-k', tempo)
+		end
+		Cmus.notificar('seek')
     end,
     playlist = function(playlist)
 		-- WIP: questionar usuário sobre operação ("-a", "-l")
@@ -132,7 +193,7 @@ Cmus.acoes = {
         end
 		playlist = vim.fn.fnameescape(playlist)
         Cmus.comando('-P', '-a', playlist)
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     file = function(arquivo)
         -- -f, --file FILE
@@ -145,7 +206,7 @@ Cmus.acoes = {
 			do return end
 		end
         Cmus.comando('-f', arquivo)
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     info = function()
         -- -Q
@@ -161,7 +222,7 @@ Cmus.acoes = {
         Cmus.comando('-c', '-q')
         Cmus.comando('-q', dir)
         Cmus.comando('-n') -- reproduzir a primeira música da nova playlist
-		Cmus.notificar()
+		Cmus.notificar('music')
     end,
     raw = function(cmd)
         -- Seção COMANDOS, no manual do cmus
@@ -192,6 +253,7 @@ Cmus.acoes = {
         Cmus.comando('-C', ('"%s"'):format(cmd))
     end,
 }
+
 Cmus.acoes.keys = function()
     local keys = {}
     for k, _ in pairs(Cmus.acoes) do
@@ -203,6 +265,7 @@ Cmus.acoes.keys = function()
     end
     return keys
 end
+
 Cmus.executar = function(args)
     local exec = Cmus.acoes[args.fargs[1]]
     if not exec then
@@ -216,6 +279,7 @@ Cmus.executar = function(args)
     end
     exec(opts)
 end
+
 Cmus.tab = function(arg, cmd)
     local args = vim.split(cmd, ' ')
     local filtrar = function(tabela)
@@ -279,7 +343,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'Cmus',
+    'CmusRemote',
     Cmus.executar,
     {
         nargs = '+',
