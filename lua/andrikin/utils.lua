@@ -488,7 +488,7 @@ Cmus.acoes = {
         if not opt:match('^-') then
             opt = '-' .. opt
         end
-        Cmus.opt('-c', opt)
+        Cmus.comando('-c', opt)
 		vim.notify(('lista "%s" esvaziada'):format(opt))
     end,
     shuffle = function()
