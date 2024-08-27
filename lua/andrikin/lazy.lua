@@ -156,6 +156,11 @@ local plugins = {
 }
 
 local opts = {
+	-- Removendo dependência de hererocks
+	rocks = {
+		hererocks = false,
+		enabled = false,
+	},
 	performance = {
 		rtp = {
 			disabled_plugins = {
