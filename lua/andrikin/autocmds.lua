@@ -277,7 +277,7 @@ autocmd(
 		callback = function()
 		vim.defer_fn(
             function() vim.cmd.lua('vim.o.showtabline = 1') end,
-			500
+			250
 		)
 		end,
 	}

@@ -149,7 +149,7 @@ Latex.new = function()
     local latex = setmetatable({
         reader = 'zathura',
         diretorios = {
-            modelos = Diretorio.new(vim.env.HOME) / 'git' / 'ouvidoria-latex-modelos',
+            modelos = Diretorio.new(vim.env.HOME) / 'documents' / 'git' / 'ouvidoria-latex-modelos',
             destino = Diretorio.new(vim.env.HOME) / 'downloads',
         }
     }, Latex)

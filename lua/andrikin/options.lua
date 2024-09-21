@@ -90,8 +90,8 @@ vim.opt.fillchars = {
 }
 
 -- Python 
-vim.g.python_host_prog = '/usr/bin/python2'
-vim.g.python3_host_prog = '/usr/bin/python3.10'
+-- vim.g.python_host_prog = '/usr/bin/python2'
+vim.g.python3_host_prog = '/usr/bin/python3'
 
 -- Using ripgrep ([cf]open; [cf]do {cmd} | update)
 if vim.fn.executable('rg') then
