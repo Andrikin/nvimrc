@@ -124,10 +124,10 @@ local plugins = {
 	{
 		'https://github.com/hrsh7th/nvim-cmp.git',
 		dependencies = {
+			{'https://github.com/L3MON4D3/LuaSnip.git', build = 'make install_jsregexp'},
 			'https://github.com/hrsh7th/cmp-nvim-lsp.git',
 			'https://github.com/hrsh7th/cmp-buffer.git',
 			'https://github.com/hrsh7th/cmp-path.git',
-			'https://github.com/L3MON4D3/LuaSnip.git',
             'https://github.com/saadparwaiz1/cmp_luasnip.git',
             'https://github.com/rafamadriz/friendly-snippets.git',
 		},
@@ -153,6 +153,11 @@ local plugins = {
 		'https://github.com/nvim-treesitter/playground.git',
 		lazy = true,
 	},
+	 -- plugin para TableTop scripts
+	{
+		'https://github.com/KeepDrive/tts.nvim.git',
+		lazy = true,
+	}
 }
 
 local opts = {
