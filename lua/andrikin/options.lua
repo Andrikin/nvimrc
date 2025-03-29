@@ -48,7 +48,7 @@ vim.opt.encoding = 'utf-8'
 vim.opt.autoread = true
 vim.opt.tabpagemax = 50
 vim.opt.wildmenu = true
-vim.opt.completeopt = 'menu,menuone,noinsert,noselect'
+vim.opt.completeopt = 'menuone,noinsert,noselect,popup'
 if vim.fn.has('win32') then
 	vim.g.shell = vim.env.COMSPEC
 else
@@ -82,6 +82,7 @@ vim.opt.showmode = false
 vim.opt.guicursor = 'i-n-v-c:block'
 vim.opt.guifont =  'SauceCodePro NFM:h11'
 vim.opt.inccommand = ''
+vim.opt.winborder = 'rounded'
 vim.opt.fillchars = {
 	vert = '|',
 	fold = '*',

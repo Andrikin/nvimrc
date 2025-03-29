@@ -1,5 +1,6 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 -- Inicializando caminho para git
+---@diagnostic disable-next-line: undefined-field
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -15,22 +16,38 @@ vim.opt.rtp:prepend(lazypath)
 -- Temas - interface: nome, url
 local tokyonight = {
     nome = 'tokyonight',
-    url = 'https://github.com/folke/tokyonight.nvim.git'
+    link = 'https://github.com/folke/tokyonight.nvim.git',
+    -- config = function()
+    --     vim.api.nvim_set_hl(0, 'CursorLine', {link = 'Visual'})
+    -- end
 }
 -- local dracula = {
 --     nome = 'dracula',
 --     url = 'https://github.com/Mofiqul/dracula.nvim.git'
 -- }
-
 local tema = tokyonight
+if tema.config then
+    tema.config()
+end
+
+local win7 = require('andrikin.utils').win7
+local has_buildin = vim.version().major >= 0 and vim.version().minor > 9
+local has_rm = vim.fn.executable('rm') == 1
+local has_mkdir = vim.fn.executable('mkdir') == 1
 local plugins = {
 	-- Fork Tim Pope vim-capslock
 	'https://github.com/Andrikin/vim-capslock',
 	-- Tim Pope's miracles
     'https://github.com/tpope/vim-fugitive.git',
-	-- 'https://github.com/tpope/vim-commentary.git', -- com 0.10, commentary é nativo
 	'https://github.com/tpope/vim-surround.git',
-	'https://github.com/tpope/vim-eunuch.git',
+	{
+		'https://github.com/tpope/vim-commentary.git',
+		enabled = not has_buildin and win7,
+    },
+    {
+        'https://github.com/tpope/vim-eunuch.git',
+        enabled = has_rm and has_mkdir,
+    },
 	{
 		'https://github.com/tpope/vim-dadbod.git',
 		lazy = true,
@@ -39,9 +56,9 @@ local plugins = {
 		'https://github.com/tpope/vim-obsession.git',
 		lazy = true,
 	},
-	-- Theme
+    -- Theme
     {
-        tema.url,
+        tema.link,
         priority = 1000,
         lazy = false,
 		config = function()
@@ -65,10 +82,15 @@ local plugins = {
 	-- Lualine,
 	{
 		'https://github.com/nvim-lualine/lualine.nvim',
+        priority = 1000,
+        lazy = false,
 		config = function()
 			require('lualine').setup(
 				{
 					options = { theme = tema.nome },
+                    sections = {
+						lualine_a = {'mode', 'CapsLockStatusline'},
+                    },
 					winbar = {
 						lualine_a = {},
 						lualine_b = {},
@@ -99,16 +121,23 @@ local plugins = {
 	{
         'https://github.com/neovim/nvim-lspconfig.git',
         dependencies = {
-            'https://github.com/folke/neodev.nvim.git', -- signature help, docs and completion for nvim lua API
-            -- { 'https://github.com/j-hui/fidget.nvim.git',
-            --     opts = {
-            --         progress = {
-            --             display = {
-            --                 skip_history = false,
-            --             }
-            --         }
-            --     }
-            -- },
+            {
+                -- WARNING: neodev é um projeto arquivado! EOL
+                'https://github.com/folke/neodev.nvim.git', -- signature help, docs and completion for nvim lua API
+                enable = win7,
+            },{
+                'https://github.com/folke/lazydev.nvim.git', -- signature help, docs and completion for nvim lua API
+                enable = not win7,
+            },
+            { 'https://github.com/j-hui/fidget.nvim.git',
+                opts = {
+                    progress = {
+                        display = {
+                            skip_history = false,
+                        }
+                    }
+                }
+            },
         }
     },
     -- Java LSP
@@ -120,18 +149,9 @@ local plugins = {
 	'https://github.com/markonm/traces.vim.git',
 	-- Undotree,
 	'https://github.com/mbbill/undotree.git',
-	-- Nim-cmp,
-	{
-		'https://github.com/hrsh7th/nvim-cmp.git',
-		dependencies = {
-			{'https://github.com/L3MON4D3/LuaSnip.git', build = 'make install_jsregexp'},
-			'https://github.com/hrsh7th/cmp-nvim-lsp.git',
-			'https://github.com/hrsh7th/cmp-buffer.git',
-			'https://github.com/hrsh7th/cmp-path.git',
-            'https://github.com/saadparwaiz1/cmp_luasnip.git',
-            'https://github.com/rafamadriz/friendly-snippets.git',
-		},
-	},
+	-- snippets
+	'https://github.com/L3MON4D3/LuaSnip.git',
+	'https://github.com/rafamadriz/friendly-snippets.git',
 	-- Telescope,
 	{
 		'https://github.com/nvim-telescope/telescope.nvim.git',
@@ -148,24 +168,29 @@ local plugins = {
 		},
 	},
 	-- Treesitter,
-	'https://github.com/nvim-treesitter/nvim-treesitter.git',
+    {
+        'https://github.com/nvim-treesitter/nvim-treesitter.git',
+        lazy = true,
+        build = ':TSUpdate',
+    },
 	{
 		'https://github.com/nvim-treesitter/playground.git',
 		lazy = true,
 	},
-	 -- plugin para TableTop scripts
-	{
-		'https://github.com/KeepDrive/tts.nvim.git',
-		lazy = true,
-	}
+    {
+---@diagnostic disable-next-line: undefined-field
+        dir = vim.loop.os_homedir() .. '/Documents/nvim/projetos/himalaya-vim',
+        lazy = true,
+        enabled = function() return vim.fn.executable('himalaya') == 1 end,
+    },
+    {
+        'https://github.com/junegunn/fzf.vim.git',
+        dependencies = {'https://github.com/junegunn/fzf.git'},
+        lazy = true,
+    },
 }
 
 local opts = {
-	-- Removendo dependência de hererocks
-	rocks = {
-		hererocks = false,
-		enabled = false,
-	},
 	performance = {
 		rtp = {
 			disabled_plugins = {
@@ -180,6 +205,10 @@ local opts = {
 			},
 		},
 	},
+    rocks = {
+        hererocks = false,
+        enabled = false,
+    }
 }
 
 require("lazy").setup(plugins, opts)

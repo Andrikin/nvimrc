@@ -723,5 +723,14 @@ Utils.cursorline = {
 
 }
 
+Utils.reload = function()
+	for name,_ in pairs(package.loaded) do
+		if name:match('^andrikin') then
+			package.loaded[name] = nil
+		end
+	end
+	require('andrikin')
+end
+
 return Utils
 

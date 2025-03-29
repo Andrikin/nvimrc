@@ -6,6 +6,15 @@ if not vim.g.nvy or not vim.g.neovide then
 	vim.keymap.set('n', '<c-\\>', '<c-]>')
 end
 
+-- autocompletion LSP neovim 0.11
+vim.keymap.set('i', '<c-space>',
+	vim.lsp.completion.get
+)
+vim.keymap.set('i', '<c-j>',
+	'pumvisible() ? "<c-y>" : "<c-j>"',
+	{expr = true}
+)
+
 -- Remover <space> dos modos: NORMAL e VISUAL (em conjunto com mapleader)
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
@@ -35,9 +44,7 @@ vim.keymap.set('i', '.', '.<c-g>u')
 -- nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
 -- nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
 -- Adding jumps to jumplist - The Primeagen gold apple with gk and gj (screen cursor up/down)
-vim.keymap.set(
-	'n',
-	'k',
+vim.keymap.set( 'n', 'k',
 	function()
 		local count = vim.v.count
 		local marcador = ''
@@ -51,9 +58,7 @@ vim.keymap.set(
 	end,
 	{ expr = true }
 )
-vim.keymap.set(
-	'n',
-	'j',
+vim.keymap.set( 'n', 'j',
 	function()
 		local count = vim.v.count
 		local marcador = ''
@@ -82,13 +87,14 @@ vim.keymap.set('n', 'gp', '"+p')
 vim.keymap.set({'n', 'v'}, 'gy', '"+y')
 vim.keymap.set('n', 'gY', '"+Y')
 
--- Bracket maps
--- For buffers
-vim.keymap.set('n', ']b', vim.cmd.bnext, {desc = 'Next buffer'})
-vim.keymap.set('n', '[b', vim.cmd.bprevious, {desc = 'Previous buffer'})
--- For arglist
-vim.keymap.set('n', ']a', vim.cmd.next, {desc = 'Next arglist file'})
-vim.keymap.set('n', '[a', vim.cmd.Next, {desc = 'Previous arglist file'})
+-- DEFAULT IN NEOVIM 0.11
+-- -- Bracket maps
+-- -- For buffers
+-- vim.keymap.set('n', ']b', vim.cmd.bnext, {desc = 'Next buffer'})
+-- vim.keymap.set('n', '[b', vim.cmd.bprevious, {desc = 'Previous buffer'})
+-- -- For arglist
+-- vim.keymap.set('n', ']a', vim.cmd.next, {desc = 'Next arglist file'})
+-- vim.keymap.set('n', '[a', vim.cmd.Next, {desc = 'Previous arglist file'})
 
 -- --- Mapleader Commands ---
 
@@ -109,7 +115,7 @@ vim.keymap.set(
 	end
 )
 
--- --- Quickfix window ---
+-- Toggle list
 local toggle_list = function(modo, comando, on_error)
     local aberto = false
     local windows = vim.fn.getwininfo()
@@ -136,23 +142,6 @@ local toggle_list = function(modo, comando, on_error)
         end
     end
 end
--- Toggle quickfix window
-vim.keymap.set('n', '<leader>q',
-    function()
-        toggle_list('quickfix', 'copen')
-    end
-)
-vim.keymap.set('n', '<leader>l',
-    function()
-        toggle_list('loclist', 'lopen',
-            function(resposta)
-                if resposta and resposta:match('E776:') then
-                    notify('loclist: Sem itens para listar.')
-                end
-            end
-        )
-    end
-)
 
 -- --- Terminal ---
 
