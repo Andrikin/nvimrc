@@ -6,7 +6,10 @@ local notify = require('andrikin.utils').notify
 require('colorizer').setup(nil, { css = true })
 
 -- Neodev
-require('neodev').setup()
+require('lazydev').setup()
+
+-- vim.diagnostic.config
+vim.diagnostic.config({ virtual_lines = true })
 
 vim.defer_fn( -- kickstart.nvim
     function()

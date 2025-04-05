@@ -1,11 +1,5 @@
 local notify = require('andrikin.utils').notify
 
-if not vim.g.nvy or not vim.g.neovide then
-	-- Fix ^\ (nvim-qt/windows 7)
-	notify('Mapeamento do comando <c-]>: Jump to the definition of the keyword under the cursor.')
-	vim.keymap.set('n', '<c-\\>', '<c-]>')
-end
-
 -- autocompletion LSP neovim 0.11
 vim.keymap.set('i', '<c-space>',
 	vim.lsp.completion.get

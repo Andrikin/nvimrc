@@ -30,24 +30,24 @@ if tema.config then
     tema.config()
 end
 
-local win7 = require('andrikin.utils').win7
-local has_buildin = vim.version().major >= 0 and vim.version().minor > 9
-local has_rm = vim.fn.executable('rm') == 1
-local has_mkdir = vim.fn.executable('mkdir') == 1
 local plugins = {
 	-- Fork Tim Pope vim-capslock
 	'https://github.com/Andrikin/vim-capslock',
 	-- Tim Pope's miracles
     'https://github.com/tpope/vim-fugitive.git',
 	'https://github.com/tpope/vim-surround.git',
-	{
-		'https://github.com/tpope/vim-commentary.git',
-		enabled = not has_buildin and win7,
-    },
-    {
-        'https://github.com/tpope/vim-eunuch.git',
-        enabled = has_rm and has_mkdir,
-    },
+	'https://github.com/tpope/vim-eunuch.git',
+	-- Vim Cool,
+	'https://github.com/romainl/vim-cool.git',
+	-- Dirvirsh,
+	'https://github.com/justinmk/vim-dirvish.git',
+	-- Traces.vim,
+	'https://github.com/markonm/traces.vim.git',
+	-- Undotree,
+	'https://github.com/mbbill/undotree.git',
+	-- snippets
+	'https://github.com/L3MON4D3/LuaSnip.git',
+	'https://github.com/rafamadriz/friendly-snippets.git',
 	{
 		'https://github.com/tpope/vim-dadbod.git',
 		lazy = true,
@@ -65,10 +65,6 @@ local plugins = {
 			vim.cmd.colorscheme(tema.nome)
 		end
     },
-	-- Vim Cool,
-	'https://github.com/romainl/vim-cool.git',
-	-- Dirvirsh,
-	'https://github.com/justinmk/vim-dirvish.git',
 	-- Emmet,
 	{
 		'https://github.com/mattn/emmet-vim.git',
@@ -82,12 +78,12 @@ local plugins = {
 	-- Lualine,
 	{
 		'https://github.com/nvim-lualine/lualine.nvim',
-        priority = 1000,
-        lazy = false,
 		config = function()
 			require('lualine').setup(
 				{
-					options = { theme = tema.nome },
+					options = { theme = tema.nome,
+						always_show_tabline = false,
+					},
                     sections = {
 						lualine_a = {'mode', 'CapsLockStatusline'},
                     },
@@ -101,11 +97,11 @@ local plugins = {
 					},
                     tabline = {
                         lualine_a = {
-                            {
-                                'tabs',
-                                mode = 1,
-                                path = 0,
-                            },
+							{
+								'tabs',
+								mode = 1,
+								path = 0,
+							},
                         },
                     }
 				}
@@ -121,23 +117,7 @@ local plugins = {
 	{
         'https://github.com/neovim/nvim-lspconfig.git',
         dependencies = {
-            {
-                -- WARNING: neodev é um projeto arquivado! EOL
-                'https://github.com/folke/neodev.nvim.git', -- signature help, docs and completion for nvim lua API
-                enable = win7,
-            },{
-                'https://github.com/folke/lazydev.nvim.git', -- signature help, docs and completion for nvim lua API
-                enable = not win7,
-            },
-            { 'https://github.com/j-hui/fidget.nvim.git',
-                opts = {
-                    progress = {
-                        display = {
-                            skip_history = false,
-                        }
-                    }
-                }
-            },
+			'https://github.com/folke/lazydev.nvim.git', -- signature help, docs and completion for nvim lua API
         }
     },
     -- Java LSP
@@ -145,13 +125,6 @@ local plugins = {
 		'https://github.com/mfussenegger/nvim-jdtls.git',
 		lazy = true,
 	},
-	-- Traces.vim,
-	'https://github.com/markonm/traces.vim.git',
-	-- Undotree,
-	'https://github.com/mbbill/undotree.git',
-	-- snippets
-	'https://github.com/L3MON4D3/LuaSnip.git',
-	'https://github.com/rafamadriz/friendly-snippets.git',
 	-- Telescope,
 	{
 		'https://github.com/nvim-telescope/telescope.nvim.git',
@@ -173,20 +146,11 @@ local plugins = {
         lazy = true,
         build = ':TSUpdate',
     },
-	{
-		'https://github.com/nvim-treesitter/playground.git',
-		lazy = true,
-	},
     {
 ---@diagnostic disable-next-line: undefined-field
         dir = vim.loop.os_homedir() .. '/Documents/nvim/projetos/himalaya-vim',
         lazy = true,
         enabled = function() return vim.fn.executable('himalaya') == 1 end,
-    },
-    {
-        'https://github.com/junegunn/fzf.vim.git',
-        dependencies = {'https://github.com/junegunn/fzf.git'},
-        lazy = true,
     },
 }
 

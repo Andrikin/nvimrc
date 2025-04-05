@@ -119,7 +119,7 @@ local config = {
       },
     },
     contentProvider = { preferred = "fernflower" },
-    extendedClientCapabilities = extendedClientCapabilities,
+    -- extendedClientCapabilities = extendedClientCapabilities,
     sources = {
       organizeImports = {
         starThreshold = 9999,

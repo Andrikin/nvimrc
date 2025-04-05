@@ -127,17 +127,17 @@ autocmd(
 -- neovim não está carregando esta configuração ao utilizar 'require'
 -- FIX: como resolver?
 -- PALEATIVO: setar vim.o.showtabline = 1 utilizando vim.defer_fn()
-autocmd(
-	'VimEnter',
-	{
-		group = Andrikin,
-		pattern = '*',
-		once = true,
-		callback = function()
-			vim.defer_fn(
-				function() vim.cmd.lua('vim.o.showtabline = 1') end,
-				250
-			)
-		end,
-	}
-)
+-- autocmd(
+-- 	'VimEnter',
+-- 	{
+-- 		group = Andrikin,
+-- 		pattern = '*',
+-- 		once = true,
+-- 		callback = function()
+-- 			vim.defer_fn(
+-- 				function() vim.cmd.lua('vim.o.showtabline = 1') end,
+-- 				150
+-- 			)
+-- 		end,
+-- 	}
+-- )
