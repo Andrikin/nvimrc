@@ -47,8 +47,12 @@ vim.opt.complete:remove('t')
 vim.opt.title = true
 vim.opt.hidden = true
 vim.opt.mouse = nil
-if vim.fn.has('persistent_undo') then
-	local path = vim.fn.stdpath('data') .. '/undotree'
+if vim.fn.has('persistent_undo') == 1 then
+	local path = vim.fs.joinpath(
+		---@diagnostic disable-next-line: param-type-mismatch
+		vim.fn.stdpath('config'),
+		'undotree'
+	)
 	if vim.fn.isdirectory(path) == 0 then
 		vim.fn.mkdir(path, 'p', '0755')
 	end
@@ -77,7 +81,8 @@ vim.opt.fillchars = {
 
 -- Python 
 -- vim.g.python_host_prog = '/usr/bin/python2'
-vim.g.python3_host_prog = '/usr/bin/python3'
+-- vim.g.python3_host_prog = '/usr/bin/python3'
+vim.g.python3_host_prog = vim.fn.systemlist('which python3')[1]
 
 -- Using ripgrep ([cf]open; [cf]do {cmd} | update)
 if vim.fn.executable('rg') then
