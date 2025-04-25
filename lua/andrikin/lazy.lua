@@ -17,18 +17,17 @@ vim.opt.rtp:prepend(lazypath)
 local tokyonight = {
     nome = 'tokyonight',
     link = 'https://github.com/folke/tokyonight.nvim.git',
-    -- config = function()
-    --     vim.api.nvim_set_hl(0, 'CursorLine', {link = 'Visual'})
-    -- end
+	opts = {},
+    config = function()
+		vim.opt.termguicolors = true
+		vim.cmd.colorscheme('tokyonight')
+    end
 }
 -- local dracula = {
 --     nome = 'dracula',
 --     url = 'https://github.com/Mofiqul/dracula.nvim.git'
 -- }
 local tema = tokyonight
-if tema.config then
-    tema.config()
-end
 
 local plugins = {
 	-- Fork Tim Pope vim-capslock
@@ -45,9 +44,39 @@ local plugins = {
 	'https://github.com/markonm/traces.vim.git',
 	-- Undotree,
 	'https://github.com/mbbill/undotree.git',
+	-- autocompletion engine
+	{
+		'https://github.com/Saghen/blink.cmp.git',
+		version = '1.*',
+		opts = {
+			cmdline = {enabled = false},
+			snippets = { preset = 'luasnip' },
+			keymap = { preset = 'default' },
+			-- (Default) Only show the documentation popup when manually triggered
+			completion = {
+				menu = {
+					border = 'none',
+					draw = {
+						columns = { { "label", "label_description", gap = 1 }, { "kind" } },
+					}
+				},
+				documentation = { auto_show = false },
+			},
+			-- Default list of enabled providers defined so that you can extend it
+			-- elsewhere in your config, without redefining it, due to `opts_extend`
+			sources = {
+				default = { 'lsp', 'snippets', 'buffer', 'path' },
+			},
+		},
+		-- snippets
+		dependencies = {
+			'https://github.com/rafamadriz/friendly-snippets.git',
+			'https://github.com/L3MON4D3/LuaSnip.git',
+		},
+	},
 	-- snippets
-	'https://github.com/L3MON4D3/LuaSnip.git',
-	'https://github.com/rafamadriz/friendly-snippets.git',
+	-- 'https://github.com/L3MON4D3/LuaSnip.git',
+	-- 'https://github.com/rafamadriz/friendly-snippets.git',
 	{
 		'https://github.com/tpope/vim-dadbod.git',
 		lazy = true,
@@ -61,9 +90,8 @@ local plugins = {
         tema.link,
         priority = 1000,
         lazy = false,
-		config = function()
-			vim.cmd.colorscheme(tema.nome)
-		end
+		config = tema.config,
+		opts = tema.opts
     },
 	-- Emmet,
 	{
@@ -117,7 +145,10 @@ local plugins = {
 	{
         'https://github.com/neovim/nvim-lspconfig.git',
         dependencies = {
-			'https://github.com/folke/lazydev.nvim.git', -- signature help, docs and completion for nvim lua API
+			{ -- signature help, docs and completion for nvim lua API
+				'https://github.com/folke/lazydev.nvim.git',
+				ft = 'lua',
+			},
         }
     },
     -- Java LSP

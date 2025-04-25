@@ -1,6 +1,9 @@
 -- Configuração de LSP servers
 
 local notify = require('andrikin.utils').notify
+if not notify then
+	notify = print
+end
 
 -- colorizer.lua
 require('colorizer').setup(nil, { css = true })
@@ -37,6 +40,14 @@ vim.defer_fn( -- kickstart.nvim
             highlight = {
                 enable = true,
                 additional_vim_regex_highlighting = true,
+				---@diagnostic disable-next-line: unused-local
+				disable = function(lang, buf)
+					local max_filesize = 100 * 1024 -- 100 KB
+					local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+					if ok and stats and stats.size > max_filesize then
+						return true
+					end
+				end,
             },
             indent = { enable = true },
         })
@@ -47,25 +58,6 @@ vim.defer_fn( -- kickstart.nvim
 local telescope_tema = 'dropdown'
 local telescope_actions = require('telescope.actions')
 require('telescope').setup({
-    -- Playground configuration, extracted from github https://github.com/nvim-treesitter/playground
-    playground = {
-        enable = true,
-        disable = {},
-        updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
-        persist_queries = false, -- Whether the query persists across vim sessions
-        keybindings = {
-            toggle_query_editor = 'o',
-            toggle_hl_groups = 'i',
-            toggle_injected_languages = 't',
-            toggle_anonymous_nodes = 'a',
-            toggle_language_display = 'I',
-            focus_language = 'f',
-            unfocus_language = 'F',
-            update = 'R',
-            goto_node = '<cr>',
-            show_help = '?',
-        },
-    },
     pickers = {
         buffers = {
             previewer = false,
@@ -95,13 +87,13 @@ require('telescope').setup({
         },
         mappings = {
             i = {
-                ['<NL>'] = telescope_actions.select_default + telescope_actions.center,
+                ['<c-j>'] = telescope_actions.select_default + telescope_actions.center,
                 ['gq'] = telescope_actions.close, -- ruim para as buscas que precisarem de "gq"
                 ['<c-u>'] = {'<c-u>', type = 'command'},
                 ['<esc>'] = {'<esc>', type = 'command'},
             },
             n = {
-                ['<NL>'] = telescope_actions.select_default + telescope_actions.center,
+                ['<c-j>'] = telescope_actions.select_default + telescope_actions.center,
                 ['gq'] = telescope_actions.close,
             },
         },
@@ -114,9 +106,21 @@ else
     notify('Telescope: extenção fzf carregada com sucesso')
 end
 
-local luasnip = require('luasnip')
+-- LuaSnip configuração
+require('luasnip').config.set_config({
+	history = true,
+})
 require('luasnip.loaders.from_vscode').lazy_load() -- carregar snippets (templates)
-luasnip.config.setup({})
+ -- carregar snippets (templates)
+-- require('luasnip.loaders.from_lua').lazy_load()
+require('luasnip.loaders.from_lua').load({
+	---@diagnostic disable-next-line: assign-type-mismatch
+	paths = {vim.fs.joinpath(
+		---@diagnostic disable-next-line: param-type-mismatch
+		vim.fn.stdpath('config'),
+		'snippets'
+	)}
+})
 
 -- LSP CONFIGURATION
 local lsp = require('lspconfig')
