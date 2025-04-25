@@ -97,6 +97,7 @@ vim.keymap.set(
 	'n',
 	'<leader>r',
 	function()
+		---@diagnostic disable-next-line: undefined-field
 		if vim.g.loaded_dirvish == 1 then -- plugin ativo
 			vim.cmd.Dirvish(
 				vim.fn.fnamemodify(vim.env.MYVIMRC, ':h') .. '/lua/andrikin'
