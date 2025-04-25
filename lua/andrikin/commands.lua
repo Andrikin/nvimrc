@@ -48,6 +48,14 @@ command(
 )
 
 command(
+	'ListaMusicas',
+	function()
+		vim.cmd.edit('/home/andre/.config/dmenu_player/lista_de_musicas_completa.dmenu')
+	end,
+	{}
+)
+
+command(
 	'Projetos',
 	function()
 		vim.cmd.Dirvish('/home/andre/documents/git/')
