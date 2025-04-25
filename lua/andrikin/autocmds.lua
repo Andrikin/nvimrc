@@ -141,3 +141,15 @@ autocmd(
 -- 		end,
 -- 	}
 -- )
+
+autocmd(
+	'FileType',
+	{
+		group = Andrikin,
+		pattern =  'checkhealth',
+		callback = function()
+			vim.cmd.LualineRenameTab('checkhealth')
+		end,
+	}
+)
+
