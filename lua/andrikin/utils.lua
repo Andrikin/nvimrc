@@ -167,6 +167,7 @@ Latex.clear_files = function()
         vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
         do return end
     end
+---@diagnostic disable-next-line: undefined-field
     local auxiliares = vim.fn.glob((Latex.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
     if #auxiliares == 0 then
         do return end
@@ -177,6 +178,7 @@ Latex.clear_files = function()
 end
 
 Latex.init = function(self)
+---@diagnostic disable-next-line: undefined-field
     vim.env.TEXINPUTS = '.:' .. self.diretorios.modelos.diretorio .. ':'
 end
 
@@ -186,6 +188,7 @@ Latex.compile = function()
         vim.notify('Comando executável somente para arquivos .tex!')
         do return end
     end
+---@diagnostic disable-next-line: undefined-field
     if not arquivo:match(Latex.diretorios.destino.diretorio) then
         vim.notify('Não foi possível compilar arquivo .tex! Necessário que arquivo esteja no diretório "$HOME/downloads."')
         do return end
@@ -199,6 +202,7 @@ Latex.compile = function()
         'pdflatex',
         '-file-line-error',
         '-interaction=nonstopmode',
+---@diagnostic disable-next-line: undefined-field
         '-output-directory=' .. Latex.diretorios.destino.diretorio,
         arquivo
     }
@@ -282,6 +286,7 @@ Ouvidoria.ci = {
             titulo = 'OUV-' .. titulo .. Ouvidoria.tex
         end
         titulo = string.format('C.I. N° %s.%s - ', num_ci, os.date('%Y')) .. titulo
+---@diagnostic disable-next-line: undefined-field
         local ci = (Ouvidoria.latex.diretorios.destino / titulo).diretorio
         vim.fn.writefile(vim.fn.readfile(modelo), ci) -- Sobreescreve arquivo, se existir
         vim.cmd.edit(ci)
@@ -342,6 +347,18 @@ local Cmus = {}
 Cmus.__index = Cmus
 
 Cmus.Musicas = Diretorio.new(vim.env.HOME) / '/music/'
+Cmus.ListaMusicas = nil
+if vim.fn.filereadable('/home/andre/.config/dmenu_player/lista_de_musicas_completa.dmenu') == 1 then
+	Cmus.ListaMusicas = '/home/andre/.config/dmenu_player/lista_de_musicas_completa.dmenu'
+else
+	vim.notify('Não foi possível encontrar o arquivo de listagem para das músicas.')
+end
+Cmus.Pastas = nil
+if vim.fn.filereadable('/home/andre/.config/dmenu_player/pastas_de_musicas.dmenu') == 1 then
+	Cmus.Pastas = 'khome/andre/.config/dmenu_player/pastas_de_musicas.dmenu'
+else
+	vim.notify('Nâo foi possível encontrar o arquivo de listagem dos diretórios.')
+end
 
 ---@return Cmus
 Cmus.new = function()
@@ -638,7 +655,15 @@ Cmus.tab = function(arg, cmd)
         end, tabela)
     end
     local completar = function()
-		local localizar_arquivos_diretorios = function()
+		-- TODO: utilizar o arquivo de listagem de músicas do
+		-- ~/.config/dmenu_player/lista_de_musicas_completa.dmenu
+		-- para realizar o autocompletion para opção 'file' e 
+		-- ~/.config/dmenu_player/pastas_de_musicas.dmenu para autocompletion
+		-- do comando 'playlist' e atualizar estes asrquivos.
+		local localizar = function(opcao)
+			if opcao then
+				do return end
+			end
 			---@type Diretorio | string
 			local cd = args[3] and Diretorio.new(args[3])
 			if not cd then
@@ -659,9 +684,9 @@ Cmus.tab = function(arg, cmd)
             shuffle = function() end, -- são comandos diretos. Nada para retornar
             volume = function() end, -- são utilizados números. Nada para retornar
             seek = function() end, -- são utilizados números. Nada para retornar
-            playlist = localizar_arquivos_diretorios,
-            file = localizar_arquivos_diretorios,
-            info = function() end, -- nada para retornar
+            info = function() end, -- Nada para retornar
+            playlist = localizar,
+            file = localizar,
             queue = function() return filtrar(Cmus.diretorios_musica()) end,
             raw = function() -- TODO: acrescentar mais comandos?
                 return filtrar({
