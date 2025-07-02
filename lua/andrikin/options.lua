@@ -36,7 +36,7 @@ vim.opt.encoding = 'utf-8'
 vim.opt.autoread = true
 vim.opt.tabpagemax = 50
 vim.opt.wildmenu = true
-vim.opt.completeopt = 'menuone,noinsert,noselect,popup'
+vim.opt.completeopt = 'menu,noinsert,noselect,popup,fuzzy'
 if vim.fn.has('win32') then
 	vim.g.shell = vim.env.COMSPEC
 else
@@ -71,7 +71,7 @@ vim.opt.showmode = false
 vim.opt.guicursor = 'i-n-v-c:block'
 vim.opt.guifont =  'SauceCodePro NFM:h11'
 vim.opt.inccommand = ''
-vim.opt.winborder = 'rounded'
+vim.opt.winborder = 'none'
 vim.opt.fillchars = {
 	vert = '|',
 	fold = '*',
@@ -102,7 +102,8 @@ vim.g.traces_num_range_preview = 0
 vim.g.undotree_WindowLayout = 1
 vim.g.undotree_ShortIndicators = 1
 vim.g.undotree_SetFocusWhenToggle = 1
-vim.g.undotree_DiffpanelHeight = 10
+vim.g.undotree_DiffAutoOpen = 0
+-- vim.g.undotree_DiffpanelHeight = 10
 -- vim.g.undotree_DiffAutoOpen = 1
 
 -- --- Netrw ---
