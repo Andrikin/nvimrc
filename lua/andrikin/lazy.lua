@@ -14,6 +14,15 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Temas - interface: nome, url
+local blackhole = {
+	nome = 'auto', -- Lualine não reconhece 'blackhole'
+	link = 'https://github.com/biisal/blackhole',
+	opts = {},
+	config = function ()
+		vim.opt.termguicolors = true
+		vim.cmd.colorscheme('blackhole')
+	end
+}
 local tokyonight = {
     nome = 'tokyonight',
     link = 'https://github.com/folke/tokyonight.nvim.git',
@@ -23,11 +32,8 @@ local tokyonight = {
 		vim.cmd.colorscheme('tokyonight')
     end
 }
--- local dracula = {
---     nome = 'dracula',
---     url = 'https://github.com/Mofiqul/dracula.nvim.git'
--- }
-local tema = tokyonight
+-- local tema = tokyonight
+local tema = blackhole
 
 local plugins = {
 	-- Fork Tim Pope vim-capslock
@@ -51,7 +57,11 @@ local plugins = {
 		opts = {
 			cmdline = {enabled = false},
 			snippets = { preset = 'luasnip' },
-			keymap = { preset = 'default' },
+			keymap = {
+				preset = 'default',
+				['<c-space>'] = {'fallback'},
+				['<c-j>'] = {'select_and_accept', 'fallback'},
+			},
 			-- (Default) Only show the documentation popup when manually triggered
 			completion = {
 				menu = {
@@ -60,6 +70,11 @@ local plugins = {
 						columns = { { "label", "label_description", gap = 1 }, { "kind" } },
 					}
 				},
+                list = {
+                    selection = {
+                        preselect = false, auto_insert = true
+                    }
+                },
 				documentation = { auto_show = false },
 			},
 			-- Default list of enabled providers defined so that you can extend it
@@ -110,6 +125,8 @@ local plugins = {
 			require('lualine').setup(
 				{
 					options = { theme = tema.nome,
+						component_separators = { left = '', right = ''},
+						section_separators = { left = '', right = ''},
 						always_show_tabline = false,
 					},
                     sections = {
@@ -145,11 +162,9 @@ local plugins = {
 	{
         'https://github.com/neovim/nvim-lspconfig.git',
         dependencies = {
-			{ -- signature help, docs and completion for nvim lua API
 				'https://github.com/folke/lazydev.nvim.git',
 				ft = 'lua',
-			},
-        }
+        },
     },
     -- Java LSP
 	{
@@ -170,7 +185,10 @@ local plugins = {
                 end,
             },
 		},
-	},
+	},{ -- change how vim.ui.select works (telescope)
+        'https://github.com/nvim-telescope/telescope-ui-select.nvim',
+        lazy = true
+    },
 	-- Treesitter,
     {
         'https://github.com/nvim-treesitter/nvim-treesitter.git',

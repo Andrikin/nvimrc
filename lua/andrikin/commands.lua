@@ -2,6 +2,17 @@
 local command = vim.api.nvim_create_user_command
 local Cmus = require('andrikin.utils').Cmus
 local Ouvidoria = require('andrikin.utils').Ouvidoria
+local Copyq = require('andrikin.utils').Copyq
+
+command(
+	'Clipboard',
+    function(opts)
+        Copyq.clipboard(opts)
+    end,
+	{
+		nargs = "?",
+	}
+)
 
 command(
     'HexEditor',
@@ -20,7 +31,9 @@ command(
 
 command(
     'Pdflatex',
-    Ouvidoria.latex.compile,
+	function()
+		Ouvidoria.latex:compile()
+	end,
     {}
 )
 

@@ -8,11 +8,11 @@ end
 -- colorizer.lua
 require('colorizer').setup(nil, { css = true })
 
--- Neodev
+-- Lazyev
 require('lazydev').setup()
 
 -- vim.diagnostic.config
-vim.diagnostic.config({ virtual_lines = true })
+vim.diagnostic.config({ underline = true })
 
 vim.defer_fn( -- kickstart.nvim
     function()
@@ -58,6 +58,11 @@ vim.defer_fn( -- kickstart.nvim
 local telescope_tema = 'dropdown'
 local telescope_actions = require('telescope.actions')
 require('telescope').setup({
+    extensions = { -- configurando extenções
+        ["ui-select"] = {
+            require("telescope.themes").get_dropdown()
+        }
+    },
     pickers = {
         buffers = {
             previewer = false,
@@ -99,12 +104,17 @@ require('telescope').setup({
         },
     }
 })
-local ok, _ = pcall(require('telescope').load_extension, 'fzf')
-if not ok then
-    notify('Telescope: não foi possível carregar a extenção fzf.')
-else
-    notify('Telescope: extenção fzf carregada com sucesso')
-end
+-- Carregando extenções do telescope
+local carregar = function (extencao)
+    local ok, _ = pcall(require('telescope').load_extension, extencao)
+    if not ok then
+        notify(('Telescope: não foi possível carregar a extenção %s.'):format(extencao))
+    else
+        notify(('Telescope: extenção %s carregada com sucesso'):format(extencao))
+    end
+ end
+carregar('fzf')
+carregar('ui-select')
 
 -- LuaSnip configuração
 require('luasnip').config.set_config({
@@ -112,8 +122,7 @@ require('luasnip').config.set_config({
 })
 require('luasnip.loaders.from_vscode').lazy_load() -- carregar snippets (templates)
  -- carregar snippets (templates)
--- require('luasnip.loaders.from_lua').lazy_load()
-require('luasnip.loaders.from_lua').load({
+require('luasnip.loaders.from_lua').lazy_load({
 	---@diagnostic disable-next-line: assign-type-mismatch
 	paths = {vim.fs.joinpath(
 		---@diagnostic disable-next-line: param-type-mismatch
@@ -122,62 +131,16 @@ require('luasnip.loaders.from_lua').load({
 	)}
 })
 
--- LSP CONFIGURATION
-local lsp = require('lspconfig')
-local servers = {
-    'emmet_ls', -- emmet LSP
-    'pyright', -- python LSP
-    'denols', -- javascript LSP
-    'texlab', -- LaTeX LSP
-    'jdtls', -- java LSP
-    'vimls', -- vim LSP
-    'html', -- html LSP
-    'jsonls', -- json LSP
-	{
-		lsp = 'lua_ls',
-		config = {
-			settings = {
-				Lua = {
-					runtime = {
-						version = 'LuaJIT',
-					},
-					diagnostics = {
-						globals = {
-							'vim',
-							'require',
-						}
-					},
-					workspace = {
-						library = vim.api.nvim_get_runtime_file("", true),
-					},
-				},
-			},
-		},
-	},
-	'cssls', -- css LSP
-    -- 'rust_analyzer', -- rust LSP
-    -- { -- javascript LSP
-    --     lsp = 'eslint',
-    --     config = {
-    --         on_attach = function(_, bufnr)
-    --             vim.api.nvim_create_autocmd('BufWritePre', {
-    --                 buffer = bufnr,
-    --                 command = 'EslintFixAll',
-    --             })
-    --         end,
-    --     }
-    -- },
-}
-for _, server in ipairs(servers) do
----@diagnostic disable-next-line: undefined-field
-    if server.config then
----@diagnostic disable-next-line: undefined-field
-        lsp[server.lsp].setup({
----@diagnostic disable-next-line: undefined-field
-            unpack(server.config)
-        })
-    else
-        lsp[server].setup({})
-    end
-end
-
+-- Ativar LSP nos buffers, automaticamente -- Neovim 0.11
+vim.lsp.enable({
+    'luals',
+    'texlab',
+    'emmetls',
+    'pyright',
+    'denols',
+    'vimls',
+    'html',
+    'jsonls',
+    'cssls',
+})
+-- vim.lsp.set_log_level("debug")

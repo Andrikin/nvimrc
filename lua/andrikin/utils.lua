@@ -161,14 +161,14 @@ Latex.ft_tex = function()
     return vim.o.ft == 'tex'
 end
 
-Latex.clear_files = function()
+Latex.clear_files = function(self)
     -- deletar arquivos auxiliares da compilação, no linux
     if not vim.fn.has('linux') then
         vim.notify('Caso esteja no sistema Windows, verifique a disponibilidade da opção de comando "-aux-directory"')
         do return end
     end
 ---@diagnostic disable-next-line: undefined-field
-    local auxiliares = vim.fn.glob((Latex.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
+    local auxiliares = vim.fn.glob((self.diretorios.destino / '*.{aux,out,log}').diretorio, false, true)
     if #auxiliares == 0 then
         do return end
     end
@@ -182,15 +182,10 @@ Latex.init = function(self)
     vim.env.TEXINPUTS = '.:' .. self.diretorios.modelos.diretorio .. ':'
 end
 
-Latex.compile = function()
+Latex.compile = function(self)
     local arquivo = vim.fn.expand('%')
-    if not Latex.ft_tex() or not arquivo:match('%.tex$') then
+    if not self.ft_tex() or not arquivo:match('%.tex$') then
         vim.notify('Comando executável somente para arquivos .tex!')
-        do return end
-    end
----@diagnostic disable-next-line: undefined-field
-    if not arquivo:match(Latex.diretorios.destino.diretorio) then
-        vim.notify('Não foi possível compilar arquivo .tex! Necessário que arquivo esteja no diretório "$HOME/downloads."')
         do return end
     end
     if vim.o.modified then -- salvar arquivo que está modificado.
@@ -199,12 +194,17 @@ Latex.compile = function()
     end
     local cmd = {}
     cmd = {
-        'pdflatex',
-        '-file-line-error',
-        '-interaction=nonstopmode',
----@diagnostic disable-next-line: undefined-field
-        '-output-directory=' .. Latex.diretorios.destino.diretorio,
-        arquivo
+        'tectonic',
+        '-X',
+        'compile',
+        '-o',
+		---@diagnostic disable-next-line: undefined-field
+		self.diretorios.destino.diretorio,
+        '-k',
+        '-Z',
+		---@diagnostic disable-next-line: undefined-field
+        'search-path=' .. self.diretorios.modelos.diretorio,
+		arquivo
     }
     vim.notify('Compilando arquivo!')
     vim.fn.systemlist(cmd)
@@ -215,24 +215,25 @@ Latex.compile = function()
             out = table.concat(out, ' ')
         end
         vim.notify('Não foi possível compilar arquivo.\n' .. out)
-        Latex.clear_files()
+        -- self:clear_files()
         do return end
-    else
-        Latex.clear_files()
+    -- else
+        -- self:clear_files()
     end
     vim.notify('Pdf compilado!')
-    Latex.open(arquivo)
+    self:open(arquivo)
 end
 
-Latex.open = function(arquivo)
-    arquivo = arquivo:gsub('tex$', 'pdf')
-    local existe = vim.fn.filereadable(arquivo) ~= 0
+Latex.open = function(self, arquivo)
+    arquivo = vim.env.HOME .. '/downloads/' .. vim.fn.fnamemodify(arquivo:gsub('tex$', 'pdf'), ':t')
+	print(arquivo)
+    local existe = vim.fn.filereadable(arquivo) > 0
     if not existe then
         error('Ouvidoria: pdf.abrir: não foi possível encontrar arquivo "pdf"')
     end
     vim.notify(string.format('Abrindo arquivo %s', vim.fn.fnamemodify(arquivo, ':t')))
     vim.fn.jobstart({
-        Latex.reader,
+        self.reader,
         arquivo
     })
 end
@@ -729,6 +730,7 @@ end
 Utils.npcall = vim.F.npcall
 
 ---@type string | nil
+---@diagnostic disable-next-line: undefined-field
 Utils.win7 = string.match(vim.loop.os_uname()['version'], 'Windows 7')
 
 Utils.cursorline = {
@@ -756,6 +758,56 @@ Utils.reload = function()
 	end
 	require('andrikin')
 end
+
+---@class Copyq
+---@field clipboard function
+local Copyq = {}
+
+Copyq.__index = Copyq
+
+-- https://copyq.readthedocs.io/en/latest/known-issues.html
+-- On Windows, CopyQ does not print anything on console
+-- Use Action dialog in CopyQ (F5 shortcut) and set "Store standard output" to "text/plain" to save the output as new item in current tab.
+-- selecionar qual tab - default 'clipboard'
+Copyq.clipboard = function(tab)
+    tab = tab.args == "" and nil or 'clipboard'
+    if vim.fn.executable('copyq') ~= 1 then
+        Utils.notify('copyq: Não foi encontrado "copyq". Por gentileza, realize a instalação.')
+        do return end
+    end
+    local clipboard = vim.fn.system({"copyq","eval","--",([[
+            let indent = 4;
+            tab('%s');
+            let c = [];
+            for(i=0;i<20;i++) c.push(str(read(i)));
+            // for(i=0;i<size();i++) c.push(str(read(i)));
+            print(JSON.stringify(c, null, indent));
+        ]]):format(tab)}
+    )
+    -- transformar JSON
+    clipboard = vim.json.decode(clipboard)
+    local temp = {}
+    local index = 1
+    for i, _ in ipairs(clipboard) do -- remover strings vazias
+        if clipboard[i] ~= "" then
+            temp[index] = clipboard[i]
+            index = index + 1
+        end
+    end
+    ---@diagnostic disable-next-line: cast-local-type
+    clipboard = temp
+    vim.ui.select(clipboard, {
+        prompt = 'Selecione uma entrado do clipboard:',
+        format_item = function(item)
+            return item
+        end,
+    }, function(choice)
+            vim.fn.setreg('"', choice)
+        end
+    )
+end
+
+Utils.Copyq = Copyq
 
 return Utils
 
