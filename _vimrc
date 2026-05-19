@@ -1,19 +1,67 @@
 " $MYVIMRC --- NeoVim ---
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: [surround, comment, capslock, eunuch, fugitive] tpope, vim-cool, vim-dirvish, undotree, vim-highlightedyank
+" Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
+" vim-cool, vim-dirvish, undotree, vim-highlightedyank
 
-" WARNING: diretório de instalação -> C:/Users/09153634969/Documents/gvim/Data/settings/_vimrc
-source $VIMRUNTIME/defaults.vim
+" TODO: curl Plug.vim - bootstrap, incluir executáveis no PATH, sort Dirvish
+" command, treesitter for vim?
+" WARNING: diretório de instalação ->
+" C:/Users/09153634969/Documents/gvim/Data/settings/_vimrc
+" WARNING: MS-Windows initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
+" $VIM/_vimrc
+
+let s:THISPC = $HOMEDRIVE .. $HOMEPATH
+let $MYVIMRC = s:THISPC .. "/Documents/gvim/Data/settings/vimrc"
+let s:NVIM = s:THISPC .. '/Documents/nvim/win-portable-neovim/nvim'
+" nvim opts dependencies
+let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
+
+" list nvim/opt and add it to $PATH
+function! s:path_initialize(force) abort
+	if !filereadable(s:OPTSFILE) || a:force
+		call s:found_nvim_opt()
+	endif
+	let paths = readfile(s:OPTSFILE)
+	for path in paths
+		call s:add_path(path)
+	endfor
+endfunction
+
+function! s:found_nvim_opt() abort
+	let nvimdirglob = s:NVIM .. '/opt/*/**/*.exe'
+    if !isdirectory(s:NVIM)
+        echom "Não foi possível encontrar diretório de instalação do Neovim."
+        return
+    endif
+	let opts = glob(nvimdirglob, v:false, v:true, v:false)->map({_, dir -> fnamemodify(dir, ':h')})->uniq()
+	call writefile(opts, s:OPTSFILE)
+endfunction
+
+function! s:add_path(dir) abort
+    if has('win32')
+        let $PATH = $PATH .. ';' .. a:dir
+    else
+        " linux...
+        let $PATH = $PATH .. ':' .. a:dir
+    endif
+endfunction
+
+" inicializar PATH
+call s:path_initialize(v:false)
+
+"source $VIMRUNTIME/defaults.vim
 
 " Plug.vim bootstrap
-let s:plugvimdir = ''
+let s:plugvimdir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/autoload/'
 if executable('curl') && !filereadable(s:plugvimdir)
-	system(['curl', '-fLo', s:plugvimdir, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
-	source s:plugvimdir
+	call system(['curl', '-fLo', s:plugvimdir, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
+    if executable('git')
+        execute 'source ' .. s:plugvimdir .. 'plug.vim'
+    else
+        echom "git: instalar git ou inicializá-lo no $PATH"
+    endif
 endif
-
-let $MYVIMRC = "C:/Users/09153634969/Documents/gvim/Data/settings/vimrc"
 
 call plug#begin()
 
@@ -95,7 +143,10 @@ set laststatus=3
 set showtabline=2 
 set noshowmode 
 
-" St tem um problema com o cursor. Ele não muda de acordo com as cores da fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html), é possível obter o cursor com a cor do texto (com truecolor)
+" St tem um problema com o cursor. Ele não muda de acordo com as cores da
+" fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas
+" (https://git.suckless.org/st/commit/5535c1f04c665c05faff2a65d5558246b7748d49.html),
+" é possível obter o cursor com a cor do texto (com truecolor)
 set termguicolors
 
 set guicursor=
@@ -128,9 +179,6 @@ let g:undotree_ShortIndicators = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_DiffpanelHeight = 5
 
-" nvim opts dependencies
-let s:OPTSFILE = ''
-
 " --- Key maps ---
 
 " CTRL-U in insert mode deletes a lot. Use CTRL-G u to first break undo,
@@ -144,7 +192,7 @@ nnoremap ' `
 " Fix & command. Redo :substitute command
 nnoremap & <cmd>&&<cr>
 xnoremap & <cmd>&&<cr>
-" Yank to end of sreen line. Make default in Neovim 0.6.0
+" Yank to end of sreen line.
 " g$ cursor after last character, g_ cursor at last character
 nnoremap Y yg_
 " Disable <c-z> (:stop)
@@ -168,7 +216,8 @@ nnoremap <expr> k (v:count > 1 ? 'm`' . v:count : '') . 'k'
 nnoremap <expr> j (v:count > 1 ? 'm`' . v:count : '') . 'j'
 
 " Moving lines up and down - The Primeagen knowledge word
-" inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria inviável trocar para essa funcionalidade
+" inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria
+" inviável trocar para essa funcionalidade
 " inoremap <c-k> <c-o>:m.-2<cr>
 nnoremap <leader>k <cmd>m.-2<cr>
 nnoremap <leader>j <cmd>m.+1<cr>
@@ -186,11 +235,12 @@ nnoremap <silent> ]a <cmd>next<cr>
 nnoremap <silent> [a <cmd>Next<cr>
 
 " --- Mapleader Commands ---
-" Be aware that '\' is used as mapleader character, so conflits can occur in Insert Mode maps
+" Be aware that '\' is used as mapleader character, so conflits can occur in
+" Insert Mode maps
 
 " open $MYVIMRC
 " nnoremap <silent> <leader>r <cmd>tabe $MYVIMRC<cr>
-nnoremap <silent> <leader>r <cmd>Dirvish C:/Users/09153634969/Documents/gvim/Data/settings/<cr>
+nnoremap <silent> <leader>r <cmd>execute 'Dirvish ' .. fnamemodify($MYVIMRC, ':h')<cr>
 
 " :mksession
 " nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
@@ -200,6 +250,10 @@ nnoremap gP "+P
 nnoremap gp "+p
 vnoremap gy "+y
 nnoremap gY "+Y
+
+" adicionar linhas acima e abaixo
+nnoremap <silent> [<space> <cmd>normal O<cr><down>
+nnoremap <silent> ]<space> <cmd>normal o<cr><up>
 
 " --- Quickfix window ---
 " Toggle quickfix window
@@ -225,6 +279,9 @@ command! -nargs=? -complete=dir Tirvish tabedit | silent Dirvish <args>
 
 " Command binary to hex
 command! HexEditor %!xxd
+
+" update OPTSFILE
+command! UpdateOptfile <SID>found_nvim_opt(v:true)
 
 " --- Functions ---
 "
@@ -303,7 +360,8 @@ function! s:t_stats() abort
 	return [0, 0]
 endfunction
 
-" INFO: It don't look for situations when there is two quickfix windows open, but I think that it handles those situations
+" INFO: It don't look for situations when there is two quickfix windows open,
+" but I think that it handles those situations
 function! s:qf_stats() abort
 	for window in gettabinfo(tabpagenr())[0].windows
 		if getwininfo(window)[0].quickfix
@@ -324,26 +382,6 @@ function! s:g_bar_search(...) abort
 	return system(join([&grepprg, shellescape(expand(join(a:000, ' '))), shellescape(expand("%"))], ' '))
 endfunction
 
-" list nvim/opt and add it to $PATH
-function! s:path_initialize(force) abort
-	if !filereadable(s:OPTSFILE) || a:force
-		s:found_nvim_opt()
-	endif
-	let paths = readfile(s:OPTSFILE)
-	for path in paths
-		s:add_path(path)
-	endfor
-endfunction
-
-function! s:found_nvim_opt() abort
-	let nvimdirglob = ''
-	let opts = glob(nvimdirglob, v:false, v:true, v:false)->map({_, dir -> fnamemodify(dir, ':h')})->uniq()
-	writefile(opts, s:OPTSFILE)
-endfunction
-
-function! s:add_path(dir) abort
-	let $PATH = $PATH .. ':' .. dir
-endfunction
 
 " --- Autocommands ---
 " for map's use <buffer>, for set's use setlocal
