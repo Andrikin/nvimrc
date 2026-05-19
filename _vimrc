@@ -6,6 +6,13 @@
 " WARNING: diretório de instalação -> C:/Users/09153634969/Documents/gvim/Data/settings/_vimrc
 source $VIMRUNTIME/defaults.vim
 
+" Plug.vim bootstrap
+let s:plugvimdir = ''
+if executable('curl') && !filereadable(s:plugvimdir)
+	system(['curl', '-fLo', s:plugvimdir, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
+	source s:plugvimdir
+endif
+
 let $MYVIMRC = "C:/Users/09153634969/Documents/gvim/Data/settings/vimrc"
 
 call plug#begin()
