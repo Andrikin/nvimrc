@@ -4,18 +4,17 @@
 " Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
 " vim-cool, vim-dirvish, undotree, vim-highlightedyank
 
-" TODO: curl Plug.vim - bootstrap, incluir executáveis no PATH, sort Dirvish
-" command, treesitter for vim?
+" TODO: autocmd gq -> help, quicklist, etc; sort Dirvish command, treesitter for vim?
 " WARNING: diretório de instalação ->
 " C:/Users/09153634969/Documents/gvim/Data/settings/_vimrc
 " WARNING: MS-Windows initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
 " $VIM/_vimrc
 
 let s:THISPC = $HOMEDRIVE .. $HOMEPATH
-let $MYVIMRC = s:THISPC .. "/Documents/gvim/Data/settings/vimrc"
-let s:NVIM = s:THISPC .. '/Documents/nvim/win-portable-neovim/nvim'
+let $MYVIMRC = s:THISPC .. '\Documents\gvim\Data\settings\vimrc'
+let s:NVIM = s:THISPC .. '\Documents\nvim\win-portable-neovim\nvim'
 " nvim opts dependencies
-let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
+let s:OPTSFILE = s:THISPC .. '\Documents\gvim\Data\settings\optfiles'
 
 " list nvim/opt and add it to $PATH
 function! s:path_initialize(force) abort
@@ -29,13 +28,15 @@ function! s:path_initialize(force) abort
 endfunction
 
 function! s:found_nvim_opt() abort
-	let nvimdirglob = s:NVIM .. '/opt/*/**/*.exe'
+	let nvimdirglob = s:NVIM .. '\opt\*\**\*.exe'
     if !isdirectory(s:NVIM)
         echom "Não foi possível encontrar diretório de instalação do Neovim."
         return
     endif
+    " ponto crítico, de mais demora
 	let opts = glob(nvimdirglob, v:false, v:true, v:false)->map({_, dir -> fnamemodify(dir, ':h')})->uniq()
 	call writefile(opts, s:OPTSFILE)
+    echom "Arquivo OPTSFILE criado!"
 endfunction
 
 function! s:add_path(dir) abort
@@ -49,8 +50,6 @@ endfunction
 
 " inicializar PATH
 call s:path_initialize(v:false)
-
-"source $VIMRUNTIME/defaults.vim
 
 " Plug.vim bootstrap
 let s:plugvimdir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/autoload/'
@@ -103,6 +102,7 @@ set nu
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
+set expandtab
 
 " Configurações para search
 set incsearch
@@ -124,23 +124,23 @@ set encoding=utf-8
 set autoread
 set tabpagemax=50
 set wildmenu
-"let &g:shell='cmd.exe'
-"let &g:shellpipe='2>&1 | tee'
 set complete-=t
+set completeopt=menu,noinsert,noselect,popup,fuzzy
 set title
 set hidden
-set mouse=nvi
-set undodir=C:/Users/09153634969/Documents/gvim/Data/settings/undotree
+set mouse=
+set &g:undodir=s:THISPC .. '\Documents\gvim\Data\settings\undotree'
 set undofile
 set noswapfile
 " set linebreak
 " set wrapmargin=5
 let &g:textwidth=0
 let mapleader = ' '
+let maplocalleader = ' '
 
 " Statusline
 set laststatus=3
-set showtabline=2 
+set showtabline=1 
 set noshowmode 
 
 " St tem um problema com o cursor. Ele não muda de acordo com as cores da
@@ -149,9 +149,8 @@ set noshowmode
 " é possível obter o cursor com a cor do texto (com truecolor)
 set termguicolors
 
-set guicursor=
+set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 let &g:guifont='SauceCodePro NFM:h11'
-"set inccommand=
 let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
 " Using ripgrep ([cf]open; [cf]do {cmd} | update)
@@ -167,8 +166,8 @@ let g:loaded_netrwPlugin = 1
 let g:loaded_netrw = 1
 
 " Set python
-let g:python_host_prog = '/usr/bin/python2'
-let g:python3_host_prog = '/usr/local/bin/python3'
+" let g:python_host_prog = '/usr/bin/python2'
+" let g:python3_host_prog = '/usr/local/bin/python3'
 
 " Awesome substitute config
 let g:awesome_pairing_chars = "({[\'\""
@@ -178,6 +177,21 @@ let g:undotree_WindowLayout = 2
 let g:undotree_ShortIndicators = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_DiffpanelHeight = 5
+
+" vim-surround Tim Pope
+let g:surround_{char2nr('\')} = ''
+let g:surround_{char2nr('l')} = ''
+let g:surround_{char2nr('t')} = ''
+
+" disable providers
+let g:loaded_perl_provider = 0
+let g:loaded_ruby_provider = 0
+
+" vim-highlightedyank config
+let g:highlightedyank_highlight_duration = 300
+
+" dirvish sort
+let g:dirvish_mode = ':SortingDirvish'
 
 " --- Key maps ---
 
@@ -235,21 +249,19 @@ nnoremap <silent> ]a <cmd>next<cr>
 nnoremap <silent> [a <cmd>Next<cr>
 
 " --- Mapleader Commands ---
-" Be aware that '\' is used as mapleader character, so conflits can occur in
 " Insert Mode maps
 
 " open $MYVIMRC
-" nnoremap <silent> <leader>r <cmd>tabe $MYVIMRC<cr>
 nnoremap <silent> <leader>r <cmd>execute 'Dirvish ' .. fnamemodify($MYVIMRC, ':h')<cr>
-
-" :mksession
-" nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
 
 " Copy and paste from clipboard (* -> selection register/+ -> primary register)
 nnoremap gP "+P
 nnoremap gp "+p
 vnoremap gy "+y
 nnoremap gY "+Y
+
+" Fix ^\
+nnoremap <silent> <c-\> <c-]>
 
 " adicionar linhas acima e abaixo
 nnoremap <silent> [<space> <cmd>normal O<cr><down>
@@ -282,6 +294,9 @@ command! HexEditor %!xxd
 
 " update OPTSFILE
 command! UpdateOptfile <SID>found_nvim_opt(v:true)
+
+" Dirvish sorting
+command! SortingDirvish <SID>sortingdirvish()
 
 " --- Functions ---
 "
@@ -378,10 +393,43 @@ function! s:set_qf_win_height() abort
 	execute "resize " min([10, max([1, lnum])])
 endfunction
 
-function! s:g_bar_search(...) abort
-	return system(join([&grepprg, shellescape(expand(join(a:000, ' '))), shellescape(expand("%"))], ' '))
+" WIP: Testar
+function! s:sortingdirvish() abort
+	let plist = getline(1, line('$'))
+	if len(plist) == 1 && plist[1] == ''
+		return
+	endif
+	silent! sort :\$:
+	silent! global/[^\]$/d
+	let dlist = getline(1, line('$'))
+	if len(dlist) == 1 && dlist[1] == ''
+		return
+	endif
+	let fpaths = []
+	for p in plist
+		let path = {'path' = p, 'mtime' = getftime(p)}
+		if !isdirectory(p)
+			call add(fpaths, path)
+		endif
+	endfor
+	" ordernar arquivos
+	call sort(fpaths, {a, b -> a.mtime > b.mtime})
+	for path in fpaths
+		call add(dlist, path.path)
+	endfor
+	call setline(1, dlist)
 endfunction
 
+" Open files
+function! s:dirvishopen() abort
+	let arquivo = getline('.')
+	let ext = fnamemodify(arquivo, ':e')
+	if ext == '' || $PATHEXT->tolower()->match(ext) || !isdirectory(arquivo)
+		echom "dirvish: não foi encontradoi arquivo para abrir"
+	else
+		call job_start(['cmd.exe', '/c', 'start', '', arquivo->shellescape()->tr('/', '\')])
+	endif
+endfunction
 
 " --- Autocommands ---
 " for map's use <buffer>, for set's use setlocal
@@ -426,3 +474,8 @@ autocmd goosebumps FileType help nnoremap <buffer> q :helpclose<cr>
 " autoresize
 autocmd goosebumps VimResized * wincmd =
 
+" gq to exit
+autocmd goosebumps FileType help,qf nnoremap <silent> <buffer> gq :close<cr>
+
+" Dirvish mappings
+autocmd goosebumps FileType dirvish nnoremap <silent> <buffer> go <SID>dirvishopen()
