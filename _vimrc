@@ -121,6 +121,9 @@ let g:undotree_ShortIndicators = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_DiffpanelHeight = 5
 
+" nvim opts dependencies
+let s:OPTSFILE = ''
+
 " --- Key maps ---
 
 " CTRL-U in insert mode deletes a lot. Use CTRL-G u to first break undo,
@@ -168,6 +171,13 @@ vnoremap J :m'>+1<cr>gv
 " Vim-capslock in command line
 cmap <silent> <expr> <c-l> <SID>capslock_redraw()
 
+" for buffers
+nnoremap <silent> ]b <cmd>bnext<cr>
+nnoremap <silent> [b <cmd>bprevious<cr>
+" for arglist
+nnoremap <silent> ]a <cmd>next<cr>
+nnoremap <silent> [a <cmd>Next<cr>
+
 " --- Mapleader Commands ---
 " Be aware that '\' is used as mapleader character, so conflits can occur in Insert Mode maps
 
@@ -179,9 +189,10 @@ nnoremap <silent> <leader>r <cmd>Dirvish C:/Users/09153634969/Documents/gvim/Dat
 " nnoremap <silent> <leader>ss :call <SID>save_session()<cr>
 
 " Copy and paste from clipboard (* -> selection register/+ -> primary register)
-nnoremap gp "+P
+nnoremap gP "+P
+nnoremap gp "+p
 vnoremap gy "+y
-nnoremap gy "+y
+nnoremap gY "+Y
 
 " --- Quickfix window ---
 " Toggle quickfix window
@@ -306,6 +317,27 @@ function! s:g_bar_search(...) abort
 	return system(join([&grepprg, shellescape(expand(join(a:000, ' '))), shellescape(expand("%"))], ' '))
 endfunction
 
+" list nvim/opt and add it to $PATH
+function! s:path_initialize(force) abort
+	if !filereadable(s:OPTSFILE) || a:force
+		s:found_nvim_opt()
+	endif
+	let paths = readfile(s:OPTSFILE)
+	for path in paths
+		s:add_path(path)
+	endfor
+endfunction
+
+function! s:found_nvim_opt() abort
+	let nvimdirglob = ''
+	let opts = glob(nvimdirglob, v:false, v:true, v:false)->map({_, dir -> fnamemodify(dir, ':h')})->uniq()
+	writefile(opts, s:OPTSFILE)
+endfunction
+
+function! s:add_path(dir) abort
+	let $PATH = $PATH .. ':' .. dir
+endfunction
+
 " --- Autocommands ---
 " for map's use <buffer>, for set's use setlocal
 
@@ -345,4 +377,7 @@ autocmd goosebumps FileType qf call <SID>set_qf_win_height()
 
 " Fast quit in vim help files
 autocmd goosebumps FileType help nnoremap <buffer> q :helpclose<cr>
+
+" autoresize
+autocmd goosebumps VimResized * wincmd =
 
