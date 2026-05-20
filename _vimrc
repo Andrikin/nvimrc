@@ -13,16 +13,22 @@
 " $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
 " VIM - h: inicialization
 
-let s:THISPC = glob("$HOMEDRIVE$HOMEPATH")
-" NVIM
-if executable('fd')
-    let s:NVIM = glob("`fd --type -d win-portable-neovim %HOMEPATH%`") .. 'nvim'
+if has('win32')
+    echom "Este pc: " .. $HOME
+    let s:THISPC = $HOMEDRIVE .. $HOMEPATH
 else
-    "let s:NVIM = s:THISPC .. '/Documents/nvim/win-portable-neovim/nvim'
-    let s:NVIM = glob(s:THISPC .. '/*ments/nvim/*/nvim')
+    " linux
+    let s:THISPC = $HOME
+endif
+" NVIM
+if has('win32')
+    if executable('fd')
+        let s:NVIM = glob("`fd --type -d win-portable-neovim %HOMEPATH%`") .. 'nvim'
+    else
+        let s:NVIM = glob(s:THISPC .. '/D*/nvim/*/nvim')
+    endif
 endif
 " NVIM OPTS dependencies
-"let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
 let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
 
  " list nvim/opt and add it to $PATH
