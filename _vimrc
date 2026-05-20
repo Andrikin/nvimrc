@@ -13,15 +13,9 @@
 " $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
 " VIM - h: inicialization
 
-if has('win32')
-    echom "Este pc: " .. $HOME
-    let s:THISPC = $HOMEDRIVE .. $HOMEPATH
-else
-    " linux
-    let s:THISPC = $HOME
-endif
 " NVIM
 if has('win32')
+    let s:THISPC = $HOMEDRIVE .. $HOMEPATH
     if executable('fd')
         let s:NVIM = glob("`fd --type -d win-portable-neovim %HOMEPATH%`") .. 'nvim'
     else
@@ -154,7 +148,7 @@ let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
  " set linebreak
  " set wrapmargin=5
  let &g:textwidth=0
- let &g:undodir=s:THISPC .. '/Documents/gvim/Data/settings/undotree'
+ let &g:undodir=fnamemodify($MYVIMRC, ':h') .. '/undotree'
  let mapleader = ' '
  let maplocalleader = ' '
 
