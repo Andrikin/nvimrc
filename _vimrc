@@ -124,6 +124,7 @@ set encoding=utf-8
 set autoread
 set tabpagemax=50
 set wildmenu
+set wildoptions=pum
 set complete-=t
 set completeopt=menu,noinsert,noselect,popup,fuzzy
 set title
@@ -149,7 +150,9 @@ set noshowmode
 " é possível obter o cursor com a cor do texto (com truecolor)
 set termguicolors
 
+" gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
+set winaltkeys=no
 let &g:guifont='SauceCodePro NFM:h11'
 let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
@@ -408,7 +411,7 @@ function! s:sortingdirvish() abort
 	let fpaths = []
 	for p in plist
 		let path = {'path' = p, 'mtime' = getftime(p)}
-		if !isdirectory(p)
+		if getftype(p) ~= 'dir'
 			call add(fpaths, path)
 		endif
 	endfor
