@@ -13,11 +13,17 @@
 " $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
 " VIM - h: inicialization
 
-let s:THISPC = $HOMEDRIVE .. $HOMEPATH
+let s:THISPC = glob("$HOMEDRIVE$HOMEPATH")
 " NVIM
-let s:NVIM = s:THISPC .. '/Documents/nvim/win-portable-neovim/nvim'
+if executable('fd')
+    let s:NVIM = glob("`fd --type -d win-portable-neovim %HOMEPATH%`") .. 'nvim'
+else
+    "let s:NVIM = s:THISPC .. '/Documents/nvim/win-portable-neovim/nvim'
+    let s:NVIM = glob(s:THISPC .. '/*ments/nvim/*/nvim')
+endif
 " NVIM OPTS dependencies
-let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
+"let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
+let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
 
  " list nvim/opt and add it to $PATH
  function! s:path_initialize(force) abort
@@ -55,11 +61,15 @@ let s:OPTSFILE = s:THISPC .. '/Documents/gvim/Data/settings/optfiles'
  call s:path_initialize(v:false)
 
  " Plug.vim bootstrap
- let s:plugvimdir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/autoload/'
- if executable('curl') && !filereadable(s:plugvimdir)
- 	call system(['curl', '-fLo', s:plugvimdir, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
+ let s:plugvim = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/autoload/plug.vim'
+ if executable('curl') && !filereadable(s:plugvim)
+     call system(['curl', '-fLo', s:plugvim, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
      if executable('git')
-         execute 'source ' .. s:plugvimdir .. 'plug.vim'
+         if filereadable(s:plugvim)
+             execute 'source ' .. s:plugvim
+         else
+             echom "plug.vim não encontrado."
+         endif
      else
          echom "git: instalar git ou inicializá-lo no $PATH"
      endif
