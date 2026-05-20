@@ -93,6 +93,12 @@ let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
 
  call plug#end()
 
+ if !isdirectory(fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged')
+     if exists(':PlugInstall')
+         PlugInstall
+     endif
+ endif
+ 
  " Add optional packages.
  " The matchit plugin makes the % command work better, but it is not backwards
  " compatible.
