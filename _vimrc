@@ -329,12 +329,12 @@ if has('win32')
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
 	" update OPTSFILE
 	command! UpdateOptfile call <SID>found_nvim_opt(v:true)
+else
+    " Dirvish XDGlikesh
+    command! Downloads execute 'Dirvish ' .. s:THISPC .. '/downloads'
+    command! Documents execute 'Dirvish ' .. s:THISPC .. '/documentos'
+    command! Desktop execute 'Dirvish ' .. s:THISPC .. '/desktop'
 endif
-
-" Dirvish XDGlikesh
-command! Downloads execute 'Dirvish ' .. s:THISPC .. '/downloads'
-command! Documents execute 'Dirvish ' .. s:THISPC .. '/documentos'
-command! Desktop execute 'Dirvish ' .. s:THISPC .. '/desktop'
 
 " Command binary to hex
 command! HexEditor %!xxd
