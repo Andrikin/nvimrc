@@ -4,15 +4,14 @@
 " Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
 " vim-cool, vim-dirvish, undotree,
 
-" TODO: fix sort function in SortingDirvish, gk e gj mappings, treesitter for
-" vim?
-" WARNING: diretório de instalação ->
-" C:/Users/09153634969/Documents/gvim/Data/settings/_vimrc
-" WARNING: MS-Windows initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
+" TODO: terminal map
+" WARNING: diretório de instalação -> C:$HOME/Documents/gvim/Data/settings/_vimrc
+" INFO: MS-Windows :h initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
 " $VIM/_vimrc
-
 " $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
 " VIM - h: inicialization
+" GVIM config locations
+" https://portablegvim.sourceforge.net/configuration.html
 
 " NVIM
 if has('win32')
@@ -46,12 +45,7 @@ if has('win32')
 		echom "Arquivo OPTSFILE criado!"
 	endfunction
 	function! s:add_path(dir) abort
-		if has('win32')
-			let $PATH = $PATH .. ';' .. a:dir
-		else
-			" linux...
-			let $PATH = $PATH .. ':' .. a:dir
-		endif
+        let $PATH = $PATH .. ';' .. a:dir
 	endfunction
 	" inicializar PATH
 	call s:path_initialize(v:false)
@@ -257,11 +251,24 @@ inoremap ! !<c-g>u
 inoremap ? ?<c-g>u
 
 " Using gk and gj (screen cursor up/down)
-nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
-nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
+" nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
+" nnoremap <expr> j v:count == 0 ? 'gj' : 'j'
 " Adding jumps to jumplist - The Primeagen gold apple
-nnoremap <expr> k (v:count > 1 ? 'm`' . v:count : '') . 'k'
-nnoremap <expr> j (v:count > 1 ? 'm`' . v:count : '') . 'j'
+" nnoremap <expr> k (v:count > 1 ? 'm`' . v:count : '') . 'k'
+" nnoremap <expr> j (v:count > 1 ? 'm`' . v:count : '') . 'j'
+function! s:vanhalen(move) abort
+    let cont = v:count
+    let mark = ''
+    if cont > 1
+        let mark = 'm`' .. cont
+    endif
+    if cont == 0
+        return mark .. 'g' .. a:move
+    endif
+    return mark .. a:move
+endfunction
+nnoremap <expr> <silent> k <SID>vanhalen('k')
+nnoremap <expr> <silent> j <SID>vanhalen('j')
 
 " Moving lines up and down - The Primeagen knowledge word
 " inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria
@@ -342,65 +349,6 @@ command! HexEditor %!xxd
 " Dirvish sorting
 command! SortingDirvish call <SID>sortingdirvish()
 
-" --- Functions ---
-"
-" HACK: Way to get :redraws after CapsLockToggle
-function! s:capslock_redraw() abort
-	let cmd = "\<plug>CapsLockToggle\<c-r>="
-	let exec_redraw = "execute('redraws')"
-	if CapsLockStatusline() is ''
-		let exec_redraw = toupper(exec_redraw)
-	endif
-	return cmd . exec_redraw . "\<cr>"
-endfunction
-
-function! s:quit_list() abort
-	let qf = s:qf_stats()
-	let tf = s:t_stats()
-	let cmd = ''
-	if qf[0]
-		let cmd = qf[1] ? ":lclose\<cr>" : ":cclose\<cr>"
-	elseif tf[0]
-		let cmd = join([':', tf[1], " windo normal ZQ\<cr>"], '')
-	endif
-	return cmd
-endfunction
-
-function! s:move_in_list(move) abort
-	let qf = s:qf_stats()
-	let cmd = ":" . v:count1
-	let go_back_to_qf = ":call win_gotoid(" . qf[2] . ")\<cr>"
-	if a:move == 'l'
-		let cmd .= qf[1] ? "lnewer\<cr>" : "cnewer\<cr>"
-	elseif a:move == 'h'
-		let cmd .= qf[1] ? "lolder\<cr>" : "colder\<cr>"
-	elseif a:move == 'j'
-		let cmd .= (qf[1] ? "lnext\<bar>" : "cnext\<bar>") . go_back_to_qf
-	elseif a:move == 'k'
-		let cmd .= (qf[1] ? "lprevious\<bar>" : "cprevious\<bar>") . go_back_to_qf
-	endif
-	return cmd
-endfunction
-
-function! s:toggle_list(type) abort
-	let qf = s:qf_stats()
-	let cmd = ''
-	if a:type == 'c'
-		if qf[0]
-			let cmd = qf[1] ? ":lclose\<bar>:copen\<cr>" : ":cclose\<cr>"
-		else
-			let cmd = ":copen\<cr>"
-		endif
-	elseif a:type == 'l'
-		if qf[0]
-			let cmd = qf[1] ? ":lclose\<cr>" : ":cclose\<bar>:lopen\<cr>"
-		else
-			let cmd = ":lopen\<cr>"
-		endif
-	endif
-	return cmd
-endfunction
-
 " Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
 function! s:toggle_terminal() abort
 	let stats = s:t_stats()
@@ -419,24 +367,17 @@ function! s:t_stats() abort
 	return [0, 0]
 endfunction
 
-" INFO: It don't look for situations when there is two quickfix windows open,
-" but I think that it handles those situations
-function! s:qf_stats() abort
-	for window in gettabinfo(tabpagenr())[0].windows
-		if getwininfo(window)[0].quickfix
-			return [1, getwininfo(window)[0].loclist, window]
-		endif
-	endfor
-	" is_qf_on, is_qf_loc, win_id
-	return [0, 0, 0]
+" DIRVISH
+" list files 
+function! s:SortIt(a, b) abort
+    if a:a.mtime > a:b.mtime
+        return -1
+    endif
+    if a:a.mtime < a:b.mtime
+        return 1
+    endif
+    return 0
 endfunction
-
-function! s:set_qf_win_height() abort
-	let stats = s:qf_stats()
-	let lnum = stats[0] ? len(stats[1] ? getloclist(0) : getqflist()) : 0
-	execute "resize " min([10, max([1, lnum])])
-endfunction
-
 function! s:sortingdirvish() abort
 	let plist = getline(1, line('$'))
 	if len(plist) == 1 && plist[0] == ''
@@ -459,7 +400,7 @@ function! s:sortingdirvish() abort
 		endif
 	endfor
 	" ordernar arquivos
-	call sort(fpaths, {a, b -> a.mtime > b.mtime})
+	call sort(fpaths, {a, b -> s:SortIt(a, b)})
 	for path in fpaths
 		call add(dlist, path.path)
 	endfor
