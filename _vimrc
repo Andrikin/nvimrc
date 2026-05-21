@@ -4,7 +4,7 @@
 " Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
 " vim-cool, vim-dirvish, undotree,
 
-" TODO: terminal map
+" TODO:
 " WARNING: diretório de instalação -> C:$HOME/Documents/gvim/Data/settings/_vimrc
 " INFO: MS-Windows :h initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
 " $VIM/_vimrc
@@ -316,7 +316,7 @@ nnoremap <silent> <expr> <leader>q <SID>quit_list()
 
 " TODO: refazer
 " Terminal
-nnoremap <silent> <expr> <leader>t <SID>toggle_terminal()
+nnoremap <silent> <leader>t <cmd>call <SID>toggle_terminal()<cr>
 
 " Fugitive maps
 nnoremap <leader>g <cmd>Git<cr>
@@ -349,22 +349,22 @@ command! HexEditor %!xxd
 " Dirvish sorting
 command! SortingDirvish call <SID>sortingdirvish()
 
-" Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
+" Toggle :terminal.
 function! s:toggle_terminal() abort
-	let stats = s:t_stats()
-	if stats[0]
-		return join([':', stats[1], " windo normal ZQ\<cr>"], '')
-	endif
-	return ":10split +terminal\<cr>"
-endfunction
-
-function! s:t_stats() abort
-	for window in gettabinfo(tabpagenr())[0].windows
-		if getwininfo(window)[0].terminal
-			return [1, win_id2win(window)]
-		endif
-	endfor
-	return [0, 0]
+    let terminals = term_list()
+    if empty(terminals)
+        terminal
+    else
+        for t in terminals
+            let info = getbufinfo(t)[0]
+            if !empty(info.windows)
+                for w in info.windows
+                    call win_execute(w, 'close', v:true)
+                endfor
+            endif
+            execute 'bdelete! ' .. t
+        endfor
+    endif
 endfunction
 
 " DIRVISH
