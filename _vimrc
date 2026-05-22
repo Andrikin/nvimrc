@@ -165,7 +165,7 @@ let mapleader = ' '
 let maplocalleader = ' '
 
 " Statusline
-set laststatus=3
+set laststatus=2
 set showtabline=1 
 set noshowmode 
 
@@ -249,6 +249,10 @@ inoremap [ [<c-g>u
 inoremap { {<c-g>u
 inoremap ! !<c-g>u
 inoremap ? ?<c-g>u
+
+" ctrl-v clipboard
+inoremap <c-v> <c-r>+
+cnoremap <c-v> <c-r>+
 
 " Using gk and gj (screen cursor up/down)
 " nnoremap <expr> k v:count == 0 ? 'gk' : 'k'
