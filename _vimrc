@@ -361,7 +361,8 @@ command! HexEditor %!xxd
 " Dirvish sorting
 command! SortingDirvish call <SID>sortingdirvish()
 
-" Toggle :terminal.
+" Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
+" (<c-\> mapped to <c-]>)
 let g:terminal_toggle = {}
 function! s:toggle_terminal() abort
     let tabnr = tabpagenr()
