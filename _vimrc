@@ -4,7 +4,7 @@
 " Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
 " vim-cool, vim-dirvish, undotree,
 
-" TODO:
+" TODO: ]a, [a mappings
 " WARNING: diretório de instalação -> C:$HOME/Documents/gvim/Data/settings/_vimrc
 " INFO: MS-Windows :h initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
 " $VIM/_vimrc
@@ -435,15 +435,18 @@ endfunction
 function! s:dirvishopen() abort
     let arquivo = getline('.')
     let ext = fnamemodify(arquivo, ':e')
-    let notexecute = ext == '' || isdirectory(arquivo)
+    let noexecute = ext == '' || isdirectory(arquivo)
     if has('win32')
-        let notexecute = notexecute || $PATHEXT->tolower()->match(ext)
+        let noexecute = noexecute || $PATHEXT->tolower()->match(ext) < 0 ? 0 : 1
     endif
-    let arquivo = arquivo->trim()
-    if !notexecute
+    " let arquivo = arquivo->shellescape()->trim()
+    if !noexecute
         if has('win32')
-            call job_start(['cmd.exe', '/c', 'start', '', arquivo->tr('/', '\')])
+            call dist#vim9#Open(arquivo) | nohlsearch
+            " call job_start(['cmd.exe', '/c', 'start', '', arquivo])
         else
+            " call dist#vim9#Open(arquivo)
+            let arquivo = arquivo->trim()
             call job_start(['xdg-open', arquivo])
         endif
     else
