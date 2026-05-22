@@ -26,14 +26,14 @@ if has('win32')
 	" list nvim/opt and add it to $PATH
 	function! s:path_initialize(force) abort
 		if !filereadable(s:OPTSFILE) || a:force
-			call s:found_nvim_opt()
+			call s:find_nvim_opt()
 		endif
 		let paths = readfile(s:OPTSFILE)
 		for path in paths
 			call s:add_path(path)
 		endfor
 	endfunction
-	function! s:found_nvim_opt() abort
+	function! s:find_nvim_opt() abort
 		let nvimdirglob = s:NVIM .. '/opt/*/**/*.exe'
 		if !isdirectory(s:NVIM)
 			echom "Não foi possível encontrar diretório de instalação do Neovim."
@@ -308,13 +308,6 @@ nnoremap <silent> <c-\> <c-]>
 nnoremap <silent> [<space> <cmd>normal O<cr><down>
 nnoremap <silent> ]<space> <cmd>normal o<cr><up>
 
-" --- Quickfix window ---
-" Toggle quickfix window
-nnoremap <silent> <expr> <leader>c <SID>toggle_list('c')
-nnoremap <silent> <expr> <leader>l <SID>toggle_list('l')
-nnoremap <silent> <expr> <leader>q <SID>quit_list()
-
-" TODO: refazer
 " Terminal
 nnoremap <silent> <leader>t <cmd>call <SID>toggle_terminal()<cr>
 
@@ -335,7 +328,7 @@ if has('win32')
 	command! RedeLocal execute 'Dirvish T:/16-Diretoria de Ouvidoria/Andre Aguiar/' 
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
 	" update OPTSFILE
-	command! UpdateOptfile call <SID>found_nvim_opt(v:true)
+	command! UpdateOptfile call <SID>find_nvim_opt(v:true)
 else
     " Dirvish XDGlikesh
     command! Downloads execute 'Dirvish ' .. s:THISPC .. '/downloads'
