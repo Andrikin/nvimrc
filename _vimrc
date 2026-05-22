@@ -4,7 +4,7 @@
 " Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
 " vim-cool, vim-dirvish, undotree,
 
-" TODO: ]a, [a mappings
+" TODO:
 " WARNING: diretório de instalação -> C:$HOME/Documents/gvim/Data/settings/_vimrc
 " INFO: MS-Windows :h initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
 " $VIM/_vimrc
@@ -290,8 +290,22 @@ vnoremap J :m'>+1<cr>gv
 nnoremap <silent> ]b <cmd>bnext<cr>
 nnoremap <silent> [b <cmd>bprevious<cr>
 " for arglist
-nnoremap <silent> ]a <cmd>next<cr>
-nnoremap <silent> [a <cmd>Next<cr>
+function! s:arglistthings(comando) abort
+    let n = argc() - 1
+    if n <= 0
+        echom "arglist: nenhum arquivo listado."
+        return
+    endif
+    try
+        execute a:comando
+    catch /^Vim\%((\S\+)\)\=:E165:/
+        execute ':' .. n .. 'previous'
+    catch /^Vim\%((\S\+)\)\=:E164:/
+        execute ':' .. n .. 'next'
+    endtry
+endfunction
+nnoremap <silent> ]a <cmd>call <SID>arglistthings('next')<cr>
+nnoremap <silent> [a <cmd>call <SID>arglistthings('previous')<cr>
 
 " --- Mapleader Commands ---
 " Insert Mode maps
