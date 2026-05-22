@@ -341,6 +341,7 @@ else
     command! Downloads execute 'Dirvish ' .. s:THISPC .. '/downloads'
     command! Documents execute 'Dirvish ' .. s:THISPC .. '/documentos'
     command! Desktop execute 'Dirvish ' .. s:THISPC .. '/desktop'
+    command! Home execute 'Dirvish ' .. s:THISPC
 endif
 
 " Command binary to hex
@@ -350,20 +351,46 @@ command! HexEditor %!xxd
 command! SortingDirvish call <SID>sortingdirvish()
 
 " Toggle :terminal.
+let g:terminal_toggle = {}
 function! s:toggle_terminal() abort
-    let terminals = term_list()
-    if empty(terminals)
-        terminal
+    let tabnr = tabpagenr()
+    if !tabnr
+        echom "terminal_toggle: erro encontrado"
+        return
+    endif
+    " terminal aberto no tab?
+    if get(g:terminal_toggle, tabnr, 0)
+        let buf = getbufinfo(g:terminal_toggle[tabnr])
+        if !empty(buf)
+            let buf = buf[0]
+            if buf.hidden
+                execute 'split +b\ ' .. g:terminal_toggle[tabnr]
+            else
+                call win_execute(win_findbuf(g:terminal_toggle[tabnr])[0], 'close', v:true)
+            endif
+        endif
     else
-        for t in terminals
-            let info = getbufinfo(t)[0]
-            if !empty(info.windows)
-                for w in info.windows
-                    call win_execute(w, 'close', v:true)
+        " novo terminal no tab
+        let terminals = term_list()
+        if empty(terminals)
+            terminal
+            let g:terminal_toggle[tabnr] = term_list()[0]
+        else
+            if count(terminals, g:terminal_toggle[tabnr])
+                " abro o buffer do terminal existente
+                execute ':split +b\ ' .. g:terminal_toggle[tabnr]
+            else
+                " abro novo terminal e adiciono na lista
+                terminal
+                let tabbufs = tabpagebuflist()
+                for t in terminals
+                    if count(tabbufs, t)
+                        let g:terminal_toggle[tabnr] = t
+                        break
+                    endif
                 endfor
             endif
-            execute 'bdelete! ' .. t
-        endfor
+        endif
     endif
 endfunction
 
