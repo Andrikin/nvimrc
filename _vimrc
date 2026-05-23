@@ -178,7 +178,11 @@ set termguicolors
 " gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 set winaltkeys=no
-let &g:guifont='SauceCodePro NFM:h11'
+if has('win32')
+    let &g:guifont='SauceCodePro NFM:h11'
+else
+    let &g:guifont='SauceCodePro Nerd Font Mono 11'
+endif
 let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
 " Using ripgrep ([cf]open; [cf]do {cmd} | update)
