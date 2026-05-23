@@ -178,6 +178,9 @@ set termguicolors
 " gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 set winaltkeys=no
+set guioptions-=T " toolbar
+set guioptions-=m " menu
+set guioptions-=r " scroolbar
 if has('win32')
     let &g:guifont='SauceCodePro NFM:h11'
 else
