@@ -327,8 +327,11 @@ vnoremap gy "+y
 nnoremap gY "+Y
 
 " Fix ^\
-nnoremap <silent> <c-\> <c-]>
-
+if has('win32')
+    nnoremap <silent> <c-\> <c-]>
+else
+    tnoremap <silent> <c-]> <c-\>
+endif
 " adicionar linhas acima e abaixo
 nnoremap <silent> [<space> <cmd>normal O<cr><down>
 nnoremap <silent> ]<space> <cmd>normal o<cr><up>
@@ -370,46 +373,34 @@ command! SortingDirvish call <SID>sortingdirvish()
 
 " Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
 " (<c-\> mapped to <c-]>)
-let g:terminal_toggle = {}
+let g:ttoggler = {}
 function! s:toggle_terminal() abort
-    let tabnr = tabpagenr()
-    if !tabnr
-        echom "terminal_toggle: erro encontrado"
-        return
+    let tnumber = tabpagenr()
+    if !tnumber
+        echom "terminal: sem número de tabpage"
+        return 
     endif
-    " terminal aberto no tab?
-    if get(g:terminal_toggle, tabnr, 0)
-        let buf = getbufinfo(g:terminal_toggle[tabnr])
-        if !empty(buf)
-            let buf = buf[0]
-            if buf.hidden
-                execute 'split +b\ ' .. g:terminal_toggle[tabnr]
-            else
-                call win_execute(win_findbuf(g:terminal_toggle[tabnr])[0], 'close', v:true)
-            endif
+    " terminal buffer existe?
+    if get(g:ttoggler, tnumber, 0)
+        let binfo = getbufinfo(g:ttoggler[tnumber])[0]
+        " está aberto?
+        if !binfo.hidden
+            call win_execute(binfo.windows[0], 'close', v:true)
+        else
+            execute 'split +b' .. g:ttoggler[tnumber]
         endif
     else
-        " novo terminal no tab
-        let terminals = term_list()
-        if empty(terminals)
-            terminal
-            let g:terminal_toggle[tabnr] = term_list()[0]
-        else
-            if count(terminals, g:terminal_toggle[tabnr])
-                " abro o buffer do terminal existente
-                execute ':split +b\ ' .. g:terminal_toggle[tabnr]
-            else
-                " abro novo terminal e adiciono na lista
-                terminal
-                let tabbufs = tabpagebuflist()
-                for t in terminals
-                    if count(tabbufs, t)
-                        let g:terminal_toggle[tabnr] = t
-                        break
-                    endif
-                endfor
+        " abrir
+        terminal
+        " registrar
+        for tbuf in term_list()
+            let winfo = win_findbuf(tbuf)[0]->win_id2tabwin()
+            let tcurrent = winfo[0]
+            if tcurrent == tnumber
+                let g:ttoggler[tnumber] = tbuf
+                break
             endif
-        endif
+        endfor
     endif
 endfunction
 
