@@ -86,6 +86,7 @@ Plug 'https://github.com/Andrikin/vim-capslock'
 Plug 'https://github.com/mbbill/undotree'
 Plug 'https://github.com/romainl/vim-cool.git'
 Plug 'https://github.com/flazz/vim-colorschemes'
+Plug 'https://github.com/markonm/traces.vim'
 
 call plug#end()
 
