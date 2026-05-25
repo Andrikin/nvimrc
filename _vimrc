@@ -111,9 +111,12 @@ if has('syntax') && has('eval')
 	packadd! hlyank
 endif
 
+" configurações próprias do tema, no caso 'molokai'
 silent! colorscheme molokai
+highlight clear Visual
+highlight Visual guibg=#293739 gui=italic
 
-" Search recursively
+" Search recursively in directories
 set path+=**
 
 " matchit
@@ -228,6 +231,10 @@ let g:hlyank_duration = 300
 
 " dirvish sort
 let g:dirvish_mode = ':SortingDirvish'
+
+" vim.traces configuration
+" Window used to show off-screen matches.
+let g:traces_preview_window = "winwidth('%') > 160 ? 'bot vnew' : 'bot 10new'"
 
 " --- Key maps ---
 
