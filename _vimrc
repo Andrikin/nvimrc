@@ -10,10 +10,17 @@
 " $VIM/_vimrc
 " $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
 " VIM - h: inicialization
-" GVIM config locations
+" PORTABLE-GVIM configurations locations
 " https://portablegvim.sourceforge.net/configuration.html
 
-" NVIM
+" Open in fullscreen - Windows only
+if has('win32')
+    simalt ~x
+    set winaltkeys=no
+else
+    set winaltkeys=no
+endif
+
 if has('win32')
 	let s:THISPC = $HOMEDRIVE .. $HOMEPATH
 	if executable('fd')
@@ -50,6 +57,7 @@ if has('win32')
 	" inicializar PATH
 	call s:path_initialize(v:false)
 else
+    " LINUX
 	let s:THISPC = $HOME
 endif
 
@@ -74,22 +82,27 @@ endif
 
 call plug#begin()
 
+" colorscheme
+Plug 'https://github.com/flazz/vim-colorschemes'
+" Tim Pope pieces of miracle
 Plug 'https://github.com/tpope/vim-fugitive.git'
 Plug 'https://github.com/tpope/vim-surround.git'
 Plug 'https://github.com/tpope/vim-eunuch.git'
 Plug 'https://github.com/tpope/vim-dadbod.git'
 Plug 'https://github.com/tpope/vim-commentary'
+" My plugins
 Plug 'https://github.com/Andrikin/awesome-pairing'
-Plug 'https://github.com/justinmk/vim-dirvish.git'
 Plug 'https://github.com/Andrikin/awesome-substitute'
 Plug 'https://github.com/Andrikin/vim-capslock'
+" Utilities
+Plug 'https://github.com/justinmk/vim-dirvish.git'
 Plug 'https://github.com/mbbill/undotree'
-Plug 'https://github.com/romainl/vim-cool.git'
-Plug 'https://github.com/flazz/vim-colorschemes'
+PluG 'https://github.com/romainl/vim-cool.git'
 Plug 'https://github.com/markonm/traces.vim'
 
 call plug#end()
 
+" Install plugins, first run - plug.vim
 if has('win32')
 	let plugged = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged'
 else
@@ -119,7 +132,7 @@ highlight Visual guibg=#293739 gui=italic
 " Search recursively in directories
 set path+=**
 
-" matchit
+" matchit configurations
 set matchpairs+=<:>
 
 " Indicadores - números nas linhas
@@ -181,7 +194,6 @@ set termguicolors
 
 " gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
-set winaltkeys=no
 set guioptions-=T " toolbar
 set guioptions-=m " menu
 set guioptions-=r " scroolbar
@@ -336,10 +348,13 @@ nnoremap gY "+Y
 
 " Fix ^\
 if has('win32')
+    " fix keyboard weird interation
     nnoremap <silent> <c-\> <c-]>
 else
+    " Terminal map
     tnoremap <silent> <c-]> <c-\>
 endif
+
 " adicionar linhas acima e abaixo
 nnoremap <silent> [<space> <cmd>normal O<cr><down>
 nnoremap <silent> ]<space> <cmd>normal o<cr><up>
