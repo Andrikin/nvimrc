@@ -97,7 +97,7 @@ Plug 'https://github.com/Andrikin/vim-capslock'
 " Utilities
 Plug 'https://github.com/justinmk/vim-dirvish.git'
 Plug 'https://github.com/mbbill/undotree'
-PluG 'https://github.com/romainl/vim-cool.git'
+Plug 'https://github.com/romainl/vim-cool.git'
 Plug 'https://github.com/markonm/traces.vim'
 
 call plug#end()
@@ -416,14 +416,20 @@ function! s:toggle_terminal() abort
         " abrir
         terminal
         " registrar
-        for tbuf in term_list()
-            let winfo = win_findbuf(tbuf)[0]->win_id2tabwin()
-            let tcurrent = winfo[0]
-            if tcurrent == tnumber
-                let g:ttoggler[tnumber] = tbuf
-                break
-            endif
-        endfor
+        let b = bufnr(0)
+        let info = win_findbuf(b)[0]->getwininfo()[0]
+        if info.terminal
+            let g:ttoggler[tnumber] = b
+        else
+            for wbuf in term_list()
+                let winfo = win_findbuf(wbuf)[0]->win_id2tabwin()
+                let wtab = winfo[0]
+                if wtab == tnumber
+                    let g:ttoggler[tnumber] = wbuf
+                    break
+                endif
+            endfor
+        endif
     endif
 endfunction
 
