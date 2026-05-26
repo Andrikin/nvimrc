@@ -99,6 +99,7 @@ Plug 'https://github.com/justinmk/vim-dirvish.git'
 Plug 'https://github.com/mbbill/undotree'
 Plug 'https://github.com/romainl/vim-cool.git'
 Plug 'https://github.com/markonm/traces.vim'
+Plug 'https://github.com/ludovicchabant/vim-gutentags'
 
 call plug#end()
 
@@ -231,6 +232,22 @@ let g:undotree_WindowLayout = 2
 let g:undotree_ShortIndicators = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_DiffpanelHeight = 5
+
+" --- Gutentags ---
+if has('win32')
+    let g:gutentags_cache_dir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/cache/ctags'
+else
+    let g:gutentags_cache_dir = $MYVIMDIR .. 'cache/ctags'
+endif
+if !isdirectory(g:gutentags_cache_dir)
+    call mkdir(g:gutentags_cache_dir, 'p', '0755')
+endif
+let g:gutentags_add_default_project_roots = 0
+let g:gutentags_project_root = ['package.json', '.git']
+let g:gutentags_generate_on_new = 1
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+let g:gutentags_generate_on_empty_buffer = 0
 
 " vim-surround Tim Pope
 let g:surround_{char2nr('\')} = ''
