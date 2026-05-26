@@ -477,7 +477,7 @@ function! s:sortingdirvish() abort
 endfunction
 
 " Open files
-function! s:dirvishopen() abort
+function! Dirvishopen() abort
     let arquivo = getline('.')
     let ext = fnamemodify(arquivo, ':e')
     let noexecute = ext == '' || isdirectory(arquivo)

@@ -1,1 +1,1 @@
-nnoremap <silent> go <cmd>call <SID>dirvishopen()<cr>
+nnoremap <silent> go <cmd>call Dirvishopen()<cr>
