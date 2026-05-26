@@ -503,12 +503,6 @@ augroup goosebumps
 	autocmd!
 augroup END
 
-" Comentary.vim
-autocmd goosebumps FileType sh,bash setlocal commentstring=#\ %s
-autocmd goosebumps FileType c setlocal commentstring=/*\ %s\ */
-autocmd goosebumps FileType java setlocal commentstring=//\ %s
-autocmd goosebumps FileType vim setlocal commentstring=\"\ %s
-
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
@@ -516,8 +510,3 @@ autocmd goosebumps InsertLeave * setlocal nocursorline
 " autoresize
 autocmd goosebumps VimResized * wincmd =
 
-" 'gq' to exit
-autocmd goosebumps FileType help,qf nnoremap <silent> <buffer> gq <cmd>close<cr>
-
-" Dirvish mappings
-autocmd goosebumps FileType dirvish nnoremap <silent> <buffer> go <cmd>call <SID>dirvishopen()<cr>
