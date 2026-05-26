@@ -178,6 +178,9 @@ set noswapfile
 " set wrapmargin=5
 let &g:textwidth=0
 let &g:undodir=fnamemodify($MYVIMRC, ':h') .. '/undotree'
+if !isdirectory(&g:undodir)
+    call mkdir(&g:undodir, 'p', '0755')
+endif
 let mapleader = ' '
 let maplocalleader = ' '
 
