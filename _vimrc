@@ -193,6 +193,7 @@ set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 set guioptions-=T " toolbar
 set guioptions-=m " menu
 set guioptions-=r " scroolbar
+set guioptions+=! " no external cmd prompt output
 if has('win32')
     let &g:guifont='SauceCodePro NFM:h11'
 else
