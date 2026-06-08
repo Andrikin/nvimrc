@@ -13,14 +13,6 @@
 " PORTABLE-GVIM configurations locations
 " https://portablegvim.sourceforge.net/configuration.html
 
-" Open in fullscreen - Windows only
-if has('win32')
-    simalt ~x
-    set winaltkeys=no
-else
-    set winaltkeys=no
-endif
-
 if has('win32')
 	let s:THISPC = $HOMEDRIVE .. $HOMEPATH
 	if executable('fd')
@@ -180,7 +172,7 @@ set noswapfile
 let &g:textwidth=0
 let &g:undodir=fnamemodify($MYVIMRC, ':h') .. '/undotree'
 if !isdirectory(&g:undodir)
-    call mkdir(&g:undodir, 'p', '0755')
+    call mkdir(&g:undodir, 'p', 0o755)
 endif
 let mapleader = ' '
 let maplocalleader = ' '
@@ -240,7 +232,7 @@ else
     let g:gutentags_cache_dir = $MYVIMDIR .. 'cache/ctags'
 endif
 if !isdirectory(g:gutentags_cache_dir)
-    call mkdir(g:gutentags_cache_dir, 'p', '0755')
+    call mkdir(g:gutentags_cache_dir, 'p', 0o755)
 endif
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['package.json', '.git']
@@ -522,6 +514,14 @@ endfunction
 augroup goosebumps
 	autocmd!
 augroup END
+
+" Open in fullscreen - Windows only
+if has('win32')
+    autocmd goosebumps GUIEnter * simalt ~<space>x
+    autocmd goosebumps GUIEnter * set winaltkeys=no
+else
+    set winaltkeys=no
+endif
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
