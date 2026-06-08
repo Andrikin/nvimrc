@@ -487,6 +487,7 @@ function! s:sortingdirvish() abort
 endfunction
 
 " Open files
+" WARNING: adicionar a pasta after/ftplugin no 'runtimepath'
 function! Dirvishopen() abort
     let arquivo = getline('.')
     let ext = fnamemodify(arquivo, ':e')
