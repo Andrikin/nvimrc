@@ -398,9 +398,9 @@ if has('win32')
 	command! UpdateOptfile call <SID>find_nvim_opt(v:true)
 else
     " Dirvish XDGlikesh
-    command! Downloads execute 'Dirvish ' .. s:THISPC .. '/downloads'
-    command! Documents execute 'Dirvish ' .. s:THISPC .. '/documentos'
-    command! Desktop execute 'Dirvish ' .. s:THISPC .. '/desktop'
+    command! Downloads execute 'Dirvish ' .. $XDG_DOWNLOAD_DIR
+    command! Documents execute 'Dirvish ' .. $XDG_DOCUMENTS_DIR
+    command! Desktop execute 'Dirvish ' .. $XDG_DESKTOP_DIR
     command! Home execute 'Dirvish ' .. s:THISPC
 endif
 
