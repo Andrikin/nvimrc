@@ -190,10 +190,7 @@ set termguicolors
 
 " gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
-set guioptions-=T " toolbar
-set guioptions-=m " menu
-set guioptions-=r " scroolbar
-set guioptions+=! " no external cmd prompt output
+set guioptions=! " no external cmd window prompt output, remove others options
 if has('win32')
     let &g:guifont='SauceCodePro NFM:h11'
 else
@@ -262,6 +259,12 @@ let g:dirvish_mode = ':SortingDirvish'
 let g:traces_preview_window = "winwidth('%') > 160 ? 'bot vnew' : 'bot 10new'"
 
 " --- Key maps ---
+
+" FROM: defaults.vim
+" Don't use Q for Ex mode, use it for formatting.  Except for Select mode.
+" Revert with ":unmap Q".
+map Q gq
+sunmap Q
 
 " CTRL-U in insert mode deletes a lot. Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
@@ -488,7 +491,7 @@ endfunction
 
 " Open files
 " WARNING: adicionar a pasta after/ftplugin no 'runtimepath'
-function! Dirvishopen() abort
+function! DirvishOpen() abort
     let arquivo = getline('.')
     let ext = fnamemodify(arquivo, ':e')
     let noexecute = ext == '' || isdirectory(arquivo)
