@@ -411,7 +411,7 @@ command! HexEditor %!xxd
 command! SortingDirvish call <SID>sortingdirvish()
 
 " Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
-" (<c-\> mapped to <c-]>)
+" when <c-\> mapped to <c-]>
 let g:ttoggler = {}
 function! s:toggle_terminal() abort
     let tnumber = tabpagenr()
@@ -454,8 +454,7 @@ endfunction
 function! s:SortIt(a, b) abort
     if a:a.mtime > a:b.mtime
         return -1
-    endif
-    if a:a.mtime < a:b.mtime
+    elseif a:a.mtime < a:b.mtime
         return 1
     endif
     return 0
