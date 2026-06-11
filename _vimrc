@@ -78,7 +78,12 @@ if executable('curl') && !filereadable(s:plugvim)
 	endif
 endif
 
-call plug#begin(fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged')
+if has('win32')
+	let s:plugged = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged'
+else
+	let s:plugged = fnamemodify($MYVIMRC, ':h') .. '/plugged'
+endif
+call plug#begin(s:plugged)
 
 " colorscheme
 Plug 'https://github.com/flazz/vim-colorschemes'
@@ -102,11 +107,6 @@ Plug 'https://github.com/ludovicchabant/vim-gutentags'
 call plug#end()
 
 " Install plugins, first run - plug.vim
-if has('win32')
-	let plugged = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged'
-else
-	let plugged = fnamemodify($MYVIMRC, ':h') .. '/plugged'
-endif
 if !isdirectory(plugged)
 	if exists(':PlugInstall')
 		PlugInstall
