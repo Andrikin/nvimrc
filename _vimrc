@@ -60,7 +60,13 @@ else
 	let s:plugvim = fnamemodify($MYVIMRC, ':h') .. '/autoload/plug.vim'
 endif
 if executable('curl') && !filereadable(s:plugvim)
-	call system(['curl', '-fLo', s:plugvim, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'])
+    call system([
+        'curl',
+        '-fLo',
+        s:plugvim,
+        '--create-dirs',
+        'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    ])
 	if executable('git')
 		if filereadable(s:plugvim)
 			execute 'source ' .. s:plugvim
@@ -72,7 +78,7 @@ if executable('curl') && !filereadable(s:plugvim)
 	endif
 endif
 
-call plug#begin()
+call plug#begin(fnamemodify($MYVIMRC, ':h') .. '/vimfiles/plugged')
 
 " colorscheme
 Plug 'https://github.com/flazz/vim-colorschemes'
