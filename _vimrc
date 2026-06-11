@@ -113,6 +113,11 @@ if !isdirectory(s:plugged)
 	endif
 endif
 
+" Add 'after/ftplugin' to runtimepath
+if has('win32')
+    let &g:rtp = &g:rtp .. ',' .. $VIM .. '/after'
+endif
+
 " Add optional packages.
 " The matchit plugin makes the % command work better, but it is not backwards
 " compatible.
