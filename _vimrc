@@ -107,7 +107,7 @@ Plug 'https://github.com/ludovicchabant/vim-gutentags'
 call plug#end()
 
 " Install plugins, first run - plug.vim
-if !isdirectory(plugged)
+if !isdirectory(s:plugged)
 	if exists(':PlugInstall')
 		PlugInstall
 	endif
