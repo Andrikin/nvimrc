@@ -176,6 +176,9 @@ set autocomplete
 set title
 set hidden
 set mouse=
+if has('win32')
+    let &g:viminfo=&g:viminfo .. ',n' .. $VIM .. '\_viminfo'
+endif
 set undofile
 set noswapfile
 " set linebreak
