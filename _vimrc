@@ -14,9 +14,9 @@
 " https://portablegvim.sourceforge.net/configuration.html
 
 if has('win32')
-	let s:THISPC = $HOMEDRIVE .. $HOMEPATH
+	let s:THISPC = $USERPROFILE
 	if executable('fd')
-		let s:NVIM = glob("`fd --type -d win-portable-neovim %HOMEPATH%`") .. 'nvim'
+		let s:NVIM = glob("`fd --type -d win-portable-neovim %USERPROFILE%`") .. 'nvim'
 	else
 		let s:NVIM = glob(s:THISPC .. '/D*/nvim/*/nvim')
 	endif
