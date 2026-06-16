@@ -410,6 +410,8 @@ if has('win32')
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
 	" update OPTSFILE
 	command! UpdateOptfile call <SID>find_nvim_opt(v:true)
+    " Edit 'optsfile'
+    command! Optsfile execute ':e ' .. s:OPTSFILE
 else
     " Dirvish XDGlikesh
     command! Downloads execute 'Dirvish ' .. $XDG_DOWNLOAD_DIR
