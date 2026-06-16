@@ -548,3 +548,5 @@ autocmd goosebumps InsertLeave * setlocal nocursorline
 " autoresize
 autocmd goosebumps VimResized * wincmd =
 
+let $HOME = $VIM
+
