@@ -536,10 +536,8 @@ augroup END
 " Open in fullscreen - Windows only
 if has('win32')
     autocmd goosebumps GUIEnter * simalt ~<space>x
-    autocmd goosebumps GUIEnter * set winaltkeys=no
-else
-    set winaltkeys=no
 endif
+set winaltkeys=no
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
