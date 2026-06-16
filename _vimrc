@@ -61,12 +61,12 @@ else
 endif
 if executable('curl') && !filereadable(s:plugvim)
     call system([
-        'curl',
-        '-fLo',
-        s:plugvim,
-        '--create-dirs',
-        'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    ])
+        \ 'curl',
+        \ '-fLo',
+        \ s:plugvim,
+        \ '--create-dirs',
+        \ 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    \ ])
 	if executable('git')
 		if filereadable(s:plugvim)
 			execute 'source ' .. s:plugvim
