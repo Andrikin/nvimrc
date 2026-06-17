@@ -128,6 +128,11 @@ if has('syntax') && has('eval')
 	packadd! hlyank
 endif
 
+if has("linux")
+    " :Man pager
+    runtime ftplugin/man.vim
+endif
+
 " configurações próprias do tema, no caso 'molokai'
 silent! colorscheme molokai
 highlight clear Visual
