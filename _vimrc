@@ -415,7 +415,7 @@ if has('win32')
 	command! RedeLocal execute 'Dirvish T:/16-Diretoria de Ouvidoria/Andre Aguiar/' 
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
 	" update OPTSFILE
-	command! UpdateOptfile call <SID>find_nvim_opt(v:true)
+	command! UpdateOptfile call <SID>path_initialize(v:true)
     " Edit 'optsfile'
     command! Optsfile execute ':e ' .. s:OPTSFILE
 else
