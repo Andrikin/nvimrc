@@ -22,6 +22,8 @@ if has('win32')
 	endif
 	" NVIM OPTS dependencies
 	let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
+    " Edit 'optsfile'
+    command! Optsfile execute ':e ' .. s:OPTSFILE
 	" list nvim/opt and add it to $PATH
 	function! s:path_initialize(force) abort
 		if !filereadable(s:OPTSFILE) || a:force
@@ -32,6 +34,8 @@ if has('win32')
 			call s:add_path(path)
 		endfor
 	endfunction
+    " Update 'optfiles'
+	command! UpdateOptfile call <SID>path_initialize(v:true)
 	function! s:find_nvim_opt() abort
         " buscar por arquivos executáveis
         let nvimdirglob = s:NVIM .. '/opt/*/**/*.{bat,cmd,exe}'
@@ -414,10 +418,6 @@ if has('win32')
 	command! Desktop execute 'Dirvish ' .. s:THISPC .. '/Desktop'
 	command! RedeLocal execute 'Dirvish T:/16-Diretoria de Ouvidoria/Andre Aguiar/' 
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
-	" update OPTSFILE
-	command! UpdateOptfile call <SID>path_initialize(v:true)
-    " Edit 'optsfile'
-    command! Optsfile execute ':e ' .. s:OPTSFILE
 else
     " Dirvish XDGlikesh
     if exists('$XDG_DOWNLOAD_DIR') && exists('$XDG_DOCUMENTS_DIR') && exists('$XDG_DESKTOP_DIR')
