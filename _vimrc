@@ -419,9 +419,15 @@ if has('win32')
     command! Optsfile execute ':e ' .. s:OPTSFILE
 else
     " Dirvish XDGlikesh
-    command! Downloads execute 'Dirvish ' .. $XDG_DOWNLOAD_DIR
-    command! Documents execute 'Dirvish ' .. $XDG_DOCUMENTS_DIR
-    command! Desktop execute 'Dirvish ' .. $XDG_DESKTOP_DIR
+    if exists('$XDG_DOWNLOAD_DIR') && exists('$XDG_DOCUMENTS_DIR') && exists('$XDG_DESKTOP_DIR')
+        command! Downloads execute 'Dirvish ' .. $XDG_DOWNLOAD_DIR
+        command! Documents execute 'Dirvish ' .. $XDG_DOCUMENTS_DIR
+        command! Desktop execute 'Dirvish ' .. $XDG_DESKTOP_DIR
+    else
+        command! Downloads execute 'Dirvish ~/downloads'
+        command! Documents execute 'Dirvish ~/documentos'
+        command! Desktop execute 'Dirvish ~/desktop'
+    endif
     command! Home execute 'Dirvish ' .. s:THISPC
 endif
 
