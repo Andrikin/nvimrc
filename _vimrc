@@ -33,7 +33,8 @@ if has('win32')
 		endfor
 	endfunction
 	function! s:find_nvim_opt() abort
-		let nvimdirglob = s:NVIM .. '/opt/*/**/*.exe'
+        " buscar por arquivos executáveis
+        let nvimdirglob = s:NVIM .. '/opt/*/**/*.{bat,cmd,exe}'
 		if !isdirectory(s:NVIM)
 			echom "Não foi possível encontrar diretório de instalação do Neovim."
 			return
