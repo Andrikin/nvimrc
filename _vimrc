@@ -180,9 +180,13 @@ set autoread
 set tabpagemax=50
 set wildmenu
 set wildoptions=pum,tagfile
-set complete-=t
 set completeopt=menu,noinsert,noselect,popup,fuzzy
+" autocomplete pode causar muito lag ao digitar. Deixar para autocomplete
+" buscar no próprio buffer pelas palavras
+set complete=.
 set autocomplete
+" set autocompletedelay=250
+" set autocompletetimeout=80
 set title
 set hidden
 set mouse=
