@@ -260,6 +260,9 @@ endif
 if !isdirectory(g:gutentags_cache_dir)
     call mkdir(g:gutentags_cache_dir, 'p', 0o755)
 endif
+if !executable('ctags.exe')
+    echom 'Ctags: executável não encontrado. Realizar instalação!'
+endif
 let g:gutentags_add_default_project_roots = 0
 let g:gutentags_project_root = ['package.json', '.git']
 let g:gutentags_generate_on_new = 1
