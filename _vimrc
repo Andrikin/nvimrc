@@ -21,7 +21,10 @@ if has('win32')
 		let s:NVIM = glob(s:THISPC .. '/D*/nvim/*/nvim')
 	endif
 	" NVIM OPTS dependencies
-	let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
+	let s:OPTSFILE = glob(s:NVIM .. '/opt/optfile')
+    if !filereadable(s:OPTSFILE)
+        let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
+    endif
     " Edit 'optsfile'
     command! Optsfile execute ':e ' .. s:OPTSFILE
 	" list nvim/opt and add it to $PATH
