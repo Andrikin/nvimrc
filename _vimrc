@@ -169,6 +169,7 @@ set smartcase
 set hlsearch
 
 " Configurações gerais
+set shortmess=aoOt
 set noautochdir
 set scrolloff=999
 set lazyredraw
@@ -221,7 +222,9 @@ set termguicolors
 
 " gui options
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
-set guioptions=! " no external cmd window prompt output, remove others options
+" ! -> no external cmd window prompt output
+" d -> dark mode (Windows version)
+set guioptions=!d
 if has('win32')
     let &g:guifont='SauceCodePro NFM:h11'
 else
