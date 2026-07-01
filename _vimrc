@@ -20,10 +20,15 @@ if has('win32')
 	else
 		let s:NVIM = glob(s:THISPC .. '/D*/nvim/*/nvim')
 	endif
-	" NVIM OPTS dependencies
+	" NVIMOPTS dependencies in this computer
 	let s:OPTSFILE = glob(s:NVIM .. '/opt/optfile')
     if !filereadable(s:OPTSFILE)
-        let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
+        " in thumbdrive?
+        let s:OPTSFILE = glob($VIMRUNTIME[0:1] .. '/nvim/*/nvim/opt/optfile')
+        if !filereadable(s:OPTSFILE)
+            " fallback to 'optfiles' in vim folder
+            let s:OPTSFILE = fnamemodify($MYVIMRC, ':h') .. '/optfiles'
+        endif
     endif
     " Edit 'optsfile'
     command! Optsfile execute ':e ' .. s:OPTSFILE
