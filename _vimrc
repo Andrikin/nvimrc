@@ -557,9 +557,25 @@ augroup goosebumps
 	autocmd!
 augroup END
 
-" Open in fullscreen - Windows only
+" linux GVim maximized window
+function! s:resizeit() abort
+    if executable('wmctrl')
+        let winid = split(system('wmctrl -pl | grep ' .. shellescape(getpid())))
+        try
+            let winid = winid[0]
+        catch /^Vim\%((\S\+)\)\=:E684:/
+            echo 'Não foi possível redimensionar Gvim'
+        endtry
+        if winid
+            call system('wmctrl -i -b add,maximized_vert,maximized_horz -r ' .. winid)
+        endif
+    endif
+endfunction
+" Open in fullscreen
 if has('win32')
     autocmd goosebumps GUIEnter * simalt ~<space>x
+else
+    autocmd goosebumps VimEnter * call <SID>resizeit()
 endif
 set winaltkeys=no
 
