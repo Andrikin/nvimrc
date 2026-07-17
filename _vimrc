@@ -466,7 +466,7 @@ function! s:toggle_terminal() abort
         return 
     endif
     " terminal buffer existe?
-    if get(g:ttoggler, tnumber, 0)
+    if get(g:ttoggler, tnumber, 0) && len(getbufinfo(get(g:ttoggler, tnumber, 0)))
         let binfo = getbufinfo(g:ttoggler[tnumber])[0]
         " está aberto?
         if !binfo.hidden
