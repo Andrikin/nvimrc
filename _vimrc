@@ -147,7 +147,7 @@ if has("linux")
 endif
 
 " configurações próprias do tema, no caso 'molokai'
-silent! colorscheme molokai
+silent! colorscheme monokain
 highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
 
