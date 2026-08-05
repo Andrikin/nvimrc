@@ -587,6 +587,15 @@ else
 endif
 set winaltkeys=no
 
+" set environment variables for 'uv'
+if has('python') && has('uv')
+    let UVDIR = fnamemodify(exepath('uv'), ':h')
+    $UV_PYTHON_INSTALL_DIR = UVDIR
+    $UV_TOOL_BIN_DIR = UVDIR
+    $UV_TOOL_DIR = UVDIR
+    $UV_CACHE_DIR = UVDIR .. '\cache'
+endif
+
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
