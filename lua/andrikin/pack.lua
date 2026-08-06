@@ -1,13 +1,11 @@
----@diagnostic disable: param-type-mismatch
--- TODO: Usar vim.pack para gerenciamento de plugins no neovim 0.12+nightly
-
-local notify = require('andrikin.utils').notify or vim.notify or vim.print
+-- PACK --
 
 -- install plugins
 vim.pack.add({
     -- colorscheme
-    'https://github.com/biisal/blackhole',
-	'https://github.com/polirritmico/monokai-nightasty.nvim',
+	-- 'https://github.com/biisal/blackhole',
+	-- 'https://github.com/polirritmico/monokai-nightasty.nvim',
+	'https://github.com/ellisonleao/gruvbox.nvim',
     -- my plugins and forks
     'https://github.com/Andrikin/awesome-pairing',
     'https://github.com/Andrikin/awesome-substitute',
@@ -40,15 +38,35 @@ vim.pack.add({
     'https://github.com/folke/lazydev.nvim.git',
     -- ft = java
     'https://github.com/mfussenegger/nvim-jdtls.git',
-}, {confirm = false})
+}, { confirm = false })
 
-if vim.fn.isdirectory(vim.fn.expand('$HOME') .. '/.config/nvim/firenvim') == 0 then
-    vim.cmd("silent! call firenvim#install(1)")
-end
+-- vim.pack autocmds:
+vim.api.nvim_create_autocmd('PackChanged', { -- install firenvim
+	callback = function (ev)
+		local nome, tipo = ev.data.spec.name, ev.data.kind
+		if nome == 'firenvim' and (tipo == 'install' or tipo == 'update') then
+			if not ev.data.active then vim.cmd.packadd('firenvim') end
+			if vim.fn.isdirectory(vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'firenvim')) == 0 then
+				vim.cmd("silent! call firenvim#install(0)")
+			end
+		end
+	end
+})
+vim.api.nvim_create_autocmd('PackChanged', { -- build blink.cmp
+	callback = function (ev)
+		local nome, tipo = ev.data.spec.name, ev.data.kind
+		if nome == 'blink.cmp' and (tipo == 'install' or tipo == 'update') then
+			if not ev.data.active then vim.cmd.packadd('blink.cmp') end
+			if vim.fn.exists(':BlinkCmp') then
+				vim.cmd.BlinkCmp('build')
+			end
+		end
+	end
+})
 
 local gcc = vim.fn.executable('gcc') == 1
 if not gcc then
-    vim.notify('Treesitter: Não foi possível encontrar compilador executável "gcc".')
+    vim.print('Treesitter: Não foi possível encontrar compilador executável "gcc".')
 else
     vim.pack.add({{
         src = 'https://github.com/nvim-treesitter/nvim-treesitter.git',
@@ -87,16 +105,14 @@ end
 
 -- Colorscheme
 vim.o.termguicolors = true
--- vim.cmd.colorscheme('blackhole')
-vim.cmd.colorscheme('monokai-nightasty')
+require('gruvbox').setup()
+vim.cmd.colorscheme('gruvbox')
 
 vim.cmd.packadd('nvim.difftool')
 vim.cmd.packadd('nvim.undotree')
 vim.cmd.packadd('nvim.tohtml')
 vim.cmd.packadd('justify')
 
--- monokai colorscheme
-require('monokai-nightasty').setup()
 -- spellfile.vim
 require('nvim.spellfile').config()
 -- colorizer.lua
@@ -144,7 +160,7 @@ require('dressing').setup({
 -- blink.cmp configuration
 local rust = vim.fn.executable('cargo') == 1
 if not rust then
-    notify("rust: Não foi encontrado executável do 'rust'. Verificar instalação.")
+    vim.print("rust: Não foi encontrado executável do 'rust'. Verificar instalação.")
     do return end
 end
 -- compile fuzzy for blink.cmp - v2
