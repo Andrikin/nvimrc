@@ -1,0 +1,7 @@
+lazy-lock.json
+nvim-pack-lock.json
+opts/*
+undotree/*
+servers/*
+lua/andrikin/.luarc.json
+
