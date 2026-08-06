@@ -1,4 +1,4 @@
-local notify = require('andrikin.utils').notify or vim.notify or vim.print
+-- MAPPINGS --
 
 -- autocompletion LSP neovim 0.11
 vim.keymap.set('i', '<c-space>',
@@ -129,7 +129,7 @@ local toggle_list = function()
 	local ttoggler = vim.g.ttoggler
     local tnumber = vim.api.nvim_tabpage_get_number(0)
     if tnumber <= 0 then
-        vim.notify('toggle_terminal: erro encontrado')
+        vim.print('toggle_terminal: erro encontrado')
         return
     end
     if ttoggler[tnumber] then
