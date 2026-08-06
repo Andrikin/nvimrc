@@ -1,7 +1,6 @@
 -- Autocmds goosebumps
 local autocmd = vim.api.nvim_create_autocmd
 local Andrikin = vim.api.nvim_create_augroup('Andrikin', {clear = true})
-local cursorline = require('andrikin.utils').cursorline
 
 -- Highlight linha quando entrar em INSERT MODE
 autocmd('InsertEnter', {
@@ -12,14 +11,14 @@ autocmd('InsertEnter', {
         if dirvish then
             return
         end
-        cursorline.on()
+        vim.wo[0][0].cursorline = true
     end,
 })
 autocmd('WinEnter', {
     group = Andrikin,
     pattern = '*',
     callback = function()
-        cursorline.off()
+        vim.wo[0][0].cursorline = false
     end,
 })
 autocmd('InsertLeave', {
@@ -30,7 +29,7 @@ autocmd('InsertLeave', {
         if dirvish then
             return
         end
-		cursorline.off()
+        vim.wo[0][0].cursorline = false
     end,
 })
 
@@ -76,9 +75,11 @@ autocmd('VimEnter', {
 	end,
 })
 
+-- WIP: obter o pid do processo "server"
 autocmd('VimEnter',{
 	group = Andrikin,
 	callback = function()
+		return -- remover depois de refeita a função
 		if vim.fn.executable("wmctrl") == 1 then
 			local winid = vim.fn.split(vim.system({
 				'wmctrl', '-pl', '|', 'grep',
@@ -95,17 +96,4 @@ autocmd('VimEnter',{
 		end
 	end
 })
-
--- neovim não está carregando esta configuração ao utilizar 'require'
--- FIX: como resolver?
--- PALEATIVO: setar vim.o.showtabline = 1 utilizando vim.defer_fn()
--- autocmd( 'VimEnter', {
--- 		group = Andrikin,
--- 		callback = function()
--- 			vim.defer_fn(
--- 				function() vim.cmd.lua('vim.o.showtabline = 1') end,
--- 				150
--- 			)
--- 		end,
--- 	})
 
