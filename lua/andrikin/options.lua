@@ -1,4 +1,7 @@
 -- OPTIONS
+local function add_path(path)
+	vim.env.PATH = vim.fn.join({vim.env.PATH, path}, ":")
+end
 
 vim.g.mapleader = ' '
 vim.g.localmapleader = ' '
@@ -120,21 +123,16 @@ vim.g['surround_' .. vim.fn.char2nr('l')] = ''
 -- Html
 vim.g['surround_' .. vim.fn.char2nr('t')] = ''
 
--- neovide cofigurations
-if vim.g.neovide then
-	vim.g.neovide_position_animation_length = 0
-	vim.g.neovide_cursor_animation_length = 0
-	vim.g.neovide_cursor_short_animation_length = 0
-	vim.g.neovide_cursor_trail_size = 0
-	vim.g.neovide_scroll_animation_length = 0
-	vim.g.neovide_scroll_animation_far_lines = 0
-	vim.g.neovide_hide_mouse_when_typing = true
-	vim.g.neovide_cursor_antialiasing = false
-	vim.g.neovide_cursor_animate_in_insert_mode = false
-	vim.g.neovide_cursor_animate_command_line = false
-	vim.g.neovide_cursor_vfx_mode = ''
-	vim.g.neovide_detach_on_quit = 'always_detach'
-	vim.g.neovide_fullscreen = false
-	vim.g.neovide_cursor_hack = false
+-- initialize PATH variables
+for program, path in pairs({
+	['jdtls'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'jdtls', 'bin'),
+	['luals'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'luals', 'bin'),
+	['texlab'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'texlab'),
+	['tectonic'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'opts', 'tectonic'),
+	['zig'] = vim.fs.joinpath(vim.env.HOME, '.local', 'zig')
+}) do
+	if not vim.env.PATH:match(program) then
+		add_path(path)
+	end
 end
 
