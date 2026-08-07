@@ -225,7 +225,7 @@ set noshowmode
 " é possível obter o cursor com a cor do texto (com truecolor)
 set termguicolors
 
-" gui options
+" -- GUI --
 set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 " ! -> no external cmd window prompt output
 " d -> dark mode (Windows version)
@@ -249,9 +249,15 @@ endif
 let g:loaded_netrwPlugin = 1
 let g:loaded_netrw = 1
 
-" Set python
-" let g:python_host_prog = '/usr/bin/python2'
-" let g:python3_host_prog = '/usr/local/bin/python3'
+" Set python3.+
+let python2 = exepath('python')
+let python3 = exepath('python3.14')
+if python2 != ''
+    let g:python_host_prog = python2
+endif
+if python3 != ''
+    let g:python3_host_prog = python3
+endif
 
 " Awesome substitute config
 let g:awesome_pairing_chars = "({[\'\""
