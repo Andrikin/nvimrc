@@ -1,4 +1,4 @@
-if winwidth('%') < 160
+if winwidth('%') > winheight('%')
     " move janela para o lado
     wincmd L
 endif
