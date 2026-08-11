@@ -606,6 +606,9 @@ endif
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
 
+" Configuração para arquivos temporários copyq
+autocmd goosebumps BufRead CopyQ.*.txt setlocal textwidth=78
+
 " autoresize
 autocmd goosebumps VimResized * wincmd =
 
