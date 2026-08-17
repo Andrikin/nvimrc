@@ -1,16 +1,10 @@
-" $MYVIMRC --- NeoVim ---
+" $MYVIMRC
 " Autor: André Alexandre Aguiar
 " Email: andrealexandreaguiar@gmail.com
-" Dependences: [surround, comment, capslock, eunuch, fugitive] tpope,
-" vim-cool, vim-dirvish, undotree,
 
-" TODO:
-" WARNING: diretório de instalação -> C:$HOME/Documents/gvim/Data/settings/_vimrc
-" INFO: MS-Windows :h initialization -> $HOME/_vimrc, $HOME/vimfiles/vimrc or
-" $VIM/_vimrc
-" $MYVIMRC - já setado corretamente se respeitado os locais de inicialização do
-" VIM - h: inicialization
-" PORTABLE-GVIM configurations locations
+" WARNING: Instalação -> ($VIM/_vimrc) C:\user\profile\Documents\gvim\vim\_vimrc
+" INFO: MS-Windows :h initialization
+" NOTE: PORTABLE-GVIM configurations locations
 " https://portablegvim.sourceforge.net/configuration.html
 
 if has('win32')
@@ -105,7 +99,8 @@ Plug 'https://github.com/tpope/vim-fugitive.git'
 Plug 'https://github.com/tpope/vim-surround.git'
 Plug 'https://github.com/tpope/vim-eunuch.git'
 Plug 'https://github.com/tpope/vim-dadbod.git'
-Plug 'https://github.com/tpope/vim-commentary'
+" Plug 'https://github.com/tpope/vim-commentary'
+" use packadd comment - native plugin vim9.2
 " My plugins
 Plug 'https://github.com/Andrikin/awesome-pairing'
 Plug 'https://github.com/Andrikin/awesome-substitute'
@@ -139,6 +134,7 @@ endif
 if has('syntax') && has('eval')
 	packadd! matchit
 	packadd! hlyank
+	packadd! comment
 endif
 
 if has("linux")
@@ -218,6 +214,11 @@ let maplocalleader = ' '
 set laststatus=2
 set showtabline=1 
 set noshowmode 
+
+" Spell
+" WARNING: para realizar o download, netrw precisa estar carregado
+" TODO: encontrar um modo de realizar o download automaticamente...
+set spelllang=pt_br
 
 " St tem um problema com o cursor. Ele não muda de acordo com as cores da
 " fonte que ele está sobre. Dessa forma, com o patch de Jules Maselbas
@@ -607,7 +608,7 @@ autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
 
 " Configuração para arquivos temporários copyq
-autocmd goosebumps BufRead CopyQ.*.txt setlocal textwidth=78
+autocmd goosebumps BufRead CopyQ.*.txt setlocal textwidth=78 spell
 
 " autoresize
 autocmd goosebumps VimResized * wincmd =
