@@ -236,3 +236,5 @@ vim.lsp.enable({
     -- 'cssls',
 })
 -- vim.lsp.set_log_level("debug")
+
+vim.cmd.cd('desktop/')
