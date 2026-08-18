@@ -1,4 +1,5 @@
 -- OPTIONS
+
 local function add_path(path)
 	vim.env.PATH = vim.fn.join({vim.env.PATH, path}, ":")
 end
@@ -124,11 +125,13 @@ vim.g['surround_' .. vim.fn.char2nr('l')] = ''
 vim.g['surround_' .. vim.fn.char2nr('t')] = ''
 
 -- initialize PATH variables
+local serversdir = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers')
+local optsdir = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'opts')
 for program, path in pairs({
-	['jdtls'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'jdtls', 'bin'),
-	['luals'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'luals', 'bin'),
-	['texlab'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers', 'texlab'),
-	['tectonic'] = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'opts', 'tectonic'),
+	['jdtls'] = vim.fs.joinpath(serversdir, 'jdtls', 'bin'),
+	['luals'] = vim.fs.joinpath(serversdir, 'luals', 'bin'),
+	['texlab'] = vim.fs.joinpath(serversdir, 'texlab'),
+	['tectonic'] = vim.fs.joinpath(optsdir, 'tectonic'),
 	['zig'] = vim.fs.joinpath(vim.env.HOME, '.local', 'zig')
 }) do
 	if not vim.env.PATH:match(program) then
