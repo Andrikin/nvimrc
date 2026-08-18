@@ -73,24 +73,30 @@ autocmd('UIEnter', {
     callback = require('vim._core.ui2').enable
 })
 
--- -- WIP: obter o pid do processo "server"
--- autocmd('VimEnter',{
--- 	group = Andrikin,
--- 	callback = function()
--- 		if vim.fn.executable("wmctrl") == 1 then
--- 			local winid = vim.fn.split(vim.system({
--- 				'wmctrl', '-pl', '|', 'grep',
--- 				vim.fn.shellescape(vim.fn.getpid())
--- 			}):wait().stdout)
--- 			winid = winid[1]
--- 			if not winid then
--- 				error('Não foi possível redimentsionar neovim.')
--- 			end
--- 			vim.system({
--- 				'wmctrl', '-i', '-b', 'add,maximized_vert,maximized_horz',
--- 				'-r', winid
--- 			})
--- 		end
--- 	end
--- })
---
+-- maximizar tela do terminal - nvim
+autocmd('UIEnter',{
+	group = Andrikin,
+	callback = function()
+		if vim.fn.executable("wmctrl") == 1 then
+			local wmctrl_list = vim.split(vim.system({
+				'wmctrl', '-lx'
+			}):wait().stdout, '\n')
+			local winid = ''
+			for _, id in ipairs(wmctrl_list) do
+				if id:match('terminal') then
+					winid = id:match('^(0x[0-9a-f]+)')
+					break
+				end
+			end
+			if not winid then
+				error('Não foi possível redimentsionar neovim.')
+			end
+			vim.system({
+				'wmctrl', '-i', '-b',
+				'add,maximized_vert,maximized_horz',
+				'-r', winid
+			})
+		end
+	end
+})
+
