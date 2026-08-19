@@ -106,7 +106,10 @@ Plug 'https://github.com/justinmk/vim-dirvish.git'
 Plug 'https://github.com/mbbill/undotree'
 Plug 'https://github.com/romainl/vim-cool.git'
 Plug 'https://github.com/markonm/traces.vim'
-Plug 'https://github.com/ludovicchabant/vim-gutentags'
+
+if executable('ctags')
+    Plug 'https://github.com/ludovicchabant/vim-gutentags'
+endif
 
 call plug#end()
 
@@ -266,23 +269,24 @@ let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_DiffpanelHeight = 5
 
 " --- Gutentags ---
-if has('win32')
-    let g:gutentags_cache_dir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/cache/ctags'
+if executable('ctags')
+    if has('win32')
+        let g:gutentags_cache_dir = fnamemodify($MYVIMRC, ':h') .. '/vimfiles/cache/ctags'
+    else
+        let g:gutentags_cache_dir = $MYVIMDIR .. 'cache/ctags'
+    endif
+    if !isdirectory(g:gutentags_cache_dir)
+        call mkdir(g:gutentags_cache_dir, 'p', 0o755)
+    endif
+    let g:gutentags_add_default_project_roots = 0
+    let g:gutentags_project_root = ['package.json', '.git']
+    let g:gutentags_generate_on_new = 1
+    let g:gutentags_generate_on_missing = 1
+    let g:gutentags_generate_on_write = 1
+    let g:gutentags_generate_on_empty_buffer = 0
 else
-    let g:gutentags_cache_dir = $MYVIMDIR .. 'cache/ctags'
-endif
-if !isdirectory(g:gutentags_cache_dir)
-    call mkdir(g:gutentags_cache_dir, 'p', 0o755)
-endif
-if !executable('ctags')
     echom 'Ctags: executável não encontrado. Realizar instalação!'
 endif
-let g:gutentags_add_default_project_roots = 0
-let g:gutentags_project_root = ['package.json', '.git']
-let g:gutentags_generate_on_new = 1
-let g:gutentags_generate_on_missing = 1
-let g:gutentags_generate_on_write = 1
-let g:gutentags_generate_on_empty_buffer = 0
 
 " vim-surround Tim Pope
 let g:surround_{char2nr('\')} = ''
