@@ -21,6 +21,13 @@ command(
 -- )
 
 command(
+	'Desktop',
+	function()
+		vim.cmd.Dirvish('desktop')
+	end, {}
+)
+
+command(
 	'Documentos',
 	function()
 		vim.cmd.Dirvish('documentos')
