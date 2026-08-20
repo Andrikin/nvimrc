@@ -50,7 +50,9 @@ if has('win32')
         let $PATH = $PATH .. ';' .. a:dir
 	endfunction
 	" inicializar PATH
-	call s:path_initialize(v:false)
+    if filereadable(s:OPTSFILE)
+        call s:path_initialize(v:false)
+    endif
 else
     " LINUX
 	let s:THISPC = $HOME
