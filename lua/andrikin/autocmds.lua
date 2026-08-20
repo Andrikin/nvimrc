@@ -38,7 +38,7 @@ autocmd( 'TextYankPost', {
 	group = Andrikin,
 	pattern = '*',
 	callback = function()
-		vim.hl.on_yank(
+		vim.hl.hl_op(
 			{
 				higroup = 'IncSearch',
 				timeout = 300,
@@ -83,6 +83,7 @@ autocmd('UIEnter',{
 			}):wait().stdout, '\n')
 			local winid = ''
 			for _, id in ipairs(wmctrl_list) do
+                -- look for the terminal hosting neovim
 				if id:match('terminal') then
 					winid = id:match('^(0x[0-9a-f]+)')
 					break
