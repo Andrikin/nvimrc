@@ -235,7 +235,7 @@ set guioptions=!d
 if has('win32')
     let &g:guifont='SauceCodePro NFM:h12'
 else
-    let &g:guifont='SauceCodePro Nerd Font Mono 12'
+    let &g:guifont='SauceCodePro Nerd Font Mono 11'
 endif
 let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
