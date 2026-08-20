@@ -38,13 +38,13 @@ if has('win32')
         " buscar por arquivos executáveis
         let nvimdirglob = s:NVIM .. '/opt/*/**/*.{bat,cmd,exe}'
 		if !isdirectory(s:NVIM)
-			echom "Não foi possível encontrar diretório de instalação do Neovim."
+			silent echom "Não foi possível encontrar diretório de instalação do Neovim."
 			return
 		endif
 		" ponto crítico, de mais demora
 		let opts = glob(nvimdirglob, v:false, v:true, v:false)->map({_, dir -> fnamemodify(dir, ':h')})->uniq()
 		call writefile(opts, s:OPTSFILE)
-		echom "Arquivo OPTSFILE criado!"
+		silent echom "Arquivo OPTSFILE criado!"
 	endfunction
 	function! s:add_path(dir) abort
         let $PATH = $PATH .. ';' .. a:dir
@@ -76,10 +76,10 @@ if executable('curl') && !filereadable(s:plugvim)
 		if filereadable(s:plugvim)
 			execute 'source ' .. s:plugvim
 		else
-			echom "plug.vim não encontrado."
+			silent echom "plug.vim não encontrado."
 		endif
 	else
-		echom "git: instalar git ou inicializá-lo no $PATH"
+		silent echom "git: instalar git ou inicializá-lo no $PATH"
 	endif
 endif
 
@@ -287,7 +287,7 @@ if executable('ctags')
     let g:gutentags_generate_on_write = 1
     let g:gutentags_generate_on_empty_buffer = 0
 else
-    echom 'Ctags: executável não encontrado. Realizar instalação!'
+    silent echom 'Ctags: executável não encontrado. Realizar instalação!'
 endif
 
 " vim-surround Tim Pope
@@ -387,7 +387,7 @@ nnoremap <silent> [b <cmd>bprevious<cr>
 function! s:arglistthings(comando) abort
     let n = argc() - 1
     if n <= 0
-        echom "arglist: nenhum arquivo listado."
+        silent echom "arglist: nenhum arquivo listado."
         return
     endif
     try
@@ -471,7 +471,7 @@ let g:ttoggler = {}
 function! s:toggle_terminal() abort
     let tnumber = tabpagenr()
     if !tnumber
-        echom "terminal: sem número de tabpage"
+        silent echom "terminal: sem número de tabpage"
         return 
     endif
     " terminal buffer existe?
@@ -563,7 +563,7 @@ function! DirvishOpen() abort
             call job_start(['xdg-open', arquivo])
         endif
     else
-        echom "dirvish: não foi encontrado arquivo para abrir"
+        silent echom "dirvish: não foi encontrado arquivo para abrir"
     endif
 endfunction
 
