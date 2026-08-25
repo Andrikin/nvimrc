@@ -150,6 +150,7 @@ highlight Visual guibg=#293739 gui=italic
 
 " Search recursively in directories
 set path+=**
+set path+=.
 
 " matchit configurations
 set matchpairs+=<:>
