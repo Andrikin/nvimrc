@@ -149,8 +149,8 @@ highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
 
 " Search recursively in directories
-set path+=**
-set path+=.
+" set path+=**
+" set path+=.
 
 " matchit configurations
 set matchpairs+=<:>
@@ -605,6 +605,9 @@ if has('python') && has('uv')
     $UV_TOOL_DIR = UVDIR
     $UV_CACHE_DIR = UVDIR .. '\cache'
 endif
+
+" 'path' configuration
+autocmd goosebumps FileType * set path=.,**
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
