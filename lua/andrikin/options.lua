@@ -5,24 +5,25 @@ local function add_path(path)
 end
 
 vim.g.mapleader = ' '
-vim.g.localmapleader = ' '
+vim.g.maplocalleader = vim.g.mapleader
 
 -- terminal toggler
 vim.g.ttoggler = {}
 
-vim.o.mouse = ''
-
--- Search recursively
-vim.opt.path:append('**')
+-- Search locally and recursively
+vim.go.path = '.,**'
 
 -- Indicadores - números nas linhas
 vim.o.rnu = true
 vim.o.nu = true
+vim.o.signcolumn = 'number'
 
 -- Tamanho da indentação
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.softtabstop = 4
+-- ThePrimeagen way
+vim.o.expandtab = true
 
 -- Configurações para search
 vim.o.incsearch = true
@@ -31,34 +32,27 @@ vim.o.smartcase = true
 vim.o.hlsearch = true
 
 -- Configurações gerais
-vim.o.autochdir = false
 vim.o.scrolloff = 999
 vim.o.lazyredraw = true
-vim.o.backspace = 'indent,eol,start'
 vim.o.splitbelow = true
 vim.o.splitright = true
-vim.o.helpheight = 15
 -- Problems that can occur in vim session can be avoid using this configuration
 vim.opt.sessionoptions:remove('options')
 vim.o.encoding = 'utf-8'
 vim.o.autoread = true
 vim.o.tabpagemax = 50
-vim.o.wildmenu = true
 vim.o.completeopt = 'menu,noinsert,noselect,popup,fuzzy'
-vim.o.autocomplete = false
 if vim.fn.has('win32') then
 	vim.g.shell = vim.env.COMSPEC
 else
 	vim.g.shell = vim.env.TERM
 end
 --let &g:shellpipe = '2>&1 | tee'
-vim.opt.complete:remove('t')
-vim.o.title = true
+vim.opt.complete:remove('u')
 vim.o.hidden = true
 vim.o.mouse = ''
 if vim.fn.has('persistent_undo') == 1 then
 	local path = vim.fs.joinpath(
-		---@diagnostic disable-next-line: param-type-mismatch
 		vim.fn.stdpath('config'),
 		'undotree'
 	)
@@ -79,8 +73,8 @@ vim.o.showmode = false
 -- NeoVim configurations
 vim.o.guicursor = 'i-n-v-c:block'
 vim.o.guifont = 'SauceCodePro NFM:h11'
-vim.o.inccommand = ''
-vim.o.winborder = 'rounded'
+vim.o.inccommand = 'split'
+vim.o.winborder = 'single'
 vim.o.fillchars = 'vert:|,fold:*,foldclose:+,diff:-'
 
 -- Python 
@@ -89,10 +83,8 @@ vim.o.fillchars = 'vert:|,fold:*,foldclose:+,diff:-'
 vim.g.python3_host_prog = vim.fn.systemlist('which python3')[1]
 
 -- Using ripgrep ([cf]open; [cf]do {cmd} | update)
-if vim.fn.executable('rg') then
-	vim.g.grepprg = 'rg --vimgrep --smart-case --follow'
-else
-	vim.g.grepprg = 'grep -R'
+if not vim.fn.executable('rg') == 1 then
+	vim.g.grepprg = "grep -HIn $* /dev/null"
 end
 
 -- --- Emmet ---

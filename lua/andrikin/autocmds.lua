@@ -33,6 +33,17 @@ autocmd('InsertLeave', {
     end,
 })
 
+-- 'path' setting
+autocmd('FileType', {
+    group = Andrikin,
+    pattern = '*',
+    callback = function()
+        if vim.o.path ~= vim.go.path then
+            vim.o.path = vim.go.path
+        end
+    end,
+})
+
 -- Highlight configuração
 autocmd( 'TextYankPost', {
 	group = Andrikin,
