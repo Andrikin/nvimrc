@@ -606,6 +606,9 @@ if has('python') && has('uv')
     $UV_CACHE_DIR = UVDIR .. '\cache'
 endif
 
+" Force 'path' setting
+autocmd goosebumps FileType * set path=&g:path
+
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
