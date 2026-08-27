@@ -607,7 +607,7 @@ if has('python') && has('uv')
 endif
 
 " Force 'path' setting
-autocmd goosebumps FileType * set path=&g:path
+autocmd goosebumps FileType * let &g:path=&g:path
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
