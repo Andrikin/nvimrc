@@ -172,6 +172,7 @@ set smartcase
 set hlsearch
 
 " Configurações gerais
+set nomore
 set shortmess=aoOt
 set noautochdir
 set scrolloff=999
