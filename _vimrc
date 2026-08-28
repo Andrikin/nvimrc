@@ -624,3 +624,9 @@ if has('win32')
     let $HOME = $VIM
 endif
 
+if has('win32')
+    cd $USERPROFILE\Desktop
+else
+    cd desktop
+endif 
+
