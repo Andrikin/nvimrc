@@ -148,6 +148,15 @@ silent! colorscheme monokain
 highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
 
+function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
+    let cwd = expand('%:h')
+    if &l:filetype == 'dirvish'
+        let cwd = expand('%')
+    endif
+    let list = systemlist($'find {cwd} -name {a:cmdarg} -type f')
+    return matchfuzzy(list, a:cmdarg)
+endfunction
+set findfunc=s:finditmotherfucker
 " Search recursively in directories
 setglobal path+=**
 setglobal path+=.
