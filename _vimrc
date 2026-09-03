@@ -176,6 +176,8 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
         endif
     endif
     let list = glob(cmd, v:false, v:true)
+    " filtrar?
+    let list = filter(list, {id, file -> file =~ escape(a:cmdarg, ' \')})
     return matchfuzzy(list, a:cmdarg)
 endfunction
 set findfunc=s:finditmotherfucker
