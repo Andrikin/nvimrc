@@ -149,17 +149,39 @@ highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
 
 function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
+    if getftype(a:cmdarg) == 'file'
+        return [a:cmdarg]
+    endif
+    let list = []
     let cwd = expand('%:h')
     if &l:filetype == 'dirvish'
         let cwd = expand('%')
     endif
-    let list = systemlist($'find {cwd} -name {a:cmdarg} -type f')
+    " TODO: how use 'fd'?
+    if executable('fd.exe')
+        if !a:cmdcomplete
+            let cmd = $'fd -uu --absolute-path --color never --type f {a:cmdarg} "{cwd}"'
+        else
+            let cmd = $'fd -uu --absolute-path --color never --type f "{cwd}"'
+        endif
+        let list = systemlist(cmd)
+    elseif executable('dir.exe')
+        " TODO: implementação
+    endif
+    " fallback -> glob()
+    if empty(list) || v:shell_error
+        let cmd = $'{cwd}**\*{a:cmdarg}*'
+        if a:cmdcomplete && isdirectory(a:cmdarg)
+            let cmd = $'{a:cmdarg}**\*'
+        endif
+    endif
+    let list = glob(cmd, v:false, v:true)
     return matchfuzzy(list, a:cmdarg)
 endfunction
 set findfunc=s:finditmotherfucker
-" Search recursively in directories
+
+" Set path to find files recursivelly
 setglobal path+=**
-setglobal path+=.
 
 " matchit configurations
 set matchpairs+=<:>
@@ -615,9 +637,6 @@ if has('python') && has('uv')
     $UV_TOOL_DIR = UVDIR
     $UV_CACHE_DIR = UVDIR .. '\cache'
 endif
-
-" Force 'path' setting
-autocmd goosebumps FileType * let &g:path=&g:path
 
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
