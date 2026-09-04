@@ -152,40 +152,40 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     if getftype(a:cmdarg) == 'file'
         return [a:cmdarg]
     endif
-    let list = []
+    let files = []
     let cwd = expand('%:h')
     if &l:filetype == 'dirvish'
         let cwd = expand('%')
     endif
     if has('win32')
-        " TODO: how use 'fd'?
         if executable('fd.exe')
+            let cwd = substitute(cwd, '\', '/', 'g')
             let cmd = $'fd.exe -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
             if a:cmdcomplete
                 let cmd = $'fd.exe -uu --absolute-path --color never --type d . "{cwd}"'
             endif
-            let list = systemlist(cmd)
-        elseif executable('dir.exe')
-            " TODO: implementação
+            let files = systemlist(cmd)
         endif
     else
+        " linuxmint
         let cmd = $'fdfind -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
         if a:cmdcomplete
             let cmd = $'fdfind -uu --absolute-path --color never --type d . "{cwd}"'
         endif
-        let list = systemlist(cmd)
+        let files = systemlist(cmd)
     endif
     " fallback -> glob()
-    if empty(list) || v:shell_error
-        let cmd = $'{cwd}**\*{a:cmdarg}*'
+    if empty(files) || v:shell_error
+        let cmd = $'{cwd}**\*{a:cmdarg}'
         if a:cmdcomplete && isdirectory(a:cmdarg)
-            let cmd = $'{a:cmdarg}**\*'
+            let cmd = a:cmdarg[-1] == '\' ? $'{a:cmdarg}*' : $'{a:cmdarg}\*' 
         endif
-        let list = glob(cmd, v:false, v:true)
+        let files = glob(cmd, v:false, v:true)
+        if len(files) == 0
+            let files = glob(cmd .. '*', v:false, v:true)
+        endif
     endif
-    " filtrar?
-    let list = filter(list, {id, file -> file =~ escape(a:cmdarg, ' \')})
-    return matchfuzzy(list, a:cmdarg)
+    return matchfuzzy(files, a:cmdarg)
 endfunction
 set findfunc=s:finditmotherfucker
 
