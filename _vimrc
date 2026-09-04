@@ -157,16 +157,23 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     if &l:filetype == 'dirvish'
         let cwd = expand('%')
     endif
-    " TODO: how use 'fd'?
-    if executable('fd.exe')
-        if !a:cmdcomplete
-            let cmd = $'fd -uu --absolute-path --color never --type f {a:cmdarg} "{cwd}"'
-        else
-            let cmd = $'fd -uu --absolute-path --color never --type f "{cwd}"'
+    if has('win32')
+        " TODO: how use 'fd'?
+        if executable('fd.exe')
+            let cmd = $'fd.exe -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
+            if a:cmdcomplete
+                let cmd = $'fd.exe -uu --absolute-path --color never --type d . "{cwd}"'
+            endif
+            let list = systemlist(cmd)
+        elseif executable('dir.exe')
+            " TODO: implementação
+        endif
+    else
+        let cmd = $'fdfind -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
+        if a:cmdcomplete
+            let cmd = $'fdfind -uu --absolute-path --color never --type d . "{cwd}"'
         endif
         let list = systemlist(cmd)
-    elseif executable('dir.exe')
-        " TODO: implementação
     endif
     " fallback -> glob()
     if empty(list) || v:shell_error
@@ -174,8 +181,8 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
         if a:cmdcomplete && isdirectory(a:cmdarg)
             let cmd = $'{a:cmdarg}**\*'
         endif
+        let list = glob(cmd, v:false, v:true)
     endif
-    let list = glob(cmd, v:false, v:true)
     " filtrar?
     let list = filter(list, {id, file -> file =~ escape(a:cmdarg, ' \')})
     return matchfuzzy(list, a:cmdarg)
