@@ -664,6 +664,6 @@ endif
 if has('win32')
     cd $USERPROFILE\Desktop
 else
-    cd desktop
+    cd ~/desktop
 endif 
 
