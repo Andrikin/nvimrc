@@ -153,27 +153,29 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
         return [a:cmdarg]
     endif
     let files = []
+    let query = ''
+    let cmd = ''
     let cwd = expand('%:h')
     if &l:filetype == 'dirvish'
         let cwd = expand('%')
     endif
     if has('win32')
-        if executable('fd.exe')
-            let cwd = substitute(cwd, '\', '/', 'g')
-            let cmd = $'fd.exe -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
-            if a:cmdcomplete
-                let cmd = $'fd.exe -uu --absolute-path --color never --type d . "{cwd}"'
-            endif
-            let files = systemlist(cmd)
-        endif
+        let cwd = substitute(cwd, '\', '/', 'g')
+    endif
+    if a:cmdarg =~ cwd
+        let query = $'{cwd}/**/{a:cmdarg}'
+    endif
+    let cmd = $'-uu --absolute-path --full-path --color never --type f --glob "{query}" "{cwd}"'
+    if a:cmdcomplete && isdirectory(a:cmdarg)
+        let cmd = $'-uu --absolute-path --full-path --color never --type d --glob "{query}/*" "{cwd}"'
+    endif
+    if has("win32")
+        let cmd = $'fd.exe {cmd}'
     else
         " linuxmint
-        let cmd = $'fdfind -uu --absolute-path --color never --type f "*{a:cmdarg}*" "{cwd}"'
-        if a:cmdcomplete
-            let cmd = $'fdfind -uu --absolute-path --color never --type d . "{cwd}"'
-        endif
-        let files = systemlist(cmd)
+        let cmd = $'fdfind {cmd}'
     endif
+    let files = systemlist(cmd)
     " fallback -> glob()
     if empty(files) || v:shell_error
         let cmd = $'{cwd}**\*{a:cmdarg}'
@@ -228,6 +230,7 @@ set autoread
 set tabpagemax=50
 set wildmenu
 set wildoptions=pum,tagfile
+set wildignore=**/.git/**
 set completeopt=menu,noinsert,noselect,popup,fuzzy
 " autocomplete pode causar muito lag ao digitar. Deixar para autocomplete
 " buscar no próprio buffer pelas palavras
@@ -414,8 +417,8 @@ nnoremap <expr> <silent> j <SID>vanhalen('j')
 " inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria
 " inviável trocar para essa funcionalidade
 " inoremap <c-k> <c-o>:m.-2<cr>
-nnoremap <leader>k <cmd>m.-2<cr>
-nnoremap <leader>j <cmd>m.+1<cr>
+nnoremap <up> <cmd>m.-2<cr>
+nnoremap <down> <cmd>m.+1<cr>
 vnoremap K :m'<-2<cr>gv
 vnoremap J :m'>+1<cr>gv
 
