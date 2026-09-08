@@ -138,10 +138,8 @@ if has('syntax') && has('eval')
 	packadd! comment
 endif
 
-if has("linux")
-    " :Man pager
-    runtime ftplugin/man.vim
-endif
+" Man pager
+runtime ftplugin/man.vim
 
 " configurações próprias do tema, no caso 'molokai'
 silent! colorscheme monokain
