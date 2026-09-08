@@ -415,17 +415,13 @@ endfunction
 nnoremap <expr> <silent> k <SID>vanhalen('k')
 nnoremap <expr> <silent> j <SID>vanhalen('j')
 
-" Moving lines up and down - The Primeagen knowledge word
-" inoremap <c-j> <c-o>:m.+1<cr> " utilizo muito <c-j> para newlines, seria
-" inviável trocar para essa funcionalidade
-" inoremap <c-k> <c-o>:m.-2<cr>
+" Moving lines up and down
 nnoremap <up> <cmd>m.-2<cr>
 nnoremap <down> <cmd>m.+1<cr>
-vnoremap K :m'<-2<cr>gv
-vnoremap J :m'>+1<cr>gv
-
-" Vim-capslock in command line
-" cmap <silent> <expr> <c-l> <SID>capslock_redraw()
+inoremap <up> <c-o><cmd>m.-2<cr>
+inoremap <down> <c-o><cmd>m.+1<cr>
+vnoremap K <cmd>m'<-2<cr>gv
+vnoremap J <cmd>m'>+1<cr>gv
 
 " for buffers
 nnoremap <silent> ]b <cmd>bnext<cr>
