@@ -253,8 +253,6 @@ let &g:undodir=fnamemodify($MYVIMRC, ':h') .. '/undotree'
 if !isdirectory(&g:undodir)
     call mkdir(&g:undodir, 'p', 0o755)
 endif
-let mapleader = ' '
-let maplocalleader = ' '
 
 " Statusline
 set laststatus=2
@@ -290,6 +288,10 @@ if executable('rg')
 else
 	let &g:grepprg='grep -R'
 endif
+
+" --- Mapleader ---
+let g:mapleader = ' '
+let g:maplocalleader = g:mapleader
 
 " --- Netrw ---
 " Disable Netrw
