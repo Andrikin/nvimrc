@@ -514,6 +514,7 @@ command! SortingDirvish call <SID>sortingdirvish()
 
 " Toggle :terminal. Use 'i' to enter Terminal Mode. 'ctrl-\ctrl-n' to exit
 " when <c-\> mapped to <c-]>
+" TODO: remake it better!!!
 let g:ttoggler = {}
 function! s:toggle_terminal() abort
     let tnumber = tabpagenr()
