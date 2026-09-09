@@ -414,12 +414,12 @@ nnoremap <expr> <silent> k <SID>vanhalen('k')
 nnoremap <expr> <silent> j <SID>vanhalen('j')
 
 " Moving lines up and down
-nnoremap <up> <cmd>m.-2<cr>
-nnoremap <down> <cmd>m.+1<cr>
-inoremap <up> <c-o><cmd>m.-2<cr>
-inoremap <down> <c-o><cmd>m.+1<cr>
-vnoremap K <cmd>m'<-2<cr>gv
-vnoremap J <cmd>m'>+1<cr>gv
+nnoremap <up> :<c-u>m.-2<cr>
+nnoremap <down> :<c-u>m.+1<cr>
+inoremap <up> <c-o>:<c-u>m.-2<cr>
+inoremap <down> <c-o>:<c-u>m.+1<cr>
+vnoremap <up> :<c-u>'<,'>m-2<cr>gv
+vnoremap <down> :<c-u>'<,'>m+1<cr>gv
 
 " for buffers
 nnoremap <silent> ]b <cmd>bnext<cr>
