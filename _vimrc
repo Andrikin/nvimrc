@@ -421,10 +421,10 @@ inoremap <down> <c-o>:<c-u>m.+1<cr>
 vnoremap <up> :<c-u>'<,'>m-2<cr>gv
 vnoremap <down> :<c-u>'<,'>m+1<cr>gv
 " CURSOR: move one word to left or right
-cnoremap <left> <s-left>
-cnoremap <right> <s-right>
-inoremap <left> <s-left>
-inoremap <right> <s-right>
+cnoremap <a-b> <s-left>
+cnoremap <a-f> <s-right>
+inoremap <a-b> <s-left>
+inoremap <a-f> <s-right>
 
 " for buffers
 nnoremap <silent> ]b <cmd>bnext<cr>
