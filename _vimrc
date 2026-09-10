@@ -176,6 +176,7 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     let files = systemlist(cmd)
     " fallback -> glob()
     if empty(files) || v:shell_error
+        echom 'findfunc: glob fallback'
         let cmd = $'{cwd}**\*{a:cmdarg}'
         if a:cmdcomplete && isdirectory(a:cmdarg)
             let cmd = a:cmdarg[-1] == '\' ? $'{a:cmdarg}*' : $'{a:cmdarg}\*' 
