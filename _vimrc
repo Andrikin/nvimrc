@@ -163,9 +163,9 @@ function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     if a:cmdarg =~ cwd
         let query = $'{cwd}/**/{a:cmdarg}'
     endif
-    let cmd = $'-uu --exclude .git --absolute-path --full-path --color never --type f --glob "{query}" "{cwd}"'
+    let cmd = $'-uu -E .git -a -p -c never -t f -g "{query}" "{cwd}"'
     if a:cmdcomplete && isdirectory(a:cmdarg)
-        let cmd = $'-uu --exclude .git --absolute-path --full-path --color never --type d --glob "{query}/*" "{cwd}"'
+        let cmd = $'-uu -E .git -a -p -c never -t d -g "{query}/*" "{cwd}"'
     endif
     if has("win32")
         let cmd = $'fd.exe {cmd}'
