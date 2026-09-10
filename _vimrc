@@ -418,8 +418,8 @@ nnoremap <up> :<c-u>m.-2<cr>
 nnoremap <down> :<c-u>m.+1<cr>
 inoremap <up> <c-o>:<c-u>m.-2<cr>
 inoremap <down> <c-o>:<c-u>m.+1<cr>
-vnoremap <up> :<c-u>'<,'>m-2<cr>gv
-vnoremap <down> :<c-u>'<,'>m+1<cr>gv
+vnoremap <up> :<c-u>'<,'>m'<-2<cr>gv
+vnoremap <down> :<c-u>'<,'>m'>+2<cr>gv
 " CURSOR: move one word to left or right
 cnoremap <a-b> <s-left>
 cnoremap <a-f> <s-right>
