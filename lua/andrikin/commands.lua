@@ -12,7 +12,7 @@ command(
 -- 		vim.cmd.edit('documentos/misc/dicas/tips-gerais')
 -- 	end, {}
 -- )
---
+
 -- command(
 -- 	'ListaMusicas',
 -- 	function()
@@ -23,28 +23,28 @@ command(
 command(
 	'Desktop',
 	function()
-		vim.cmd.Dirvish('desktop')
+		vim.cmd.Dirvish('~/desktop')
 	end, {}
 )
 
 command(
 	'Documentos',
 	function()
-		vim.cmd.Dirvish('documentos')
+		vim.cmd.Dirvish('~/documentos')
 	end, {}
 )
 
 command(
 	'Downloads',
 	function()
-		vim.cmd.Dirvish('downloads')
+		vim.cmd.Dirvish('~/downloads')
 	end, {}
 )
 
 command(
 	'Projetos',
 	function()
-		vim.cmd.Dirvish('documentos/projetos/git')
+		vim.cmd.Dirvish('~/documentos/projetos/git')
 	end, {}
 )
 

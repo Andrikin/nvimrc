@@ -47,6 +47,62 @@ if vim.fn.has('win32') then
 else
 	vim.g.shell = vim.env.TERM
 end
+vim.o.wildmode = 'noselect:longest:lastused,full'
+vim.o.wildoptions = {'pum', 'fuzzy'}
+vim.o.findfunc = function (cmdargs, cmdcomplete)
+    cmdargs = vim.fs.normalize(cmdargs)
+    local arquivo = vim.uv.fs_stat(cmdargs)
+    if arquivo and arquivo.type == 'file' then
+        return {cmdargs}
+    end
+    local query = '%:h'
+    if vim.o.filetype == 'dirvish' then
+        query = '%'
+    end
+    local cwd = vim.fs.normalize(vim.fn.expand(query))
+    if not cmdargs:match(cwd) then
+        query = vim.fs.joinpath(cwd, '**', cmdargs)
+    end
+    local type_search = 'f'
+    if cmdcomplete then
+        local ftype = vim.uv.fs_stat(cmdargs)
+        if ftype and ftype.type == 'directory' then
+            query = vim.fs.joinpath(cmdargs, '*')
+        end
+        type_search = 'd'
+    end
+    local cmd = {
+        'fdfind',
+        '-uu',
+        '-E', '.git',
+        '-E', 'ctags',
+        '-E', 'undotree',
+        '-a', '-p', '-c', 'never',
+        '--path-separator', '/',
+        '--base-directory', cwd,
+        '-t', type_search,
+        cmdargs
+    }
+    local files = {}
+    if vim.fn.executable('fdfind') == 1 then
+        files = vim.split(
+            vim.system(cmd):wait().stdout,
+        '\n', {trimempty = true})
+    else
+        vim.print('findfunc: "fdfind" executável não encontrado.')
+    end
+    -- fallback
+    if vim.v.shell_error > 0 or vim.tbl_isempty(files) then
+        vim.print('findfunc: glob fallback')
+        files = vim.npcall(function ()
+            return vim.fn.glob(query, false, true)
+        end)
+        if files and #files == 0 then
+            files = vim.fn.glob(query .. '*', false, true)
+        end
+    end
+    return vim.fn.matchfuzzy(files, cmdargs)
+end
 --let &g:shellpipe = '2>&1 | tee'
 vim.opt.complete:remove('u')
 vim.o.hidden = true

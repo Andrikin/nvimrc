@@ -1,8 +1,8 @@
 local buf = vim.api.nvim_get_current_buf()
 local open = vim.ui.open or function(arquivo)
-    vim.print('jobstart: ' .. arquivo)
-    vim.fn.jobstart(
-        vim.fn.shellescape(arquivo, true),
+    vim.print('vim.system: ' .. arquivo)
+    vim.system(
+        {vim.fn.shellescape(arquivo, true)},
         {detach = true}
     )
 end
@@ -16,3 +16,5 @@ vim.keymap.set('n', 'go', function()
         do return end
     end
 end, {silent = true, buffer = buf})
+-- use command 'grep <regex>' in dirvish buffer to fill quickfix list
+vim.bo.grepprg = vim.go.grepprg .. ' "$*" %'

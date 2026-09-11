@@ -237,4 +237,4 @@ vim.lsp.enable({
 })
 -- vim.lsp.set_log_level("debug")
 
-vim.cmd.cd('desktop/')
+vim.cmd.cd('~/desktop/')
