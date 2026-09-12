@@ -47,4 +47,4 @@ vim.keymap.set('n', 'gm', function()
         range = {inicio, vim.fn.line('$')},
     })
 end, opts)
-vim.bo[buf].textwidth = 80
+vim.bo.textwidth = 80
