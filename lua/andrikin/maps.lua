@@ -60,23 +60,21 @@ vim.keymap.set( 'n', 'j',
     function () return van_halen('j') end,
 	{ expr = true, silent = true }
 )
- 
--- Moving lines up and down - The Primeagen knowledge word
--- inoremap <c-j> <c-o>:m.+1<cr> -- utilizo muito <c-j> para newlines, seria inviável trocar para essa funcionalidade
--- inoremap <c-k> <c-o>:m.-2<cr>
--- nnoremap <leader>k <cmd>m.-2<cr>
--- nnoremap <leader>j <cmd>m.+1<cr>
 
 -- <up/down>: melhor quando utilizado com mapeamento das teclas <a-j/k> em
 -- nível de sistema
-vim.keymap.set('i', '<up>', "<c-o>:m.-2<cr>", {silent = true})
-vim.keymap.set('i', '<down>', "<c-o>:m.+1<cr>", {silent = true})
-vim.keymap.set('n', '<up>', ":m.-2<cr>", {silent = true})
-vim.keymap.set('n', '<down>', ":m.+1<cr>", {silent = true})
-vim.keymap.set('v', 'K', ":m'<-2<cr>gv", {silent = true})
-vim.keymap.set('v', 'J', ":m'>+1<cr>gv", {silent = true})
--- gJ com o mesmo comportamento de J (juntar linhas removendo espaços)
-vim.keymap.set('v', 'gJ', ":<c-u>'<,'>join<cr>", {silent = true})
+-- WARNING: não utilizar <cmd>!!!
+vim.keymap.set('i', '<up>', "<c-o>:<c-u>m.-2<cr>", {silent = true})
+vim.keymap.set('i', '<down>', "<c-o>:<c-u>m.+1<cr>", {silent = true})
+vim.keymap.set('n', '<up>', ":<c-u>m.-2<cr>", {silent = true})
+vim.keymap.set('n', '<down>', ":<c-u>m.+1<cr>", {silent = true})
+vim.keymap.set('v', '<up>', ":<c-u>'<,'>m'<-2<cr>gv", {silent = true})
+vim.keymap.set('v', '<down>', ":<c-u>'<,'>m'>+1<cr>gv", {silent = true})
+-- CURSOR: move one word to left or right
+vim.keymap.set('c', '<a-b>', '<s-left>')
+vim.keymap.set('c', '<a-f>', '<s-right>')
+vim.keymap.set('i', '<a-b>', '<s-left>')
+vim.keymap.set('i', '<a-f>', '<s-right>')
 
 -- Copy and paste from clipboard (* -> selection register/+ -> primary register)
 vim.keymap.set('n', 'gP', '"+P')
@@ -84,14 +82,7 @@ vim.keymap.set('n', 'gp', '"+p')
 vim.keymap.set({'n', 'v'}, 'gy', '"+y')
 vim.keymap.set('n', 'gY', '"+Y')
 
--- DEFAULT IN NEOVIM 0.11
--- -- Bracket maps
--- -- For buffers
--- vim.keymap.set('n', ']b', vim.cmd.bnext, {desc = 'Next buffer'})
--- vim.keymap.set('n', '[b', vim.cmd.bprevious, {desc = 'Previous buffer'})
--- -- For arglist
--- vim.keymap.set('n', ']a', vim.cmd.next, {desc = 'Next arglist file'})
--- vim.keymap.set('n', '[a', vim.cmd.Next, {desc = 'Previous arglist file'})
+-- Bracket maps
 vim.keymap.set('n', ']a', function()
     local ok, erro = pcall(vim.cmd.next)
     if not ok then
@@ -109,14 +100,13 @@ vim.keymap.set('n', '[a', function()
     end
 end, {desc = 'Previous arglist file'})
 
--- --- Mapleader Commands ---
+--- MAPLEADER COMMANDS ---
 
 -- open $MYVIMRC
 vim.keymap.set(
 	'n',
 	'<leader>r',
 	function()
-		---@diagnostic disable-next-line: undefined-field
 		if vim.g.loaded_dirvish == 1 then -- plugin ativo
 			vim.cmd.Dirvish(
 				vim.fn.fnamemodify(vim.env.MYVIMRC, ':h') .. '/lua/andrikin'
@@ -129,7 +119,7 @@ vim.keymap.set(
 	end
 )
 
--- --- Terminal ---
+--- TERMINAL ---
 local toggle_list = function()
 	local ttoggler = vim.g.ttoggler
     local tnumber = vim.api.nvim_tabpage_get_number(0)
@@ -137,15 +127,15 @@ local toggle_list = function()
         vim.print('toggle_terminal: erro encontrado')
         return
     end
-    if ttoggler[tnumber] then
-        local binfo = vim.fn.getbufinfo(ttoggler[tnumber])[1]
-		if binfo.hidden == 0 then
-			vim.api.nvim_buf_call(
-				ttoggler[tnumber],
-				vim.cmd.close
-			)
-		else
-			vim.cmd.split("+b" .. ttoggler[tnumber])
+    local binfo = vim.fn.getbufinfo(ttoggler[tnumber] or 0)[1]
+    if ttoggler[tnumber] and binfo then
+        if binfo.hidden == 0 then
+            vim.api.nvim_buf_call(
+                ttoggler[tnumber],
+                vim.cmd.close
+            )
+        else
+            vim.cmd.split("+b" .. ttoggler[tnumber])
         end
     else
 		vim.cmd.split('+terminal')
@@ -171,19 +161,11 @@ local toggle_list = function()
 end
 vim.keymap.set('n', '<leader>t', toggle_list)
 
--- Undotree plugin
-vim.keymap.set(
-	'n',
-	'<leader>u',
-	vim.cmd.Undotree
-)
+-- Nvim-Undotree plugin
+vim.keymap.set('n', '<leader>u', vim.cmd.Undotree)
 
 -- Fugitive maps
-vim.keymap.set(
-	'n',
-	'<leader>g',
-	vim.cmd.Git
-)
+vim.keymap.set('n', '<leader>g', vim.cmd.Git)
 
 -- mini.pick
 -- https://github.com/nvim-mini/mini.nvim/issues/2186
