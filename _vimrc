@@ -145,6 +145,8 @@ runtime ftplugin/man.vim
 silent! colorscheme monokain
 highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
+highlight clear QuickFixLine
+highlight QuickFixLine gui=bold,italic guibg=#293739
 
 function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     if getftype(a:cmdarg) == 'file'
