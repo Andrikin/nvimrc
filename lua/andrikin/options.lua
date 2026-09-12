@@ -187,3 +187,4 @@ for program, path in pairs({
 	end
 end
 
+vim.cmd.highlight({args = {'def', 'link', 'QuickFixLine', 'TabLineSel'}, bang = true})
