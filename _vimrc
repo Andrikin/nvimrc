@@ -283,7 +283,7 @@ let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
 " Using ripgrep ([cf]open; [cf]do {cmd} | update)
 if executable('rg')
-	let &g:grepprg='rg --vimgrep -uuu --smart-case '
+	let &g:grepprg='rg --vimgrep -uu --smart-case '
 else
 	let &g:grepprg='grep -rn '
 endif
