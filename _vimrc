@@ -285,7 +285,7 @@ let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 if executable('rg')
 	let &g:grepprg='rg --vimgrep -uuu --smart-case '
 else
-	let &g:grepprg='grep -R'
+	let &g:grepprg='grep -rn '
 endif
 
 " --- Mapleader ---
