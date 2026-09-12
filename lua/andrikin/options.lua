@@ -139,8 +139,10 @@ vim.o.fillchars = 'vert:|,fold:*,foldclose:+,diff:-'
 vim.g.python3_host_prog = vim.fn.systemlist('which python3')[1]
 
 -- Using ripgrep ([cf]open; [cf]do {cmd} | update)
-if not vim.fn.executable('rg') == 1 then
-	vim.g.grepprg = "grep -HIn $* /dev/null"
+if vim.fn.executable('rg') == 1 then
+    vim.g.grepprg = "rg --vimgrep -uu --smart-case "
+else
+	vim.g.grepprg = "grep -rHn "
 end
 
 -- --- Emmet ---
