@@ -1,4 +1,8 @@
 setlocal conceallevel=2
 setlocal concealcursor=nvc
-syn match qfFileNameConceal =[^|]\{-}/= contained nextgroup=qfFileNameConceal,qfFileName conceal
+if has('win32')
+    syn match qfFileNameConceal =[^|]\{-}\\= contained nextgroup=qfFileNameConceal,qfFileName conceal
+else
+    syn match qfFileNameConceal =[^|]\{-}/= contained nextgroup=qfFileNameConceal,qfFileName conceal
+end
 syn match qfFileName /^[^|]*/ contains=qfFileNameConceal nextgroup=qfSeparator1
