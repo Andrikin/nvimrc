@@ -91,7 +91,7 @@ endif
 call plug#begin(s:plugged)
 
 " colorscheme
-Plug 'https://github.com/flazz/vim-colorschemes'
+" Plug 'https://github.com/flazz/vim-colorschemes'
 " Tim Pope pieces of miracle
 Plug 'https://github.com/tpope/vim-fugitive.git'
 Plug 'https://github.com/tpope/vim-surround.git'
@@ -142,11 +142,11 @@ endif
 runtime ftplugin/man.vim
 
 " configurações próprias do tema, no caso 'molokai'
-silent! colorscheme monokain
+silent! colorscheme unokai
 highlight clear Visual
 highlight Visual guibg=#293739 gui=italic
 highlight clear QuickFixLine
-highlight QuickFixLine gui=bold,italic guibg=#293739
+highlight link QuickFixLine CursorLine
 
 function! s:finditmotherfucker(cmdarg, cmdcomplete) abort
     if getftype(a:cmdarg) == 'file'
