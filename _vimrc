@@ -215,10 +215,9 @@ set smartcase
 set hlsearch
 
 " Configurações gerais
+set diffopt+=algorithm:patience
 set shortmess=aoOt
 set noautochdir
-set scrolloff=999
-set lazyredraw
 set backspace=indent,eol,start
 set splitbelow
 set splitright
@@ -422,9 +421,13 @@ inoremap <up> <c-o>:<c-u>m.-2<cr>
 inoremap <down> <c-o>:<c-u>m.+1<cr>
 vnoremap <up> :<c-u>'<,'>m'<-2<cr>gv
 vnoremap <down> :<c-u>'<,'>m'>+2<cr>gv
-" CURSOR: move one word to left or right
+" CURSOR: Emacs like
+cnoremap <a-n> <left>
+cnoremap <a-p> <right>
 cnoremap <a-b> <s-left>
 cnoremap <a-f> <s-right>
+inoremap <a-n> <left>
+inoremap <a-p> <right>
 inoremap <a-b> <s-left>
 inoremap <a-f> <s-right>
 
