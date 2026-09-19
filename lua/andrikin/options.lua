@@ -10,8 +10,8 @@ vim.g.maplocalleader = vim.g.mapleader
 -- terminal toggler
 vim.g.ttoggler = {}
 
--- Search locally and recursively
-vim.go.path = '.,**'
+-- set path to find files recursivelly
+vim.opt.path:prepend('**')
 
 -- Indicadores - números nas linhas
 vim.o.rnu = true
@@ -194,4 +194,9 @@ for program, path in pairs({
 	end
 end
 
-vim.cmd.highlight({args = {'def', 'link', 'QuickFixLine', 'TabLineSel'}, bang = true})
+-- Add ~/.local/bin
+add_path('/home/andre/.local/bin')
+
+-- HIGHLIGHT configuration
+vim.cmd.highlight('clear QuickFixLine')
+vim.cmd.highlight('link QuickFixLine CursorLine')
