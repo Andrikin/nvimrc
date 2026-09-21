@@ -1,14 +1,5 @@
 -- MAPPINGS --
 
--- autocompletion LSP neovim 0.11
-vim.keymap.set('i', '<c-space>',
-	vim.lsp.completion.get
-)
-vim.keymap.set('i', '<c-j>',
-	'pumvisible() ? "<c-y>" : "<c-j>"',
-	{ expr = true, silent = true }
-)
-
 -- Remover <space> dos modos: NORMAL e VISUAL (em conjunto com mapleader)
 vim.keymap.set({ 'n', 'v' }, '<space>', '<Nop>', { silent = true })
 
