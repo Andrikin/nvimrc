@@ -101,3 +101,15 @@ autocmd('UIEnter',{
 	end
 })
 
+-- LOCAL/QUICKFIX 
+autocmd('QuickFixCmdPost', {
+    group = Andrikin,
+    pattern = '[^l]*',
+    callback = function() vim.cmd.cwindow() end
+})
+autocmd('QuickFixCmdPost', {
+    group = Andrikin,
+    pattern = 'l*',
+    callback = function() vim.cmd.lwindow() end
+})
+
