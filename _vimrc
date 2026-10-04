@@ -659,6 +659,10 @@ if has('win32')
     endif
 endif
 
+" quickfix
+autocmd QuickFixCmdPost [^l]* cwindow
+autocmd QuickFixCmdPost l* lwindow
+
 " When enter/exit Insert Mode, change line background color
 autocmd goosebumps InsertEnter * setlocal cursorline
 autocmd goosebumps InsertLeave * setlocal nocursorline
