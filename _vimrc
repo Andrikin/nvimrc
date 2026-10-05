@@ -275,9 +275,9 @@ set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 " d -> dark mode (Windows version)
 set guioptions=!d
 if has('win32')
-    let &g:guifont='SauceCodePro NFM:h12'
+    let &g:guifont='AtkynsonMono NFM:h12'
 else
-    let &g:guifont='SauceCodePro Nerd Font Mono 11'
+    let &g:guifont='AtkynsonMono Nerd Font Mono 11'
 endif
 let &g:fillchars='vert:|,fold:*,foldclose:+,diff:-'
 
