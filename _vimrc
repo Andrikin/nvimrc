@@ -662,7 +662,7 @@ if has('win32')
     endif
 endif
 
-" quickfix
+" open quickfix automatically
 autocmd QuickFixCmdPost [^l]* cwindow
 autocmd QuickFixCmdPost l* lwindow
 
