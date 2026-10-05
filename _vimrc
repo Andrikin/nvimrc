@@ -593,6 +593,9 @@ function! s:sortingdirvish() abort
 		call add(dlist, path.path)
 	endfor
 	call setline(1, dlist)
+    if has('win32') " modify file path char
+        sil %s:\\:\/:g
+    endif
 endfunction
 
 " Open files
