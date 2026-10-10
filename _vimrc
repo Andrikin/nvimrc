@@ -477,6 +477,10 @@ endif
 nnoremap <silent> [<space> <cmd>normal O<cr><down>
 nnoremap <silent> ]<space> <cmd>normal o<cr><up>
 
+" local/quickfix open
+nnoremap gl <cmd>copen<cr>
+nnoremap gL <cmd>lopen<cr>
+
 " Terminal
 nnoremap <silent> <leader>t <cmd>call <SID>toggle_terminal()<cr>
 
