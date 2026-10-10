@@ -219,12 +219,14 @@ vim.diagnostic.config({ underline = true })
 vim.lsp.config('lua_ls', vim.lsp.config['lua_ls'])
 vim.lsp.config('texlab', vim.lsp.config['texlab'])
 vim.lsp.config('rust_analyzer', vim.lsp.config['rust_analyzer'])
+vim.lsp.config("tinymist", vim.lsp.config['tinymist'])
 
 -- Ativar LSP nos buffers, automaticamente -- Neovim 0.11
 vim.lsp.enable({
     'lua_ls',
     'texlab',
     'rust_analyzer',
+    'tinymist',
     -- 'emmetls',
     -- 'pyright',
     -- 'basedpyright',
