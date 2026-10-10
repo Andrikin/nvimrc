@@ -133,7 +133,7 @@ vim.o.showmode = false
 
 -- NeoVim configurations
 vim.o.guicursor = 'i-n-v-c:block'
-vim.o.guifont = 'SauceCodePro NFM:h11'
+vim.o.guifont = 'AtkynsonMono NFM:h11'
 vim.o.inccommand = 'split'
 vim.o.winborder = 'single'
 vim.o.fillchars = 'vert:|,fold:*,foldclose:+,diff:-'
@@ -180,6 +180,7 @@ vim.g['surround_' .. vim.fn.char2nr('l')] = ''
 vim.g['surround_' .. vim.fn.char2nr('t')] = ''
 
 -- initialize PATH variables
+-- WARNING: adicionar mais caso necessário
 local serversdir = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'servers')
 local optsdir = vim.fs.joinpath(vim.env.HOME, '.config', 'nvim', 'opts')
 for program, path in pairs({
@@ -187,15 +188,14 @@ for program, path in pairs({
 	['luals'] = vim.fs.joinpath(serversdir, 'luals', 'bin'),
 	['texlab'] = vim.fs.joinpath(serversdir, 'texlab'),
 	['tectonic'] = vim.fs.joinpath(optsdir, 'tectonic'),
-	['zig'] = vim.fs.joinpath(vim.env.HOME, '.local', 'zig')
+	['tinymist'] = vim.fs.joinpath(optsdir, 'tinymist'),
+	['zig'] = vim.fs.joinpath(vim.env.HOME, '.local', 'zig'),
+	['bin'] = vim.fs.joinpath(vim.env.HOME, '.local', 'bin'),
 }) do
 	if not vim.env.PATH:match(program) then
 		add_path(path)
 	end
 end
-
--- Add ~/.local/bin
-add_path('/home/andre/.local/bin')
 
 -- HIGHLIGHT configuration
 vim.cmd.highlight('clear QuickFixLine')
