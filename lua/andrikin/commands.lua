@@ -6,20 +6,6 @@ command(
     '%!xxd', {}
 )
 
--- command(
--- 	'Dicas',
--- 	function()
--- 		vim.cmd.edit('documentos/misc/dicas/tips-gerais')
--- 	end, {}
--- )
-
--- command(
--- 	'ListaMusicas',
--- 	function()
--- 		vim.cmd.edit('~/.config/dmenu_player/lista_de_musicas_completa.dmenu')
--- 	end, {}
--- )
-
 command(
 	'Desktop',
 	function()
@@ -99,4 +85,18 @@ command('SortingDirvish',
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, dlist)
     end,
 {})
+
+-- command(
+-- 	'Dicas',
+-- 	function()
+-- 		vim.cmd.edit('documentos/misc/dicas/tips-gerais')
+-- 	end, {}
+-- )
+  
+-- command(
+-- 	'ListaMusicas',
+-- 	function()
+-- 		vim.cmd.edit('~/.config/dmenu_player/lista_de_musicas_completa.dmenu')
+-- 	end, {}
+-- )
 
