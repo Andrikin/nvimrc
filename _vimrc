@@ -415,12 +415,12 @@ nnoremap <expr> <silent> k <SID>vanhalen('k')
 nnoremap <expr> <silent> j <SID>vanhalen('j')
 
 " Moving lines up and down
-nnoremap <up> :<c-u>m.-2<cr>
-nnoremap <down> :<c-u>m.+1<cr>
-inoremap <up> <c-o>:<c-u>m.-2<cr>
-inoremap <down> <c-o>:<c-u>m.+1<cr>
-vnoremap <up> :<c-u>'<,'>m'<-2<cr>gv
-vnoremap <down> :<c-u>'<,'>m'>+2<cr>gv
+nnoremap <a-k> :<c-u>m.-2<cr>
+nnoremap <a-j> :<c-u>m.+1<cr>
+inoremap <a-k> <c-o>:<c-u>m.-2<cr>
+inoremap <a-j> <c-o>:<c-u>m.+1<cr>
+vnoremap <a-k> :<c-u>'<,'>m'<-2<cr>gv
+vnoremap <a-j> :<c-u>'<,'>m'>+2<cr>gv
 " CURSOR: Emacs like
 cnoremap <a-n> <left>
 cnoremap <a-p> <right>
