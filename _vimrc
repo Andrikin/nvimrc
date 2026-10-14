@@ -598,7 +598,7 @@ function! s:sortingdirvish() abort
 	endfor
 	call setline(1, dlist)
     if has('win32') " modify file path char
-        sil %s:\\:\/:g
+        sil %s:\\:\/:ge
     endif
 endfunction
 
