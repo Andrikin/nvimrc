@@ -275,7 +275,7 @@ set guicursor=i-n-v-c:block,n-v-c:blinkwait700-blinkoff400-blinkon250
 " d -> dark mode (Windows version)
 set guioptions=!d
 if has('win32')
-    let &g:guifont='AtkynsonMono NFM:h12'
+    let &g:guifont='AtkynsonMono NFM:h11'
 else
     let &g:guifont='AtkynsonMono Nerd Font Mono 11'
 endif
@@ -498,7 +498,7 @@ if has('win32')
 	command! Downloads execute 'Dirvish ' .. s:THISPC .. '/Downloads'
 	command! Documents execute 'Dirvish ' .. s:THISPC .. '/Documents'
 	command! Desktop execute 'Dirvish ' .. s:THISPC .. '/Desktop'
-	command! RedeLocal execute 'Dirvish T:/16-Diretoria de Ouvidoria/Andre Aguiar/' 
+	command! RedeLocal execute 'Dirvish T:/12-Diretoria de Auditoria/Servidor - André Aguiar'
 	command! ComunicacaoInterna execute 'Dirvish T:/1-Comunicação Interna - C.I/' .. strftime('%Y')
 else
     " Dirvish XDGlikesh
