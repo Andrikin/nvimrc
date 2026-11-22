@@ -459,10 +459,10 @@ nnoremap <silent> [a <cmd>call <SID>arglistthings('previous')<cr>
 nnoremap <silent> <leader>r <cmd>execute 'Dirvish ' .. fnamemodify($MYVIMRC, ':h')<cr>
 
 " Copy and paste from clipboard (* -> selection register/+ -> primary register)
-nnoremap gP "+P
-nnoremap gp "+p
-vnoremap gy "+y
-nnoremap gY "+Y
+nnoremap zP "+P
+nnoremap zp "+p
+vnoremap zy "+y
+nnoremap zY "+Y
 
 " Fix ^\
 if has('win32')
