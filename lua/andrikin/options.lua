@@ -162,6 +162,9 @@ vim.o.spelllang = 'pt_br'
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- builtin dir plugin disable
+vim.g.loaded_nvim_dir_plugin = 1
+
 -- Dirvish
 vim.g.dirvish_mode = ':SortingDirvish'
 
@@ -196,6 +199,7 @@ for program, path in pairs({
 		add_path(path)
 	end
 end
+add_path('/opt/typst')
 
 -- HIGHLIGHT configuration
 vim.cmd.highlight('clear QuickFixLine')

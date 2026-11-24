@@ -5,7 +5,7 @@ vim.pack.add({
     -- colorscheme
 	-- 'https://github.com/biisal/blackhole',
 	-- 'https://github.com/polirritmico/monokai-nightasty.nvim',
-	'https://github.com/ellisonleao/gruvbox.nvim',
+	-- 'https://github.com/ellisonleao/gruvbox.nvim',
     -- my plugins and forks
     'https://github.com/Andrikin/awesome-pairing',
     'https://github.com/Andrikin/awesome-substitute',
@@ -105,8 +105,7 @@ end
 
 -- Colorscheme
 vim.o.termguicolors = true
-require('gruvbox').setup()
-vim.cmd.colorscheme('gruvbox')
+vim.cmd.colorscheme('unokai')
 
 vim.cmd.packadd('nvim.difftool')
 vim.cmd.packadd('nvim.undotree')
