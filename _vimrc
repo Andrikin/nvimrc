@@ -576,9 +576,9 @@ function! s:sortingdirvish() abort
 		let plist = []
 	endif
     if has('win32')
-        silent! global /[^\\]$/d
+        silent! global /[^\\]$/d _
     else
-        silent! global /[^/]$/d
+        silent! global /[^/]$/d _
     endif
 	let dlist = getline(1, line('$'))
 	if len(dlist) == 1 && dlist[0] == ''
