@@ -655,17 +655,6 @@ else
 endif
 set winaltkeys=no
 
-" set environment variables for 'uv'
-if has('win32')
-    if has('python') && has('uv')
-        let UVDIR = fnamemodify(exepath('uv'), ':h')
-        $UV_PYTHON_INSTALL_DIR = UVDIR
-        $UV_TOOL_BIN_DIR = UVDIR
-        $UV_TOOL_DIR = UVDIR
-        $UV_CACHE_DIR = UVDIR .. '\cache'
-    endif
-endif
-
 " open quickfix automatically
 autocmd QuickFixCmdPost [^l]* cwindow
 autocmd QuickFixCmdPost l* lwindow
@@ -679,6 +668,17 @@ autocmd goosebumps BufRead CopyQ.*.txt setlocal textwidth=78 spell noeol nofixeo
 
 " autoresize
 autocmd goosebumps VimResized * wincmd =
+
+" set environment variables for 'uv'
+if has('win32')
+    if has('python') && has('uv')
+        let UVDIR = fnamemodify(exepath('uv'), ':h')
+        $UV_PYTHON_INSTALL_DIR = UVDIR
+        $UV_TOOL_BIN_DIR = UVDIR
+        $UV_TOOL_DIR = UVDIR
+        $UV_CACHE_DIR = UVDIR .. '\cache'
+    endif
+endif
 
 if has('win32')
     let $HOME = $VIM
